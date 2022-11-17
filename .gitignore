@@ -1,0 +1,8 @@
+_output/
+downloads/
+*.idea
+*.DS_Store
+*.bak
+**/*.tar.gz
+.vscode/
+**/node_modules

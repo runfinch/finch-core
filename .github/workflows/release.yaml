@@ -1,0 +1,131 @@
+name: Build
+
+on:
+  workflow_dispatch:
+env:
+  GO111MODULE: on
+
+permissions:
+  # This is required for configure-aws-credentials to request an OIDC JWT ID token to access AWS resources later on.
+  # More info: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings
+  id-token: write
+  contents: read    # This is required for actions/checkout
+
+jobs:
+  macos-arm64-build:
+    runs-on: ['self-hosted', 'macos', 'arm64', '11.7']
+    timeout-minutes: 60
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.19.x
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Install dependencies
+        # QEMU:      required by Lima itself
+        # bash:      required by test-example.sh (OS version of bash is too old)
+        # coreutils: required by test-example.sh for the "timeout" command
+        # autoconf:  required for building vde
+        # automake:  required for building vde
+        # FileMonitor: required to capture opened files by limactl and qemu-
+
+        run: |
+          brew update
+          brew install qemu bash coreutils
+          brew install autoconf automake
+          brew install cpanm
+          brew upgrade
+          sudo cpanm install JSON
+          curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
+          rm -rf /Applications/FileMonitor.app
+          unzip FileMonitor_1.3.0.zip -d /Applications
+
+      - name: Make and release deps
+        run: make install-deps
+      - name: Upload MacOS build
+        uses: actions/upload-artifact@v2
+        with:
+          name: lima-and-qemu.macos-arm64
+          path: ./src/lima/lima-and-qemu.macos*
+          if-no-files-found: error
+
+  macos-x86-build:
+    runs-on: ['self-hosted', 'macos', 'amd64', '11.7']
+    timeout-minutes: 60
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.19.x
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Install dependencies
+        # QEMU:      required by Lima itself
+        # bash:      required by test-example.sh (OS version of bash is too old)
+        # coreutils: required by test-example.sh for the "timeout" command
+        # autoconf:  required for building vde
+        # automake:  required for building vde
+        # FileMonitor: required to capture opened files by limactl and qemu-
+
+        run: |
+          brew update
+          brew install qemu bash coreutils
+          brew install autoconf automake
+          brew install cpanm
+          brew upgrade
+          sudo cpanm install JSON
+          curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
+          rm -rf /Applications/FileMonitor.app
+          unzip FileMonitor_1.3.0.zip -d /Applications
+
+      - name: Make and release deps
+        run: make install-deps
+      - name: Upload MacOS build
+        uses: actions/upload-artifact@v2
+        with:
+          name: lima-and-qemu.macos-x86
+          path: ./src/lima/lima-and-qemu.macos*
+          if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - macos-x86-build
+      - macos-arm64-build
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.ROLE }}
+          role-session-name: dependency-upload-session
+          aws-region: ${{ secrets.REGION }}
+
+      - name: Download MacOS ARM64 build
+        uses: actions/download-artifact@v2
+        with:
+          name: lima-and-qemu.macos-arm64
+          path: build
+      - name: Download MacOS x86_64 build
+        uses: actions/download-artifact@v2
+        with:
+          name: lima-and-qemu.macos-x86
+          path: build
+      - name: "Upload to S3"
+        run: |
+          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64*"
+          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64*"
+    
+
