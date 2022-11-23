@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: 1.19.x
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: recursive
@@ -60,7 +60,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: 1.19.x
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: recursive
@@ -101,7 +101,7 @@ jobs:
       - macos-x86-build
       - macos-arm64-build
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           persist-credentials: false
