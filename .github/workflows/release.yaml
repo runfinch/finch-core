@@ -47,7 +47,7 @@ jobs:
       - name: Make and release deps
         run: make install-deps
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lima-and-qemu.macos-arm64
           path: ./src/lima/lima-and-qemu.macos*
@@ -88,7 +88,7 @@ jobs:
       - name: Make and release deps
         run: make install-deps
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lima-and-qemu.macos-x86
           path: ./src/lima/lima-and-qemu.macos*
