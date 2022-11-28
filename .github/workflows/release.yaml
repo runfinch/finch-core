@@ -16,10 +16,10 @@ jobs:
     runs-on: ['self-hosted', 'macos', 'arm64', '11.7']
     timeout-minutes: 60
     steps:
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: 1.19.x
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: recursive
@@ -47,7 +47,7 @@ jobs:
       - name: Make and release deps
         run: make install-deps
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lima-and-qemu.macos-arm64
           path: ./src/lima/lima-and-qemu.macos*
@@ -57,10 +57,10 @@ jobs:
     runs-on: ['self-hosted', 'macos', 'amd64', '11.7']
     timeout-minutes: 60
     steps:
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: 1.19.x
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: recursive
@@ -88,7 +88,7 @@ jobs:
       - name: Make and release deps
         run: make install-deps
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lima-and-qemu.macos-x86
           path: ./src/lima/lima-and-qemu.macos*
@@ -101,7 +101,7 @@ jobs:
       - macos-x86-build
       - macos-arm64-build
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           persist-credentials: false
@@ -114,12 +114,12 @@ jobs:
           aws-region: ${{ secrets.REGION }}
 
       - name: Download MacOS ARM64 build
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: lima-and-qemu.macos-arm64
           path: build
       - name: Download MacOS x86_64 build
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: lima-and-qemu.macos-x86
           path: build
