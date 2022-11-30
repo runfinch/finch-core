@@ -18,4 +18,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: bump submodules
-          title: '[Automated] Bump submodules'
+          signoff: true
+          title: 'build(deps): Bump submodules'
