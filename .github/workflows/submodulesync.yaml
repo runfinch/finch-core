@@ -16,10 +16,10 @@ jobs:
       - name: Update sub modules
         run: |
           git submodule update --remote
-          cd src/lima && git fetch --tags
+          (cd src/lima && git fetch --tags)
           TAG=`cd src/lima && git describe --tags $(git rev-list --tags --max-count=1)`
           echo "Pulling changes from release: $TAG"
-          cd src/lima && git checkout $TAG
+          (cd src/lima && git checkout $TAG)
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v4
