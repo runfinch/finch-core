@@ -1,0 +1,37 @@
+# Trigger the workflow on creating a new release/tag
+
+name: Publish release to s3
+
+# Controls when the workflow will run
+on:
+  create:
+    tags:
+      - '*'
+permissions:
+  # This is required for configure-aws-credentials to request an OIDC JWT ID token to access AWS resources later on.
+  # More info: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings
+  id-token: write
+  contents: read    # This is required for actions/checkout
+
+jobs:
+  upload-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download last release
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: "runfinch/finch-core"
+          latest: true
+          tarBall: true
+          zipBall: true
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.ROLE }}
+          role-session-name: upload release
+          aws-region: ${{ secrets.REGION }}
+
+      - name: Upload release artifacts to s3
+        run: |
+          aws s3 cp . s3://${{ secrets.ARTIFACT_BUCKET_NAME }} --recursive --exclude "*" --include "finch-core*"
