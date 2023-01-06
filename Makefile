@@ -93,7 +93,7 @@ install-deps: lima
 	sha512sum src/lima/lima-and-qemu.macos-${LIMA_ARCH}.${BUILD_TS}.tar.gz | cut -d " " -f 1  > src/lima/lima-and-qemu.macos-${LIMA_ARCH}.${BUILD_TS}.tar.gz.sha512sum
 
 .PHONY: download-sources
-download-sources: install-deps
+download-sources:
 	./bin/download-sources.pl
 	mv ./downloads/dependency-sources.tar.gz ./downloads/dependency-sources-${LIMA_ARCH}.${BUILD_TS}.tar.gz
 
