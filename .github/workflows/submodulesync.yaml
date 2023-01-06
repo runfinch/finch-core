@@ -1,7 +1,9 @@
 name: Sync Submodules
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * 1'
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -12,10 +14,17 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Update sub modules
-        run: git submodule update --remote
+        run: |
+          git submodule update --remote
+          (cd src/lima && git fetch --tags)
+          TAG=`cd src/lima && git describe --tags $(git rev-list --tags --max-count=1)`
+          echo "Pulling changes from release: $TAG"
+          (cd src/lima && git checkout $TAG)
+
       - name: Create PR
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: bump submodules
-          title: '[Automated] Bump submodules'
+          signoff: true
+          title: 'build(deps): Bump submodules'
