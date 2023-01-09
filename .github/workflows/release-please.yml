@@ -10,7 +10,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         with:
           release-type: go
-          token: ${{ FINCH_BOT_TOKEN }}
+          token: ${{ secrets.FINCH_BOT_TOKEN }}
           package-name: finch
           # Before we are at v1.0.0
           bump-minor-pre-major: true
