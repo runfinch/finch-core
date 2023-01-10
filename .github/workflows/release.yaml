@@ -58,8 +58,8 @@ jobs:
       - name: Upload MacOS build
         uses: actions/upload-artifact@v3
         with:
-          name: DependenciesSourceCode.zip
-          path: ./downloads/dependency-sources*
+          name: DependenciesSourceCode.tar.gz
+          path: ./downloads/dependency-sources.tar.gz
           if-no-files-found: error
 
   macos-x86-build:
