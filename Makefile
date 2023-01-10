@@ -64,9 +64,7 @@ download: download.os download.socket_vmnet
 
 .PHONY: lima
 lima:
-	cd src/lima
-	git clean -f -d
-	cd ../..
+	(cd src/lima && git clean -f -d)
 	make -C src/lima PREFIX=$(HOMEBREW_PREFIX) all install
 
 .PHONY: lima-template
@@ -95,7 +93,6 @@ install-deps: lima
 .PHONY: download-sources
 download-sources:
 	./bin/download-sources.pl
-	mv ./downloads/dependency-sources.tar.gz ./downloads/dependency-sources-${LIMA_ARCH}.${BUILD_TS}.tar.gz
 
 .PHONY: os
 os: download
