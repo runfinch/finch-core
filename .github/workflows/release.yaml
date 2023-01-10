@@ -58,7 +58,7 @@ jobs:
       - name: Upload MacOS build
         uses: actions/upload-artifact@v3
         with:
-          name: dependencies.sources-arm64
+          name: DependenciesSourceCode.zip
           path: ./downloads/dependency-sources*
           if-no-files-found: error
 
@@ -103,14 +103,6 @@ jobs:
           path: ./src/lima/lima-and-qemu.macos*
           if-no-files-found: error
 
-      - name: Make and release source code of dependencies
-        run: make download-sources
-      - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
-        with:
-          name: dependencies.sources-x86
-          path: ./downloads/dependency-sources*
-          if-no-files-found: error
 
   release:
     runs-on: ubuntu-latest
@@ -142,19 +134,14 @@ jobs:
           name: lima-and-qemu.macos-x86
           path: build
 
-      - name: Download MacOS ARM64 dependencies' sources
+      - name: Download MacOS dependencies' sources
         uses: actions/download-artifact@v3
         with:
-          name: dependencies.sources-arm64
-          path: build
-
-      - name: Download MacOS x86_64 dependencies' sources
-        uses: actions/download-artifact@v3
-        with:
-          name: dependencies.sources-x86
+          name: DependenciesSourceCode.zip
           path: build
 
       - name: "Upload to S3"
         run: |
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64*" --include "dependencies-sources-aarch64*"
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64*" --include "dependencies-sources-x86_64*"
+          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64*"
+          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64*" 
+          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} --recursive --exclude "*"  --include "dependency-sources.tar.gz"
