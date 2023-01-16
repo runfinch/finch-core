@@ -4,9 +4,8 @@ name: Publish release to s3
 
 # Controls when the workflow will run
 on:
-  create:
-    tags:
-      - '*'
+  workflow_dispatch:
+
 permissions:
   # This is required for configure-aws-credentials to request an OIDC JWT ID token to access AWS resources later on.
   # More info: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings
