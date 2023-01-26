@@ -18,7 +18,6 @@ FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:9490055bc67d883711352
 # From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/aarch64/images/
 FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-37-1.7.aarch64-20230124190350.qcow2)
 FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:091a3f2b963f7ce1ec961630e52f59d6cd167b614851bf9abea79566e0f41379")
-SOCKET_VMNET_URL := $(or $(SOCKET_VMNET_URL),https://deps.runfinch.com/socket_vmnet-1.0.0-alpha.tar.gz)
 
 .DEFAULT_GOAL := all
 
@@ -39,9 +38,6 @@ endif
 FINCH_OS_IMAGE_LOCATION ?= $(OUTDIR)/os/$(FINCH_OS_BASENAME)
 FINCH_OS_IMAGE_INSTALLATION_LOCATION ?= $(DEST)/os/$(FINCH_OS_BASENAME)
 
-SOCKET_VMNET_BASENAME := $(notdir $(SOCKET_VMNET_URL))
-SOCKET_VMNET_DEPDIR := $(DOWNLOAD_DIR)/$(basename $(SOCKET_VMNET_BASENAME))
-
 .PHONY: all
 all: binaries
 
@@ -54,13 +50,8 @@ download.os:
 	curl -L --fail $(FINCH_OS_IMAGE_URL) > "$(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)"
 	cd $(OS_DOWNLOAD_DIR) && shasum -a 512 --check $(HASH_DIR)/$(FINCH_OS_BASENAME).sha512 || exit 1
 
-.PHONY: download.socket_vmnet
-download.socket_vmnet:
-	curl -L --fail $(SOCKET_VMNET_URL) > "$(DOWNLOAD_DIR)/$(SOCKET_VMNET_BASENAME)"
-	cd $(DOWNLOAD_DIR) && shasum -a 512 --check $(HASH_DIR)/"$(SOCKET_VMNET_BASENAME).sha512" || exit 1
-
 .PHONY: download
-download: download.os download.socket_vmnet
+download: download.os
 
 .PHONY: lima
 lima:
@@ -79,10 +70,10 @@ lima-template: download
 	rm $(OUTDIR)/lima-template/*.yaml.bak
 
 .PHONY: lima-socket-vmnet
-lima-socket-vmnet: download.socket_vmnet
-	mkdir -p $(SOCKET_VMNET_DEPDIR)
-	tar -zvxf "$(DOWNLOAD_DIR)/$(SOCKET_VMNET_BASENAME)" -C $(SOCKET_VMNET_DEPDIR) --strip-component=1
-	cd $(SOCKET_VMNET_DEPDIR) && $(MAKE) PREFIX=$(SOCKET_VMNET_TEMP_PREFIX) install.bin
+lima-socket-vmnet:
+	git submodule update --init --recursive src/socket_vmnet
+	cd src/socket_vmnet && git clean -f -d
+	cd src/socket_vmnet && PREFIX=$(SOCKET_VMNET_TEMP_PREFIX) $(MAKE) install.bin
 
 .PHONY: install-deps
 install-deps: lima
