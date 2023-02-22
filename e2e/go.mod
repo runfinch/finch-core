@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/onsi/ginkgo/v2 v2.8.1
 	github.com/onsi/gomega v1.27.1
-	github.com/runfinch/common-tests v0.5.0
+	github.com/runfinch/common-tests v0.6.0
 )
 
 require (
