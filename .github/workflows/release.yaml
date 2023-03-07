@@ -141,7 +141,7 @@ jobs:
       - name: Download MacOS dependencies' sources
         uses: actions/download-artifact@v3
         with:
-          name: DependenciesSourceCode.zip
+          name: DependenciesSourceCode.tar.gz
           path: build
 
       - name: "Upload to S3"
