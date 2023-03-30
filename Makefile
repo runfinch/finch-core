@@ -16,8 +16,8 @@ BUILD_TS := $(shell date +%s)
 FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-37-1.7.x86_64-20230329185717.qcow2)
 FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:df67925e051ace602f58b1e01ed65156c975b985be1c0b24dd62f63d28d076d4")
 # From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/aarch64/images/
-FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-37-1.7.aarch64-20230328221909.qcow2)
-FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:921a8901fd1913f508c9eeae79752f5274aab689dc6618a7141d151f9fddb11f")
+FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-37-1.7.aarch64-20230330181518.qcow2)
+FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:0951ee1a69817e2ef472163af752bf4efb25486659308d22d9e72ca9b45a097f")
 
 .DEFAULT_GOAL := all
 
