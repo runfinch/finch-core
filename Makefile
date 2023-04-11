@@ -44,11 +44,13 @@ all: binaries
 .PHONY: binaries
 binaries: os lima-socket-vmnet lima-template
 
-.PHONY: download.os
-download.os:
+$(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME):
 	mkdir -p $(OS_DOWNLOAD_DIR)
 	curl -L --fail $(FINCH_OS_IMAGE_URL) > "$(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)"
 	cd $(OS_DOWNLOAD_DIR) && shasum -a 512 --check $(HASH_DIR)/$(FINCH_OS_BASENAME).sha512 || exit 1
+
+.PHONY: download.os
+download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
 
 .PHONY: download
 download: download.os
