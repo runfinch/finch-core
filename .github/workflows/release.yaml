@@ -230,10 +230,14 @@ jobs:
           name: limactl.ventura.x86_64
           path: build
 
+      - name: Generate Timestamp
+        id: timestamp
+        run: echo "::set-output name=value::$(date +%s)"
+
       - name: Add Ventura builds to tarballs
         run: |
-          timestamp=$(date +%s)
-
+          timestamp=${{ steps.timestamp.outputs.value }}
+          
           mkdir -p build/lima-and-qemu.macos-aarch64/bin
           tar -xzf build/lima-and-qemu.macos-aarch64.tar.gz -C build/lima-and-qemu.macos-aarch64
           tar -xzf build/limactl.ventura.arm64.tar.gz -C build/lima-and-qemu.macos-aarch64/bin
@@ -254,6 +258,8 @@ jobs:
 
       - name: "Upload to S3"
         run: |
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64*"
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64*" 
+          timestamp=${{ steps.timestamp.outputs.value }}
+
+          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64.${timestamp}.tar.gz*"
+          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64.${timestamp}.tar.gz*" 
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} --recursive --exclude "*"  --include "dependency-sources.tar.gz"
