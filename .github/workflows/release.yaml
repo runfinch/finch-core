@@ -3,9 +3,8 @@ name: Build
 # Runs every Tuesday at 9 am UTC
 on:
 
-# TODO: Enable auto build when we have a solution in place for managing limactl ventura dependency.
-#  schedule:
-#    - cron: '0 9 * * 2'
+  schedule:
+    - cron: '0 9 * * 2'
   workflow_dispatch:
 
 env:
@@ -51,7 +50,12 @@ jobs:
           unzip FileMonitor_1.3.0.zip -d /Applications
 
       - name: Make and release deps
-        run: make install-deps
+        run: |
+          (cd src/lima && git clean -f -d)
+          make -C src/lima PREFIX=/opt/homebrew all install
+          ./bin/lima-and-qemu.pl
+          mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
+
       - name: Upload MacOS build
         uses: actions/upload-artifact@v3
         with:
@@ -101,7 +105,12 @@ jobs:
           unzip FileMonitor_1.3.0.zip -d /Applications
 
       - name: Make and release deps
-        run: make install-deps
+        run: |
+          (cd src/lima && git clean -f -d)
+          make -C src/lima PREFIX=/usr/local all install
+          ./bin/lima-and-qemu.pl
+          mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-x86_64.tar.gz
+
       - name: Upload MacOS build
         uses: actions/upload-artifact@v3
         with:
@@ -109,13 +118,81 @@ jobs:
           path: ./src/lima/lima-and-qemu.macos*
           if-no-files-found: error
 
+  macos-arm64-ventura-build:
+    runs-on:  ['self-hosted', 'macos', 'arm64', '12.6']
+    timeout-minutes: 60
+    steps:
+        - uses: actions/setup-go@v4
+          with:
+            go-version: 1.19.x
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 1
+            submodules: recursive
+            persist-credentials: false
+
+        - name: "Switch Xcode version to enable macOS 13 SDK"
+          # Xcode 14.1 added support for macOS 13 SDK.
+          # Xcode is installed in build runners using xcodes: https://github.com/RobotsAndPencils/xcodes
+          run: |
+            sudo xcode-select --switch /Applications/Xcode-14.2.0.app/
+            xcrun --show-sdk-version
+
+        - name: Create Ventura limactl tarball
+          working-directory: src/lima
+          run: |
+            make clean && make exe codesign
+            tar cfz limactl.ventura.arm64.tar.gz -C _output/bin limactl
+
+        - name: Upload Ventura build
+          uses: actions/upload-artifact@v3
+          with:
+            name: limactl.ventura.arm64
+            path: src/lima/limactl.ventura.arm64.tar.gz
+            if-no-files-found: error
+
+  macos-x86_64-ventura-build:
+    runs-on:  ['self-hosted', 'macos', 'amd64', '12.6']
+    timeout-minutes: 60
+    steps:
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.19.x
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: recursive
+          persist-credentials: false
+
+      - name: "Switch Xcode version to enable macOS 13 SDK"
+        # Xcode 14.1 added support for macOS 13 SDK.
+        # Xcode is installed in build runners using xcodes: https://github.com/RobotsAndPencils/xcodes
+        run: |
+          sudo xcode-select --switch /Applications/Xcode-14.2.0.app/
+          xcrun --show-sdk-version
+
+      - name: Create Ventura limactl tarball
+        working-directory: src/lima
+        run: |
+          make clean && make exe codesign
+          tar cfz limactl.ventura.x86_64.tar.gz -C _output/bin limactl
+
+      - name: Upload Ventura build
+        uses: actions/upload-artifact@v3
+        with:
+          name: limactl.ventura.x86_64
+          path: src/lima/limactl.ventura.x86_64.tar.gz
+          if-no-files-found: error
 
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     needs:
       - macos-x86-build
       - macos-arm64-build
+      - macos-x86_64-ventura-build
+      - macos-arm64-ventura-build
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -134,11 +211,40 @@ jobs:
         with:
           name: lima-and-qemu.macos-arm64
           path: build
+
       - name: Download MacOS x86_64 build
         uses: actions/download-artifact@v3
         with:
           name: lima-and-qemu.macos-x86
           path: build
+
+      - name: Download MacOS ARM64 Ventura build
+        uses: actions/download-artifact@v3
+        with:
+          name: limactl.ventura.arm64
+          path: build
+
+      - name: Download MacOS x86_64 Ventura build
+        uses: actions/download-artifact@v3
+        with:
+          name: limactl.ventura.x86_64
+          path: build
+
+      - name: Add Ventura builds to tarballs
+        run: |
+          timestamp=$(date +%s)
+
+          mkdir -p build/lima-and-qemu.macos-aarch64/bin
+          tar -xzf build/lima-and-qemu.macos-aarch64.tar.gz -C build/lima-and-qemu.macos-aarch64
+          tar -xzf build/limactl.ventura.arm64.tar.gz -C build/lima-and-qemu.macos-aarch64/bin
+          tar -czf build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-aarch64 .
+          sha512sum build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz.sha512sum
+
+          mkdir -p build/lima-and-qemu.macos-x86_64/bin
+          tar -xzf build/lima-and-qemu.macos-x86_64.tar.gz -C build/lima-and-qemu.macos-x86_64
+          tar -xzf build/limactl.ventura.x86_64.tar.gz -C build/lima-and-qemu.macos-x86_64/bin
+          tar -czf build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-x86_64 .
+          sha512sum build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz.sha512sum
 
       - name: Download MacOS dependencies' sources
         uses: actions/download-artifact@v3
