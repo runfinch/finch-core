@@ -1,11 +1,12 @@
 #!/bin/sh
-set -euxo pipefail
 
 DEPENDENCY_CLOUDFRONT_URL="https://deps.runfinch.com/"
 AARCH64_FILENAME_PATTERN="aarch64/lima-and-qemu.macos-aarch64.[0-9].*\.gz$"
 AMD64_FILENAME_PATTERN="x86-64/lima-and-qemu.macos-x86_64.[0-9].*\.gz$"
 AARCH64="aarch64"
 X86_64="x86-64"
+
+set -x
 
 while getopts d: flag
 do
