@@ -55,11 +55,6 @@ download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
 .PHONY: download
 download: download.os
 
-.PHONY: lima
-lima:
-	(cd src/lima && git clean -f -d)
-	make -C src/lima PREFIX=$(HOMEBREW_PREFIX) all install
-
 .PHONY: lima-template
 lima-template: download
 	mkdir -p $(OUTDIR)/lima-template
@@ -76,12 +71,6 @@ lima-socket-vmnet:
 	git submodule update --init --recursive src/socket_vmnet
 	cd src/socket_vmnet && git clean -f -d
 	cd src/socket_vmnet && PREFIX=$(SOCKET_VMNET_TEMP_PREFIX) $(MAKE) install.bin
-
-.PHONY: install-deps
-install-deps: lima
-	./bin/lima-and-qemu.pl
-	mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-${LIMA_ARCH}.${BUILD_TS}.tar.gz
-	sha512sum src/lima/lima-and-qemu.macos-${LIMA_ARCH}.${BUILD_TS}.tar.gz | cut -d " " -f 1  > src/lima/lima-and-qemu.macos-${LIMA_ARCH}.${BUILD_TS}.tar.gz.sha512sum
 
 .PHONY: download-sources
 download-sources:
