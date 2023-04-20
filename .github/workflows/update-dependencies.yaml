@@ -3,6 +3,7 @@ on:
   schedule:
     - cron: '0 11 * * 2'
   workflow_dispatch:
+  push:
 
 permissions:
   # This is required for configure-aws-credentials to request an OIDC JWT ID token to access AWS resources later on.
