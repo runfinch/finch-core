@@ -5,6 +5,7 @@ OUTDIR ?= $(CURDIR)/_output
 HASH_DIR ?= $(CURDIR)/hashes
 DOWNLOAD_DIR := $(CURDIR)/downloads
 OS_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/os
+DEPENDENCIES_DOWNLOAD_DIR :=  $(DOWNLOAD_DIR)/dependencies
 SOCKET_VMNET_TEMP_PREFIX ?= $(OUTDIR)/dependencies/lima-socket_vmnet/opt/finch
 UNAME := $(shell uname -m)
 ARCH ?= $(UNAME)
@@ -19,16 +20,19 @@ FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:0d890b07baf9d31c47378
 FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-37-1.7.aarch64-20230417202010.qcow2)
 FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:f3a334802c3285b58b4469655ba533925c04d40ab72c089dc75e37c4d41ea57f")
 
+LIMA_DEPENDENCY_FILE_NAME ?= lima-and-qemu.tar.gz
 .DEFAULT_GOAL := all
 
 ifneq (,$(findstring arm64,$(ARCH)))
 	LIMA_ARCH = aarch64
+	LIMA_URL ?= https://deps.runfinch.com/aarch64/lima-and-qemu.macos-aarch64.1682013360.tar.gz
 	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_AARCH64_URL))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_AARCH64_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_AARCH64_DIGEST)
 	HOMEBREW_PREFIX ?= /opt/homebrew
 else ifneq (,$(findstring x86_64,$(ARCH)))
 	LIMA_ARCH = x86_64
+	LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1682013360.tar.gz
 	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_x86_URL))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_x86_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_x86_DIGEST)
@@ -54,6 +58,16 @@ download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
 
 .PHONY: download
 download: download.os
+
+.PHONY: download.lima-dependencies
+download.lima-dependencies:
+	mkdir -p ${DEPENDENCIES_DOWNLOAD_DIR}
+	curl -L --fail $(LIMA_URL) > "$(DEPENDENCIES_DOWNLOAD_DIR)/${LIMA_DEPENDENCY_FILE_NAME}"
+
+.PHONE: install.lima-dependencies
+install.lima-dependencies: download.lima-dependencies
+	mkdir -p ${OUTDIR}
+	tar -xvzf ${DEPENDENCIES_DOWNLOAD_DIR}/${LIMA_DEPENDENCY_FILE_NAME} -C ${OUTDIR}
 
 .PHONY: lima-template
 lima-template: download
@@ -103,4 +117,4 @@ clean:
 
 .PHONY: test-e2e
 test-e2e:
-	cd e2e && go test -v ./... -ginkgo.v
+	cd e2e && go test -timeout 30m -v ./... -ginkgo.v
