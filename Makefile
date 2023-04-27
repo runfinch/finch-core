@@ -5,6 +5,7 @@ OUTDIR ?= $(CURDIR)/_output
 HASH_DIR ?= $(CURDIR)/hashes
 DOWNLOAD_DIR := $(CURDIR)/downloads
 OS_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/os
+LIMA_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/dependencies
 DEPENDENCIES_DOWNLOAD_DIR :=  $(DOWNLOAD_DIR)/dependencies
 SOCKET_VMNET_TEMP_PREFIX ?= $(OUTDIR)/dependencies/lima-socket_vmnet/opt/finch
 UNAME := $(shell uname -m)
@@ -59,15 +60,17 @@ download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
 .PHONY: download
 download: download.os
 
+$(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME):
+	mkdir -p $(DEPENDENCIES_DOWNLOAD_DIR)
+	curl -L --fail $(LIMA_URL) > "$(DEPENDENCIES_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)"
+	mkdir -p ${OUTDIR}
+	tar -xvzf ${DEPENDENCIES_DOWNLOAD_DIR}/${LIMA_DEPENDENCY_FILE_NAME} -C ${OUTDIR}
+
 .PHONY: download.lima-dependencies
-download.lima-dependencies:
-	mkdir -p ${DEPENDENCIES_DOWNLOAD_DIR}
-	curl -L --fail $(LIMA_URL) > "$(DEPENDENCIES_DOWNLOAD_DIR)/${LIMA_DEPENDENCY_FILE_NAME}"
+download.lima-dependencies: $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)
 
 .PHONE: install.lima-dependencies
 install.lima-dependencies: download.lima-dependencies
-	mkdir -p ${OUTDIR}
-	tar -xvzf ${DEPENDENCIES_DOWNLOAD_DIR}/${LIMA_DEPENDENCY_FILE_NAME} -C ${OUTDIR}
 
 .PHONY: lima-template
 lima-template: download
