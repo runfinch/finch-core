@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   macos-arm64-build:
-    runs-on: ['self-hosted', 'macos', 'arm64', '11.7']
+    runs-on: [self-hosted, macos, arm64, 11, release]
     timeout-minutes: 60
     steps:
       - uses: actions/setup-go@v4
@@ -73,7 +73,7 @@ jobs:
           if-no-files-found: error
 
   macos-x86-build:
-    runs-on: ['self-hosted', 'macos', 'amd64', '11.7']
+    runs-on: [self-hosted, macos, amd64, 11, release]
     timeout-minutes: 60
     steps:
       - uses: actions/setup-go@v4
@@ -119,7 +119,7 @@ jobs:
           if-no-files-found: error
 
   macos-arm64-ventura-build:
-    runs-on:  ['self-hosted', 'macos', 'arm64', '12.6']
+    runs-on:  [self-hosted, macos, arm64, 12, release]
     timeout-minutes: 60
     steps:
         - uses: actions/setup-go@v4
@@ -152,7 +152,7 @@ jobs:
             if-no-files-found: error
 
   macos-x86_64-ventura-build:
-    runs-on:  ['self-hosted', 'macos', 'amd64', '12.6']
+    runs-on:  [self-hosted, macos, amd64, 12, release]
     timeout-minutes: 60
     steps:
       - uses: actions/setup-go@v4
