@@ -48,6 +48,7 @@ jobs:
           curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
           rm -rf /Applications/FileMonitor.app
           unzip FileMonitor_1.3.0.zip -d /Applications
+        shell: zsh {0}
 
       - name: Make and release deps
         run: |
@@ -55,6 +56,7 @@ jobs:
           make -C src/lima PREFIX=/opt/homebrew all install
           ./bin/lima-and-qemu.pl
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
+        shell: zsh {0}
 
       - name: Upload MacOS build
         uses: actions/upload-artifact@v3
@@ -103,6 +105,7 @@ jobs:
           curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
           rm -rf /Applications/FileMonitor.app
           unzip FileMonitor_1.3.0.zip -d /Applications
+        shell: zsh {0}
 
       - name: Make and release deps
         run: |
@@ -110,6 +113,7 @@ jobs:
           make -C src/lima PREFIX=/usr/local all install
           ./bin/lima-and-qemu.pl
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-x86_64.tar.gz
+        shell: zsh {0}
 
       - name: Upload MacOS build
         uses: actions/upload-artifact@v3
@@ -119,7 +123,7 @@ jobs:
           if-no-files-found: error
 
   macos-arm64-ventura-build:
-    runs-on:  [self-hosted, macos, arm64, 12, release]
+    runs-on:  [self-hosted, macos, arm64, 13, release]
     timeout-minutes: 60
     steps:
         - uses: actions/setup-go@v4
@@ -130,13 +134,6 @@ jobs:
             fetch-depth: 1
             submodules: recursive
             persist-credentials: false
-
-        - name: "Switch Xcode version to enable macOS 13 SDK"
-          # Xcode 14.1 added support for macOS 13 SDK.
-          # Xcode is installed in build runners using xcodes: https://github.com/RobotsAndPencils/xcodes
-          run: |
-            sudo xcode-select --switch /Applications/Xcode-14.2.0.app/
-            xcrun --show-sdk-version
 
         - name: Create Ventura limactl tarball
           working-directory: src/lima
@@ -152,7 +149,7 @@ jobs:
             if-no-files-found: error
 
   macos-x86_64-ventura-build:
-    runs-on:  [self-hosted, macos, amd64, 12, release]
+    runs-on:  [self-hosted, macos, amd64, 13, release]
     timeout-minutes: 60
     steps:
       - uses: actions/setup-go@v4
@@ -163,13 +160,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
-
-      - name: "Switch Xcode version to enable macOS 13 SDK"
-        # Xcode 14.1 added support for macOS 13 SDK.
-        # Xcode is installed in build runners using xcodes: https://github.com/RobotsAndPencils/xcodes
-        run: |
-          sudo xcode-select --switch /Applications/Xcode-14.2.0.app/
-          xcrun --show-sdk-version
 
       - name: Create Ventura limactl tarball
         working-directory: src/lima
@@ -249,6 +239,7 @@ jobs:
           tar -xzf build/limactl.ventura.x86_64.tar.gz -C build/lima-and-qemu.macos-x86_64/bin
           tar -czf build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-x86_64 .
           sha512sum build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz.sha512sum
+        shell: zsh {0}
 
       - name: Download MacOS dependencies' sources
         uses: actions/download-artifact@v3
@@ -263,3 +254,4 @@ jobs:
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64.${timestamp}.tar.gz*"
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64.${timestamp}.tar.gz*" 
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} --recursive --exclude "*"  --include "dependency-sources.tar.gz"
+        shell: zsh {0}

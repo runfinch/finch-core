@@ -59,6 +59,7 @@ for my $example (@ARGV) {
     system("limactl stop $example");
     system("limactl delete $example");
 }
+
 system("sudo pkill FileMonitor");
 
 sleep 10;
