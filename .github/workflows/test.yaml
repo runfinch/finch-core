@@ -9,7 +9,7 @@ jobs:
     runs-on: [self-hosted, macos, arm64, 11, release]
     steps:
     - uses: actions/checkout@v3
-    - run: echo $PATH
+    - run: export PATH="/opt/homebrew/bin:$PATH"
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       
