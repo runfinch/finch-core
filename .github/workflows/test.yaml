@@ -4,14 +4,12 @@ on:
     branches:
       - main
   workflow_dispatch:
-defaults:
-  run:
-    shell: zsh
 jobs:
   testjob:
     runs-on: [self-hosted, macos, arm64, 11, release]
     steps:
     - uses: actions/checkout@v3
+    - run: echo $PATH
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       
