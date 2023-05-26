@@ -1,9 +1,12 @@
-name: CI
+name: test-filemonitor
 on:
   pull_request:
     branches:
       - main
   workflow_dispatch:
+defaults:
+  run:
+    shell: zsh
 jobs:
   testjob:
     runs-on: [self-hosted, macos, arm64, 11, release]
@@ -11,5 +14,4 @@ jobs:
     - uses: actions/checkout@v3
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
-      shell: zsh {0}
       
