@@ -239,7 +239,6 @@ jobs:
           tar -xzf build/limactl.ventura.x86_64.tar.gz -C build/lima-and-qemu.macos-x86_64/bin
           tar -czf build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-x86_64 .
           sha512sum build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz.sha512sum
-        shell: zsh {0}
 
       - name: Download MacOS dependencies' sources
         uses: actions/download-artifact@v3
@@ -254,4 +253,3 @@ jobs:
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64.${timestamp}.tar.gz*"
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64.${timestamp}.tar.gz*" 
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} --recursive --exclude "*"  --include "dependency-sources.tar.gz"
-        shell: zsh {0}
