@@ -21,14 +21,15 @@ jobs:
     runs-on: [self-hosted, macos, arm64, 11, release]
     timeout-minutes: 60
     steps:
-      - uses: actions/setup-go@v4
-        with:
-          go-version: 1.19.x
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.x
 
       - name: Install dependencies
         # QEMU:      required by Lima itself
@@ -78,14 +79,15 @@ jobs:
     runs-on: [self-hosted, macos, amd64, 11, release]
     timeout-minutes: 60
     steps:
-      - uses: actions/setup-go@v4
-        with:
-          go-version: 1.19.x
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.x
 
       - name: Install dependencies
         # QEMU:      required by Lima itself
@@ -126,14 +128,15 @@ jobs:
     runs-on:  [self-hosted, macos, arm64, 13, release]
     timeout-minutes: 60
     steps:
-        - uses: actions/setup-go@v4
-          with:
-            go-version: 1.19.x
         - uses: actions/checkout@v3
           with:
             fetch-depth: 1
             submodules: recursive
             persist-credentials: false
+
+        - uses: actions/setup-go@v4
+          with:
+            go-version: 1.20.x
 
         - name: Create Ventura limactl tarball
           working-directory: src/lima
@@ -152,14 +155,15 @@ jobs:
     runs-on:  [self-hosted, macos, amd64, 13, release]
     timeout-minutes: 60
     steps:
-      - uses: actions/setup-go@v4
-        with:
-          go-version: 1.19.x
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.x
 
       - name: Create Ventura limactl tarball
         working-directory: src/lima
