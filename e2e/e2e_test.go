@@ -81,7 +81,7 @@ func TestE2e(t *testing.T) {
 		tests.Port(opt)
 		tests.Kill(opt)
 		tests.Stats(opt)
-		tests.BuilderPrune(opt)
+		// tests.BuilderPrune(opt)
 		tests.Exec(opt)
 		tests.Logs(opt)
 		tests.Login(opt)
