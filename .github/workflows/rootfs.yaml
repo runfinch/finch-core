@@ -1,0 +1,61 @@
+name: Build and Push Rootfs Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+     - 'Dockerfile'
+  workflow_dispatch:
+
+permissions:
+  # This is required for configure-aws-credentials to request an OIDC JWT ID token to access AWS resources later on.
+  # More info: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings
+  id-token: write
+  contents: write
+
+jobs:
+  build-rootfs-image:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ['amd64', 'arm64']
+    steps:
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{ secrets.REGION }}
+          role-to-assume: ${{ secrets.ROLE }}
+          role-session-name: rootfs-ecr-image-upload-session
+      - name: checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build Image
+        uses: docker/build-push-action@v4
+        with:
+          platforms: linux/${{ matrix.arch }}
+          push: false  
+          load: true # load the image into Docker so we can create a container from it
+          tags: finch-rootfs-image-production:intermediate
+      - name: Tag and Push Container Image
+        run: |
+          TIMESTAMP=${{ steps.timestamp.outputs.value }}
+
+          docker tag finch-rootfs-image-production:intermediate ${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ matrix.arch }}-"$TIMESTAMP"
+          docker push ${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ matrix.arch }}-"$TIMESTAMP"
+      - name: Create, Compress, and Upload Rootfs
+        run: |
+          TIMESTAMP=${{ steps.timestamp.outputs.value }}
+
+          docker container create --platform linux/${{ matrix.arch }} --name ${{ matrix.arch }}-rootfs finch-rootfs-image-production:intermediate
+          docker container export -o finch-rootfs-production-${{ matrix.arch }}.tar ${{ matrix.arch }}-rootfs
+
+          zstd -z -18 finch-rootfs-production-${{ matrix.arch }}.tar -o finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.zst
+
+          aws s3 cp ./finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.zst s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} 
