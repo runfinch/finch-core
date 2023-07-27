@@ -27,6 +27,8 @@ jobs:
           aws-region: ${{ secrets.REGION }}
           role-to-assume: ${{ secrets.ROLE }}
           role-session-name: rootfs-ecr-image-upload-session
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
       - name: checkout repo
         uses: actions/checkout@v3
         with:
