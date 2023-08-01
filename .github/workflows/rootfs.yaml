@@ -20,6 +20,7 @@ jobs:
     strategy:
       matrix:
         arch: ['amd64', 'arm64']
+        platform: ['common']
     steps:
       - name: Generate Timestamp
         id: timestamp
@@ -63,4 +64,9 @@ jobs:
 
           zstd -z -18 finch-rootfs-production-${{ matrix.arch }}.tar -o finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.zst
 
-          aws s3 cp ./finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.zst s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} 
+          ARCHPATH="x86-64"
+          if [ ${{ matrix.arch }} == "arm64" ]; then
+            ARCHPATH="aarch64"
+          fi
+
+          aws s3 cp ./finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.zst s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${{ matrix.platform }}/$ARCHPATH/

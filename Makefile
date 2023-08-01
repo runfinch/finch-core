@@ -31,6 +31,9 @@ ifneq (,$(findstring arm64,$(ARCH)))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_AARCH64_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_AARCH64_DIGEST)
 	HOMEBREW_PREFIX ?= /opt/homebrew
+
+	# TODO: Use Finch rootfs in Finch on Windows testing
+	FINCH_ROOTFS_URL ?= https://deps.runfinch.com/common/aarch64/finch-rootfs-production-arm64-1690563031.tar.zst
 else ifneq (,$(findstring x86_64,$(ARCH)))
 	LIMA_ARCH = x86_64
 	LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1689037160.tar.gz
@@ -38,6 +41,9 @@ else ifneq (,$(findstring x86_64,$(ARCH)))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_x86_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_x86_DIGEST)
 	HOMEBREW_PREFIX ?= /usr/local
+
+	# TODO: Use Finch rootfs in Finch on Windows testing
+	FINCH_ROOTFS_URL ?= https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1690563027.tar.zst
 endif
 
 FINCH_OS_IMAGE_LOCATION ?= $(OUTDIR)/os/$(FINCH_OS_BASENAME)
