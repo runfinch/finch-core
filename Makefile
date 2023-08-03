@@ -93,7 +93,7 @@ lima-template: download
 lima-socket-vmnet:
 	git submodule update --init --recursive src/socket_vmnet
 	cd src/socket_vmnet && git clean -f -d
-	cd src/socket_vmnet && PREFIX=$(SOCKET_VMNET_TEMP_PREFIX) $(MAKE) install.bin
+	cd src/socket_vmnet && PREFIX=$(SOCKET_VMNET_TEMP_PREFIX) "$(MAKE)" install.bin
 
 .PHONY: download-sources
 download-sources:
