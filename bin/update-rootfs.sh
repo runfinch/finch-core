@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -euxo pipefail
 
 DEPENDENCY_CLOUDFRONT_URL="https://deps.runfinch.com/"

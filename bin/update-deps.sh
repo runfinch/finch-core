@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DEPENDENCY_CLOUDFRONT_URL="https://deps.runfinch.com/"
 AARCH64_FILENAME_PATTERN="aarch64/lima-and-qemu.macos-aarch64.[0-9].*\.gz$"
