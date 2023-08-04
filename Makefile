@@ -6,6 +6,7 @@ HASH_DIR ?= $(CURDIR)/hashes
 DOWNLOAD_DIR := $(CURDIR)/downloads
 OS_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/os
 LIMA_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/dependencies
+ROOTFS_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/rootfs
 DEPENDENCIES_DOWNLOAD_DIR :=  $(DOWNLOAD_DIR)/dependencies
 SOCKET_VMNET_TEMP_PREFIX ?= $(OUTDIR)/dependencies/lima-socket_vmnet/opt/finch
 UNAME := $(shell uname -m)
@@ -34,6 +35,7 @@ ifneq (,$(findstring arm64,$(ARCH)))
 
 	# TODO: Use Finch rootfs in Finch on Windows testing
 	FINCH_ROOTFS_URL ?= https://deps.runfinch.com/common/aarch64/finch-rootfs-production-arm64-1690920104.tar.zst
+	FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_URL))
 else ifneq (,$(findstring x86_64,$(ARCH)))
 	LIMA_ARCH = x86_64
 	LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1689037160.tar.gz
@@ -44,6 +46,7 @@ else ifneq (,$(findstring x86_64,$(ARCH)))
 
 	# TODO: Use Finch rootfs in Finch on Windows testing
 	FINCH_ROOTFS_URL ?= https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1690920103.tar.zst
+	FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_URL))
 endif
 
 FINCH_OS_IMAGE_LOCATION ?= $(OUTDIR)/os/$(FINCH_OS_BASENAME)
@@ -53,18 +56,33 @@ FINCH_OS_IMAGE_INSTALLATION_LOCATION ?= $(DEST)/os/$(FINCH_OS_BASENAME)
 all: binaries
 
 .PHONY: binaries
+.PHONY: download
+
+# Rootfs required for Windows, require full OS for Linux and Mac
+
+BUILD_OS ?= $(OS)
+ifeq ($(BUILD_OS), Windows_NT)
+binaries: rootfs lima-template
+download: download.rootfs
+else 
 binaries: os lima-socket-vmnet lima-template
+download: download.os
+endif
 
 $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME):
 	mkdir -p $(OS_DOWNLOAD_DIR)
 	curl -L --fail $(FINCH_OS_IMAGE_URL) > "$(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)"
 	cd $(OS_DOWNLOAD_DIR) && shasum -a 512 --check $(HASH_DIR)/$(FINCH_OS_BASENAME).sha512 || exit 1
 
+$(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME):
+	mkdir -p $(ROOTFS_DOWNLOAD_DIR)
+	curl -L --fail $(FINCH_ROOTFS_URL) > "$(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)"
+
 .PHONY: download.os
 download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
 
-.PHONY: download
-download: download.os
+.PHONY: download.rootfs
+download.rootfs: $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)
 
 $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME):
 	mkdir -p $(DEPENDENCIES_DOWNLOAD_DIR)
@@ -103,6 +121,9 @@ download-sources:
 os: download
 	mkdir -p $(OUTDIR)/os
 	lz4 -dcf $(DOWNLOAD_DIR)/os/$(FINCH_OS_BASENAME) > "$(OUTDIR)/os/$(FINCH_OS_BASENAME)"
+
+.PHONY: rootfs
+rootfs: download
 
 .PHONY: install
 install: uninstall
