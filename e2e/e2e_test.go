@@ -38,7 +38,7 @@ func TestE2e(t *testing.T) {
 		t.Fatalf("failed to get the current working directory: %v", err)
 	}
 	subject := "limactl"
-	vmConfigFile := filepath.Join(wd, "./fedora.yaml")
+	vmConfigFile := filepath.Join(wd, "./../lima-template/fedora.yaml")
 	vmName := "fedora"
 	o, err := option.New([]string{subject})
 
