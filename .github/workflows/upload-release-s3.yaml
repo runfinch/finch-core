@@ -25,7 +25,7 @@ jobs:
           zipBall: true
 
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: ${{ secrets.ROLE }}
           role-session-name: upload release
