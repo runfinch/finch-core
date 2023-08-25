@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-     - 'Dockerfile'
+      - 'Dockerfile'
   workflow_dispatch:
 
 permissions:
@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           platforms: linux/${{ matrix.arch }}
-          push: false  
+          push: false
           load: true # load the image into Docker so we can create a container from it
           tags: finch-rootfs-image-production:intermediate
       - name: Tag and Push Container Image
@@ -62,11 +62,11 @@ jobs:
           docker container create --platform linux/${{ matrix.arch }} --name ${{ matrix.arch }}-rootfs finch-rootfs-image-production:intermediate
           docker container export -o finch-rootfs-production-${{ matrix.arch }}.tar ${{ matrix.arch }}-rootfs
 
-          zstd -z -18 finch-rootfs-production-${{ matrix.arch }}.tar -o finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.zst
+          gzip -9 -c finch-rootfs-production-${{ matrix.arch }}.tar > finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz
 
           ARCHPATH="x86-64"
           if [ ${{ matrix.arch }} == "arm64" ]; then
             ARCHPATH="aarch64"
           fi
 
-          aws s3 cp ./finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.zst s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${{ matrix.platform }}/$ARCHPATH/
+          aws s3 cp ./finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${{ matrix.platform }}/$ARCHPATH/
