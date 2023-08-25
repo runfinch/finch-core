@@ -26,16 +26,19 @@ jobs:
         os: [[self-hosted, macos, amd64, 13, test], [self-hosted, macos, amd64, 12, test], [self-hosted, macos, arm64, 13, test], [self-hosted, macos, arm64, 12, test]]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           persist-credentials: false
           submodules: true
-      - uses: actions/setup-go@v4
+      - name: Setup go
+        uses: actions/setup-go@v4
         with:
           go-version-file: e2e/go.mod
-          cache: true
+          cache-dependency-path: e2e/go.sum
       - name: Clean up previous files
+        shell: zsh {0}
         run: |
           sudo rm -rf ~/.lima
           sudo rm -rf ./_output
@@ -45,11 +48,17 @@ jobs:
           if pgrep '^socket_vmnet'; then
             sudo pkill '^socket_vmnet'
           fi
+      - name: Install dependencies
+        shell: zsh {0}
+        run: brew install go lz4 automake autoconf libtool
       - name: Build project
+        shell: zsh {0}
         run: |
           export PATH="/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
           which libtool
           # Install socket_vmnet to `_output/bin` which is used in $PATH
           SOCKET_VMNET_TEMP_PREFIX=$(pwd)/_output/ make lima-socket-vmnet
-          make install.lima-dependencies 
-      - run: make test-e2e
+          make install.lima-dependencies binaries
+      - name: Run e2e tests
+        shell: zsh {0}
+        run: make test-e2e
