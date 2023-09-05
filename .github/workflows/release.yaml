@@ -27,6 +27,7 @@ jobs:
           echo 'system("sudo echo sudoed")' >> test.pl
           chmod u+x test.pl
           ./test.pl
+        shell: zsh {0}
 
       # - name: Install dependencies
       #   # QEMU:      required by Lima itself
