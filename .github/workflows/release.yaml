@@ -22,33 +22,38 @@ jobs:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
+      - run: |
+          echo '#!/usr/bin/env perl' >> test.pl
+          echo 'system("sudo echo sudoed")' >> test.pl
+          chmod u+x test.pl
+          ./test.pl
 
-      - name: Install dependencies
-        # QEMU:      required by Lima itself
-        # bash:      required by test-example.sh (OS version of bash is too old)
-        # coreutils: required by test-example.sh for the "timeout" command
-        # autoconf:  required for building vde
-        # automake:  required for building vde
-        # FileMonitor: required to capture opened files by limactl and qemu-
+      # - name: Install dependencies
+      #   # QEMU:      required by Lima itself
+      #   # bash:      required by test-example.sh (OS version of bash is too old)
+      #   # coreutils: required by test-example.sh for the "timeout" command
+      #   # autoconf:  required for building vde
+      #   # automake:  required for building vde
+      #   # FileMonitor: required to capture opened files by limactl and qemu-
 
-        run: |
-          brew update
-          brew install qemu bash coreutils
-          brew install autoconf automake
-          brew install cpanm
-          brew upgrade
-          sudo cpanm install JSON
-          curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
-          rm -rf /Applications/FileMonitor.app
-          unzip FileMonitor_1.3.0.zip -d /Applications
-        shell: zsh {0}
+      #   run: |
+      #     brew update
+      #     brew install qemu bash coreutils
+      #     brew install autoconf automake
+      #     brew install cpanm
+      #     brew upgrade
+      #     sudo cpanm install JSON
+      #     curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
+      #     rm -rf /Applications/FileMonitor.app
+      #     unzip FileMonitor_1.3.0.zip -d /Applications
+      #   shell: zsh {0}
 
-      - name: Make and release deps
-        run: |
-          (cd src/lima && git clean -f -d)
-          make -C src/lima PREFIX=/opt/homebrew all install
-          sudo echo hi
-          ./bin/lima-and-qemu.pl
-          sudo echo hey
-          mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
-        shell: zsh {0}
+      # - name: Make and release deps
+      #   run: |
+      #     (cd src/lima && git clean -f -d)
+      #     make -C src/lima PREFIX=/opt/homebrew all install
+      #     sudo echo hi
+      #     ./bin/lima-and-qemu.pl
+      #     sudo echo hey
+      #     mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
+      #   shell: zsh {0}
