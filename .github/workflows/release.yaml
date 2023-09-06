@@ -22,14 +22,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
-      - name: Install dependencies
-        # QEMU:      required by Lima itself
-        # bash:      required by test-example.sh (OS version of bash is too old)
-        # coreutils: required by test-example.sh for the "timeout" command
-        # autoconf:  required for building vde
-        # automake:  required for building vde
-        # FileMonitor: required to capture opened files by limactl and qemu-
-
       - name: Make and release deps
         run: |
           (cd src/lima && git clean -f -d)
