@@ -30,26 +30,8 @@ jobs:
         # automake:  required for building vde
         # FileMonitor: required to capture opened files by limactl and qemu-
 
-        run: |
-          brew update
-          brew install qemu bash coreutils
-          brew install autoconf automake
-          brew install cpanm
-          brew upgrade
-          sudo cpanm install JSON
-          curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
-          rm -rf /Applications/FileMonitor.app
-          unzip FileMonitor_1.3.0.zip -d /Applications
-        shell: zsh {0}
-
       - name: Make and release deps
         run: |
           (cd src/lima && git clean -f -d)
-          make -C src/lima PREFIX=/opt/homebrew all install
-          echo $0
-          echo $UID
-          id -un
+          ./bin/lima-and-qemu.pl
         shell: zsh {0}
-
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
