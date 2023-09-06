@@ -31,6 +31,12 @@ jobs:
         # FileMonitor: required to capture opened files by limactl and qemu-
 
         run: |
+          brew update
+          brew install qemu bash coreutils
+          brew install autoconf automake
+          brew install cpanm
+          brew upgrade
+          sudo cpanm install JSON
           curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
           rm -rf /Applications/FileMonitor.app
           unzip FileMonitor_1.3.0.zip -d /Applications
