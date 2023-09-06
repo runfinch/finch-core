@@ -44,7 +44,6 @@ $deps{$name} = "→ " . readlink($name);
 my $filemonitor = "/tmp/filemonitor.log";
 END { system("sudo pkill FileMonitor") }
 print "sudo may prompt for password to run FileMonitor\n";
-system("sudo cat $filemonitor");
 
 #Change this FileMonitor path for local build to installed path
 system("sudo -b /Applications/FileMonitor.app/Contents/MacOS/FileMonitor >$filemonitor 2>/dev/null");
@@ -62,3 +61,159 @@ for my $example (@ARGV) {
     system("limactl delete $example");
 }
 system("sudo pkill FileMonitor");
+
+sleep 10;
+# truncate last line to remove offending json string
+my $addr;
+open (FH, "+< $filemonitor") or die "can't update $filemonitor: $!";
+while ( <FH> ) {
+    $addr = tell(FH) unless eof(FH);
+}
+truncate(FH, $addr) or die "can't truncate $filemonitor: $!";
+
+open(my $fh, "<", $filemonitor) or die "Can't read $filemonitor: $!";
+while (my $line = <$fh>) {
+    # Only record files opened by limactl or qemu-*
+    my $decoded_json = decode_json($line);
+    my $processName = $decoded_json->{'file'}{'process'}{'name'};
+    my $fileName = $decoded_json->{'file'}{'destination'};
+    next unless $processName =~ /^\s*(limactl|qemu-)/;
+
+    # Skip /opt/homebrew/bin and /usr/local/bin
+    next if $fileName eq "$install_dir/bin";
+    # Ignore files not under /usr/local or /opt/homebrew
+    next unless $fileName =~ /^.*($install_dir\/\S+).*$/;
+    # Skip files that don't exist
+    next unless -e $fileName;
+
+    #Skip if file is already recorded
+    next if exists($deps{$fileName});
+    print "Filename: $fileName \n";
+
+    # find all links of $filename and record.
+    my $links = `find -L  $install_dir/opt -samefile $fileName`;
+    record($fileName);
+    my @arr = split('\n', $links);
+    for my $link (@arr) {
+        #skip if link is already recorded
+        next if exists($deps{$link});
+        record($link);
+    }
+}
+
+print "$_ $deps{$_}\n" for sort keys %deps;
+print "\n";
+
+my $dist = "lima-and-qemu";
+system("rm -rf /tmp/$dist");
+
+# Copy all files to /tmp tree and make all dylib references relative to the
+# /usr/local/bin directory using @executable_path/..
+my %resign;
+for my $file (keys %deps) {
+    my $copy = $file =~ s|^$install_dir|/tmp/$dist|r;
+    system("mkdir -p " . dirname($copy));
+    if ($file =~ m|^$install_dir/bin/|) {
+        # symlinks in the bin directory are replaced by the target file because in
+        # macOS Monterey @executable_path refers to the symlink target and not the
+        # symlink location itself, breaking the dylib lookup.
+        system("cp $file $copy");
+    }
+    else {
+        system("cp -R $file $copy");
+        next if -l $file;
+    }
+    next unless qx(file $copy) =~ /Mach-O/;
+
+    open(my $fh, "otool -L $file |") or die "Failed to run 'otool -L $file': $!";
+    while (<$fh>) {
+        my($dylib) = m|$install_dir/(\S+)| or next;
+        my $grep = "";
+        if ($file =~ m|bin/qemu-system-$arch$|) {
+            # qemu-system-* is already signed with an entitlement to use the hypervisor framework
+            $grep = "| grep -v 'will invalidate the code signature'";
+            $resign{$copy}++;
+        }
+        $resign{$copy}++ if $arch eq "aarch64";
+        system "install_name_tool -change $install_dir/$dylib \@executable_path/../$dylib $copy 2>&1 $grep";
+    }
+    close($fh);
+}
+# Replace invalidated signatures
+for my $file (keys %resign) {
+    system("codesign --sign - --force --preserve-metadata=entitlements $file");
+}
+
+my $files = join(" ", map s|^$install_dir/||r, keys %deps);
+
+
+# Package socket_vmnet
+die if -e "/tmp/$dist/socket_vmnet";
+if (-f "/opt/socket_vmnet/bin/socket_vmnet") {
+    system("mkdir -p /tmp/$dist/socket_vmnet/bin");
+    system("cp /opt/socket_vmnet/bin/socket_vmnet /tmp/$dist/socket_vmnet/bin/socket_vmnet");
+    $files .= " socket_vmnet/bin/socket_vmnet";
+}
+
+# Ensure all files are writable by the owner; this is required for Squirrel.Mac
+# to remove the quarantine xattr when applying updates.
+system("chmod -R u+w /tmp/$dist");
+
+unlink("$repo_root/$dist.tar.gz");
+system("tar cvfz $repo_root/$dist.tar.gz -C /tmp/$dist $files");
+
+exit;
+
+# File references may involve multiple symlinks that need to be recorded as well, e.g.
+#
+#   /usr/local/opt/libssh/lib/libssh.4.dylib
+#
+# turns into 2 symlinks and one file:
+#
+#   /usr/local/opt/libssh → ../Cellar/libssh/0.9.5_1
+#   /usr/local/Cellar/libssh/0.9.5_1/lib/libssh.4.dylib → libssh.4.8.6.dylib
+#   /usr/local/Cellar/libssh/0.9.5_1/lib/libssh.4.8.6.dylib [394K]
+
+my %seen;
+sub record {
+    my $dep = shift;
+    return if $seen{$dep}++;
+    $dep =~ s|^/|| or die "$dep is not an absolute path";
+    my $filename = "";
+    my @segments = split '/', $dep;
+    while (@segments) {
+        my $segment = shift @segments;
+        my $name = "$filename/$segment";
+        my $link = readlink $name;
+        # symlinks in the bin directory are replaced by the target, and the symlinks are not
+        # recorded (see above). However, at least "share/qemu" needs to remain a symlink to
+        # "../Cellar/qemu/6.0.0/share/qemu" so qemu will still find its data files. Therefore
+        # symlinks are still recorded for all other files.
+        if (defined $link && $name !~ m|^$install_dir/bin/|) {
+            # Record the symlink itself with the link target as the comment
+            $deps{$name} = "→ $link";
+            if ($link =~ m|^/|) {
+                # Can't support absolute links pointing outside /usr/local
+                die "$name → $link" unless $link =~ m|^$install_dir/|;
+                $link = join("/", $link, @segments);
+            } else {
+                $link = join("/", $filename, $link, @segments);
+            }
+            # Re-parse from the start because the link may contain ".." segments
+            return record($link)
+        }
+        if ($segment eq "..") {
+            $filename = dirname($filename);
+        } else {
+            $filename = $name;
+        }
+    }
+    # Use human readable size of the file as the comment:
+    # $ ls -lh /usr/local/Cellar/libssh/0.9.5_1/lib/libssh.4.8.6.dylib
+    # -rw-r--r--  1 jan  staff   394K  5 Jan 11:04 /usr/local/Cellar/libssh/0.9.5_1/lib/libssh.4.8.6.dylib
+    $deps{$filename} = sprintf "[%s]", (split / +/, qx(ls -lh $filename))[4];
+}
+
+sub dirname {
+    shift =~ s|/[^/]+$||r;
+}
