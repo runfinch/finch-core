@@ -48,6 +48,7 @@ print "sudo may prompt for password to run FileMonitor\n";
 
 #Change this FileMonitor path for local build to installed path
 system("sudo -b /Applications/FileMonitor.app/Contents/MacOS/FileMonitor >$filemonitor 2>/dev/null");
+system("sudo echo this-is-sudo-too");
 sleep(1) until -s $filemonitor;
 
 my $repo_root = join('/', dirname($FindBin::Bin), 'src', 'lima');
