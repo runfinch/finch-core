@@ -43,7 +43,7 @@ $deps{$name} = "→ " . readlink($name);
 # Capture any library and datafiles access with FileMonitor
 my $filemonitor = "/tmp/filemonitor.log";
 END { system("sudo pkill FileMonitor") }
-system("sudo cat $filemonitor");
+system("sudo echo this-is-sudo");
 print "sudo may prompt for password to run FileMonitor\n";
 
 #Change this FileMonitor path for local build to installed path
