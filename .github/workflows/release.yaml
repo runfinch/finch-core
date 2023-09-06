@@ -24,6 +24,9 @@ jobs:
           persist-credentials: false
       - name: Make and release deps
         run: |
+          curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
+          rm -rf /Applications/FileMonitor.app
+          unzip FileMonitor_1.3.0.zip -d /Applications
           (cd src/lima && git clean -f -d)
           ./bin/lima-and-qemu.pl
         shell: zsh {0}
