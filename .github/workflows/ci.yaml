@@ -12,6 +12,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'contrib/**'
+      - 'Dockerfile'
   workflow_dispatch:
 
 concurrency:
