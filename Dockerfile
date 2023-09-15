@@ -9,6 +9,15 @@ RUN dnf group install -y cloud-server-environment --exclude=plymouth* \
     --exclude=dracut* \
     --exclude=shim-*
 
+# install packages needed by Lima
+RUN dnf install -y \
+  --setopt=install_weak_deps=False \
+  qemu-user-static-aarch64 \
+  qemu-user-static-arm \
+  qemu-user-static-x86 \
+  iptables \
+  fuse-sshfs
+
 RUN systemctl enable cloud-init cloud-init-local cloud-config cloud-final
 
 # enable systemd
