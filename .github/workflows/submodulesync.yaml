@@ -1,34 +1,21 @@
 name: Sync Submodules
 
 on:
-  schedule:
-    - cron: '0 9 * * 1'
   workflow_dispatch:
-
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Update sub modules
-        run: |
-          git submodule update --remote
-          # pin submodule to a commit, https://github.com/lima-vm/lima/commit/b357e260b1a03f0142c63b3e071b784ae66d5d34
-          (cd src/lima && git checkout b357e260b1a03f0142c63b3e071b784ae66d5d34)
-          # TODO: Track back release once lima has v0.18.0
-          # (cd src/lima && git fetch --tags)
-          #  TAG=`cd src/lima && git describe --tags $(git rev-list --tags --max-count=1)`
-          # echo "Pulling changes from release: $TAG"
-          #  (cd src/lima && git checkout $TAG)
-
+        run: git submodule update --remote
       - name: Create PR
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: bump submodules
-          signoff: true
-          title: 'build(deps): Bump submodules'
+          title: '[Automated] Bump submodules'
