@@ -27,7 +27,7 @@ LIMA_DEPENDENCY_FILE_NAME ?= lima-and-qemu.tar.gz
 
 ifneq (,$(findstring arm64,$(ARCH)))
 	LIMA_ARCH = aarch64
-	LIMA_URL ?= https://deps.runfinch.com/aarch64/lima-and-qemu.macos-aarch64.1691201350.tar.gz
+	LIMA_URL ?= https://deps.runfinch.com/aarch64/lima-and-qemu.macos-aarch64.1695247723.tar.gz
 	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_AARCH64_URL))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_AARCH64_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_AARCH64_DIGEST)
@@ -38,7 +38,7 @@ ifneq (,$(findstring arm64,$(ARCH)))
 	FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_URL))
 else ifneq (,$(findstring x86_64,$(ARCH)))
 	LIMA_ARCH = x86_64
-	LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1691201350.tar.gz
+	LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1695247723.tar.gz
 	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_x86_URL))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_x86_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_x86_DIGEST)
