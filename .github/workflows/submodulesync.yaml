@@ -12,7 +12,7 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Update sub modules
-        run: git submodule update --remote
+        run: git submodule update --init --recursive --remote
       - name: Create PR
         uses: peter-evans/create-pull-request@v4
         with:
