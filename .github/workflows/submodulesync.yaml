@@ -17,10 +17,7 @@ jobs:
       - name: Update sub modules
         run: |
           git submodule update --remote
-          
-          (cd src/lima && git log --oneline > gitlog)
-          (cd src/lima && cat gitlog)
-
+          (cd src/lima && git checkout a26c6b20d63b714f3253c1685b977d3ffe7f492c)
       - name: Create PR
         uses: peter-evans/create-pull-request@v5
         with:
