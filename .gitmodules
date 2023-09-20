@@ -1,6 +1,7 @@
 [submodule "src/lima"]
 	path = src/lima
 	url = https://github.com/lima-vm/lima
+        branch = master
 [submodule "src/socket_vmnet"]
 	path = src/socket_vmnet
 	url = https://github.com/lima-vm/socket_vmnet
