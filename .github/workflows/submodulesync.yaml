@@ -17,10 +17,13 @@ jobs:
       - name: Update sub modules
         run: |
           git submodule update --remote
-          (cd src/lima && git fetch --tags)
-          TAG=`cd src/lima && git describe --tags $(git rev-list --tags --max-count=1)`
-          echo "Pulling changes from release: $TAG"
-          (cd src/lima && git checkout $TAG)
+#          pin submodule to a commit, https://github.com/lima-vm/lima/commit/b357e260b1a03f0142c63b3e071b784ae66d5d34
+          (cd src/lima && git checkout b357e260b1a03f0142c63b3e071b784ae66d5d34)
+#          TODO: Track back release once lima has v0.18.0
+#          (cd src/lima && git fetch --tags)
+#          TAG=`cd src/lima && git describe --tags $(git rev-list --tags --max-count=1)`
+#          echo "Pulling changes from release: $TAG"
+#          (cd src/lima && git checkout $TAG)
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v5
