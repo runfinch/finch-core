@@ -1,0 +1,91 @@
+# Workflow to run cdk integration tests with finch
+name: AWS CDK CI
+
+on:
+  workflow_dispatch:
+  # Run every day at 12am
+  schedule:
+    - cron: '0 0 * * *'
+  
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      matrix: 
+        os: [[self-hosted, macos, amd64, 13, test], [self-hosted, macos, amd64, 12, test], [self-hosted, macos, arm64, 13, test], [self-hosted, macos, arm64, 12, test]]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # Cleanup 
+      - name: Cleanup Workspace
+        run: |
+          sudo rm -rf * 
+          sudo rm -rf /opt/finch
+          sudo rm -rf ~/.finch
+          rm -rf /tmp/finch-temp
+          if pgrep '^qemu-system'; then
+            sudo pkill '^qemu-system'
+          fi
+          if pgrep '^socket_vmnet'; then
+            sudo pkill '^socket_vmnet'
+          fi
+        
+      - name: Checkout AWS CDK main branch
+        uses: actions/checkout@v3
+        with:
+          repository: aws/aws-cdk
+          ref: main
+
+      - name: Configure Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: yarn install
+
+      # Setting Node options and running lerna build
+      - name: Build with lerna
+        run: | 
+          npx lerna run build
+          npm install -g @aws-cdk/integ-tests
+          npm install -g @aws-cdk/core      
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+
+      - name: Checkout Finch main branch with submodules
+        uses: actions/checkout@v3
+        with:
+          repository: runfinch/finch
+          ref: main
+          path: finch-temp
+          submodules: 'recursive'
+
+    # Setup Go using version specified in go.mod
+      - name: Setup Go from Finch's go.mod
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: finch-temp/go.mod
+
+      # Build and Install Finch
+      - name: Build and Install Finch
+        run: |
+          mkdir -p /tmp/finch
+          # move to /tmp because UNIX_PATH_MAX = 104 https://github.com/runfinch/finch/issues/11#issue-1460402755
+          mv finch-temp /tmp
+          cd /tmp/finch-temp
+          # user directories that are mounted in the vm are deleted after each test run by cdk test framework
+          # In finch the file sharing is not synchronous by default so the files still show up in the vm for a bit,
+          # so it's important to sync the host fs with the vm for the cdk testing framework.
+          sed -i '' '/sshfs:/,/9p:/s/cache: null/cache: false/' finch.yaml
+          sudo make clean 
+          make
+          sudo make install
+          finch vm init
+
+      - name: Run integration tests
+        uses: nick-fields/retry@v2
+        with:
+         timeout_minutes: 180
+         max_attempts: 3
+         # Drop in replacement for docker in CDK https://github.com/aws/aws-cdk/blob/b23252b99559ad1a1f0e05b6936c60f9c52522ff/packages/cdk-assets/README.md?plain=1#L185
+         command: CDK_DOCKER=finch yarn integ-runner --max-workers=1 --directory packages/@aws-cdk-testing/framework-integ
