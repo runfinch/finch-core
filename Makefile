@@ -33,20 +33,16 @@ ifneq (,$(findstring arm64,$(ARCH)))
 	FINCH_OS_DIGEST ?= $(FINCH_OS_AARCH64_DIGEST)
 	HOMEBREW_PREFIX ?= /opt/homebrew
 
-	# TODO: Use Finch rootfs in Finch on Windows testing
-	FINCH_ROOTFS_URL ?= https://deps.runfinch.com/common/aarch64/finch-rootfs-production-arm64-1690920104.tar.zst
-	FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_URL))
 else ifneq (,$(findstring x86_64,$(ARCH)))
 	LIMA_ARCH = x86_64
 	LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1695247723.tar.gz
 	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_x86_URL))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_x86_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_x86_DIGEST)
+	FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_x86_URL))
+	FINCH_ROOTFS_URL ?= $(FINCH_ROOTFS_x86_URL)
+	FINCH_ROOTFS_DIGEST ?= $(FINCH_ROOTFS_x86_DIGEST)
 	HOMEBREW_PREFIX ?= /usr/local
-
-	# TODO: Use Finch rootfs in Finch on Windows testing
-	FINCH_ROOTFS_URL ?= https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1690920103.tar.zst
-	FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_URL))
 endif
 
 FINCH_OS_IMAGE_LOCATION ?= $(OUTDIR)/os/$(FINCH_OS_BASENAME)
@@ -64,7 +60,7 @@ BUILD_OS ?= $(OS)
 ifeq ($(BUILD_OS), Windows_NT)
 binaries: rootfs lima-template
 download: download.rootfs
-else 
+else
 binaries: os lima-socket-vmnet lima-template
 download: download.os
 endif
@@ -76,13 +72,18 @@ $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME):
 
 $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME):
 	mkdir -p $(ROOTFS_DOWNLOAD_DIR)
+	mkdir -p $(OUTDIR)/os
 	curl -L --fail $(FINCH_ROOTFS_URL) > "$(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)"
+	cd $(ROOTFS_DOWNLOAD_DIR) && gunzip $(FINCH_ROOTFS_BASENAME)
+	$(eval FINCH_ROOTFS_BASENAME := $(subst .gz,,$(FINCH_ROOTFS_BASENAME)))
+	cp $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME) $(OUTDIR)/os
 
 .PHONY: download.os
 download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
 
 .PHONY: download.rootfs
 download.rootfs: $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)
+	$(eval FINCH_ROOTFS_DIGEST := "sha256:$(sha256 $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME))")
 
 $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME):
 	mkdir -p $(DEPENDENCIES_DOWNLOAD_DIR)
