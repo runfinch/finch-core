@@ -32,7 +32,7 @@ jobs:
           role-to-assume: ${{ secrets.ROLE }}
           role-session-name: rootfs-ecr-image-upload-session
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
       - name: checkout repo
         uses: actions/checkout@v4
         with:
