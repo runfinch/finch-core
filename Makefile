@@ -16,11 +16,11 @@ BUILD_TS := $(shell date +%s)
 # Set these variables if they aren't set, or if they are set to ""
 # Allows callers to override these default values
 # From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/
-FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.x86_64-20230830214712.qcow2)
-FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:e8d5872454cf25155ce5f19381f27ef096ce89efcbb5ecc639dcb6bf44e16bf8")
+FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.x86_64-20230918164920.qcow2)
+FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:214cce00ce5f6ac402a0a5a5269013eae201bf143ad8dbb9d50cfd5e22acd991")
 # From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/aarch64/images/
-FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.aarch64-20230830214718.qcow2)
-FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:219a30f1409f8757eaf654dabf378fe0412b9499f877e5c69ad2f24327b1a5f4")
+FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.aarch64-20230918164937.qcow2)
+FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:ad4c2fa3f80736cb6ea8e46f1a6ccf1f5f578e56de462bb60fcbc241786478d2")
 
 FINCH_ROOTFS_x86_URL := $(or $(FINCH_ROOTFS_x86_URL),https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1694791577.tar.gz)
 FINCH_ROOTFS_x86_DIGEST := $(or $(FINCH_ROOTFS_x86_DIGEST),"sha256:2d4d2e7386450899c6d0587fd0db21afadb31d974fa744aa9365c883935c5341")
@@ -127,7 +127,7 @@ install.lima-dependencies: download.lima-dependencies
 .PHONY: lima-template
 lima-template: download
 	mkdir -p $(OUTDIR)/lima-template
-	cp $(OUTDIR)/lima-template/$(FEDORA_YAML) $(OUTDIR)/lima-template/fedora.yaml
+	cp lima-template/fedora.yaml $(OUTDIR)/lima-template
 	# using -i.bak is very intentional, it allows the following commands to succeed for both GNU / BSD sed
 	# this sed command uses the alternative separator of "|" because the image location uses "/"
 	sed -i.bak -e "s|<image_location>|$(FINCH_IMAGE_LOCATION)|g" $(OUTDIR)/lima-template/fedora.yaml
