@@ -23,7 +23,6 @@ RUN curl -L -O https://github.com/sigstore/cosign/releases/download/v2.0.1/cosig
 RUN sudo rpm -ivh cosign-2.0.1.x86_64.rpm
 RUN rm -rf cosign-2.0.1.x86_64.rpm
 
-
 RUN systemctl enable cloud-init cloud-init-local cloud-config cloud-final
 
 # enable systemd
