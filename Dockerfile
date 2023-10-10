@@ -18,6 +18,11 @@ RUN dnf install -y \
   iptables \
   fuse-sshfs
 
+# install cosign
+RUN curl -L -O https://github.com/sigstore/cosign/releases/download/v2.0.1/cosign-2.0.1.x86_64.rpm && \
+    sudo rpm -ivh cosign-2.0.1.x86_64.rpm && \
+    rm -rf cosign-2.0.1.x86_64.rpm
+
 RUN systemctl enable cloud-init cloud-init-local cloud-config cloud-final
 
 # enable systemd
