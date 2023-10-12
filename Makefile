@@ -173,7 +173,7 @@ install.lima-dependencies-wsl2:
 	# Required by heimdal-libs, from https://packages.msys2.org/package/libsqlite?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-sqlite3-0.dll $(OUTDIR)/bin/
 
-	# Required by ssh.exe, from heimdal-libs https://packages.msys2.org/package/heimdal-libs?repo=msys&variant=x86_64
+	# Required by ssh.exe, from https://packages.msys2.org/package/heimdal-libs?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-asn1-8.dll $(OUTDIR)/bin/
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-com_err-1.dll $(OUTDIR)/bin/
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-gssapi-3.dll $(OUTDIR)/bin/
