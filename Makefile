@@ -28,29 +28,34 @@ FINCH_ROOTFS_x86_DIGEST := $(or $(FINCH_ROOTFS_x86_DIGEST),"sha256:ed36fb7f48196
 LIMA_DEPENDENCY_FILE_NAME ?= lima-and-qemu.tar.gz
 .DEFAULT_GOAL := all
 
+WINGIT_TEMP_DIR := $(CURDIR)/wingit-temp
+WINGIT_x86_URL := $(or $(WINGIT_x86_URL),https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/Git-2.42.0.2-64-bit.tar.bz2)
+WINGIT_x86_BASENAME ?= $(notdir $(WINGIT_x86_URL))
+WINGIT_x86_HASH := $(or $(WINGIT_x86_HASH),"sha256:c192e56f8ed3d364acc87ad04d1f5aa6ae03c23b32b67bf65fcc6f9b8f032e65")
+
 ifneq (,$(findstring arm64,$(ARCH)))
-    LIMA_ARCH = aarch64
-    LIMA_URL ?= https://deps.runfinch.com/aarch64/lima-and-qemu.macos-aarch64.1691201350.tar.gz
-    FINCH_OS_BASENAME := $(notdir $(FINCH_OS_AARCH64_URL))
-    FINCH_OS_IMAGE_URL := $(FINCH_OS_AARCH64_URL)
-    FINCH_OS_DIGEST ?= $(FINCH_OS_AARCH64_DIGEST)
-    # TODO: Use Finch rootfs in Finch on Windows testing
-    FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_AARCH64_URL))
-    FINCH_ROOTFS_URL ?= $(FINCH_ROOTFS_AARCH64_URL)
-    FINCH_ROOTFS_DIGEST ?= $(FINCH_ROOTFS_AARCH64_DIGEST)
-    HOMEBREW_PREFIX ?= /opt/homebrew
+	LIMA_ARCH = aarch64
+	LIMA_URL ?= https://deps.runfinch.com/aarch64/lima-and-qemu.macos-aarch64.1691201350.tar.gz
+	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_AARCH64_URL))
+	FINCH_OS_IMAGE_URL := $(FINCH_OS_AARCH64_URL)
+	FINCH_OS_DIGEST ?= $(FINCH_OS_AARCH64_DIGEST)
+	# TODO: Use Finch rootfs in Finch on Windows testing
+	FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_AARCH64_URL))
+	FINCH_ROOTFS_URL ?= $(FINCH_ROOTFS_AARCH64_URL)
+	FINCH_ROOTFS_DIGEST ?= $(FINCH_ROOTFS_AARCH64_DIGEST)
+	HOMEBREW_PREFIX ?= /opt/homebrew
 
 else ifneq (,$(findstring x86_64,$(ARCH)))
-    LIMA_ARCH = x86_64
-    LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1691201350.tar.gz
-    FINCH_OS_BASENAME := $(notdir $(FINCH_OS_x86_URL))
-    FINCH_OS_IMAGE_URL := $(FINCH_OS_x86_URL)
-    FINCH_OS_DIGEST ?= $(FINCH_OS_x86_DIGEST)
-    # TODO: Use Finch rootfs in Finch on Windows testing
-    FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_x86_URL))
-    FINCH_ROOTFS_URL ?= $(FINCH_ROOTFS_x86_URL)
-    FINCH_ROOTFS_DIGEST ?= $(FINCH_ROOTFS_x86_DIGEST)
-    HOMEBREW_PREFIX ?= /usr/local
+	LIMA_ARCH = x86_64
+	LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1691201350.tar.gz
+	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_x86_URL))
+	FINCH_OS_IMAGE_URL := $(FINCH_OS_x86_URL)
+	FINCH_OS_DIGEST ?= $(FINCH_OS_x86_DIGEST)
+	# TODO: Use Finch rootfs in Finch on Windows testing
+	FINCH_ROOTFS_BASENAME := $(notdir $(FINCH_ROOTFS_x86_URL))
+	FINCH_ROOTFS_URL ?= $(FINCH_ROOTFS_x86_URL)
+	FINCH_ROOTFS_DIGEST ?= $(FINCH_ROOTFS_x86_DIGEST)
+	HOMEBREW_PREFIX ?= /usr/local
 
 endif
 
@@ -121,8 +126,47 @@ $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME):
 .PHONY: download.lima-dependencies
 download.lima-dependencies: $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)
 
-.PHONE: install.lima-dependencies
+.PHONY: install.lima-dependencies
 install.lima-dependencies: download.lima-dependencies
+
+.PHONY: install.lima-dependencies-wsl2
+install.lima-dependencies-wsl2:
+	mkdir -p $(DEPENDENCIES_DOWNLOAD_DIR)
+	mkdir -p $(OUTDIR)/bin
+
+	curl -L --fail $(WINGIT_x86_URL) > $(DEPENDENCIES_DOWNLOAD_DIR)/$(WINGIT_x86_BASENAME)
+	pwsh.exe -NoLogo -NoProfile -c ./verify_hash.ps1 "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" $(WINGIT_x86_HASH)
+	# this takes a long time
+	C:\Windows\System32\tar.exe -xvzf "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" -C $(WINGIT_TEMP_DIR)
+	
+	cp $(WINGIT_TEMP_DIR)/usr/bin/gzip.exe $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/cygpath.exe $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/tar.exe $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/ssh.exe $(OUTDIR)/bin/
+	# Dependency DLLs, extracted with https://github.com/lucasg/Dependencies
+	# Dependencies.exe -chain $(WINGIT_TEMP_DIR)\usr\bin\ssh.exe -depth 3 -json
+	# Note: Depth 3 is only needed for ssh.exe, everything else only needs depth 1
+	# TODO: Automate
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-iconv-2.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-2.0.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-intl-8.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-gssapi-3.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypto-3.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-z.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-gcc_s-seh-1.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-asn1-8.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-com_err-1.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-heimntlm-0.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-heimbase-1.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-hcrypto-4.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-krb5-26.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-roken-18.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypt-0.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-wind-0.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-hx509-5.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-sqlite3-0.dll $(OUTDIR)/bin/
+
+	rm $(WINGIT_TEMP_DIR)
 
 .PHONY: lima-template
 lima-template: download
