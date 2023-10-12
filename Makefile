@@ -171,8 +171,6 @@ $(LIMA_OUTDIR)/bin/ssh.exe:
 
 	# Required by ssh.exe, from https://packages.msys2.org/package/libopenssl?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypto-3.dll $(LIMA_OUTDIR)/bin/
-	# Required by ssh-keygen.exe, from https://packages.msys2.org/package/libopenssl?repo=msys&variant=x86_64
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypto-1.1.dll $(LIMA_OUTDIR)/bin/
 	# Required by ssh.exe, from https://packages.msys2.org/package/zlib-devel?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-z.dll $(LIMA_OUTDIR)/bin/
 	# Required by ssh.exe, from https://packages.msys2.org/package/libcrypt?repo=msys&variant=x86_64
