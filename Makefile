@@ -139,32 +139,51 @@ install.lima-dependencies-wsl2:
 	# this takes a long time
 	C:\Windows\System32\tar.exe -xvzf "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" -C $(WINGIT_TEMP_DIR)
 	
+	# Lima runtime dependencies
+
+	# From https://packages.msys2.org/package/gzip?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/gzip.exe $(OUTDIR)/bin/
+	# From https://packages.msys2.org/package/msys2-runtime?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/cygpath.exe $(OUTDIR)/bin/
+	# From https://packages.msys2.org/package/tar?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/tar.exe $(OUTDIR)/bin/
+	# From https://packages.msys2.org/package/openssh?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/ssh.exe $(OUTDIR)/bin/
+	
 	# Dependency DLLs, extracted with https://github.com/lucasg/Dependencies
 	# Dependencies.exe -chain $(WINGIT_TEMP_DIR)\usr\bin\ssh.exe -depth 3 -json
-	# Note: Depth 3 is only needed for ssh.exe, everything else only needs depth 1
+	# Depth 3 is only needed for ssh.exe, everything else only needs depth 1
 	# TODO: Automate
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-iconv-2.dll $(OUTDIR)/bin/
+
+	# Required by all MSYS2 programs, from https://github.com/msys2/msys2-runtime
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-2.0.dll $(OUTDIR)/bin/
+	# Required by tar.exe, from https://packages.msys2.org/package/libiconv?repo=msys&variant=x86_64
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-iconv-2.dll $(OUTDIR)/bin/
+	# Required by msys-iconv-2.dll, from https://packages.msys2.org/package/libintl?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-intl-8.dll $(OUTDIR)/bin/
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-gssapi-3.dll $(OUTDIR)/bin/
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypto-3.dll $(OUTDIR)/bin/
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-z.dll $(OUTDIR)/bin/
+	# GCC exception handling, required for all programs that throw exceptions, from https://packages.msys2.org/package/gcc-libs?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-gcc_s-seh-1.dll $(OUTDIR)/bin/
+
+	# Required by ssh.exe, from https://packages.msys2.org/package/libopenssl?repo=msys&variant=x86_64
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypto-3.dll $(OUTDIR)/bin/
+	# Required by ssh.exe, from https://packages.msys2.org/package/zlib-devel?repo=msys&variant=x86_64
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-z.dll $(OUTDIR)/bin/
+	# Required by ssh.exe, from https://packages.msys2.org/package/libcrypt?repo=msys&variant=x86_64
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypt-0.dll $(OUTDIR)/bin/
+	# Required by heimdal-libs, from https://packages.msys2.org/package/libsqlite?repo=msys&variant=x86_64
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-sqlite3-0.dll $(OUTDIR)/bin/
+
+	# Required by ssh.exe, from heimdal-libs https://packages.msys2.org/package/heimdal-libs?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-asn1-8.dll $(OUTDIR)/bin/
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-com_err-1.dll $(OUTDIR)/bin/
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-heimntlm-0.dll $(OUTDIR)/bin/
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-heimbase-1.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-gssapi-3.dll $(OUTDIR)/bin/
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-hcrypto-4.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-heimbase-1.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-heimntlm-0.dll $(OUTDIR)/bin/
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-hx509-5.dll $(OUTDIR)/bin/
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-krb5-26.dll $(OUTDIR)/bin/
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-roken-18.dll $(OUTDIR)/bin/
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypt-0.dll $(OUTDIR)/bin/
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-wind-0.dll $(OUTDIR)/bin/
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-hx509-5.dll $(OUTDIR)/bin/
-	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-sqlite3-0.dll $(OUTDIR)/bin/
 
 	rm $(WINGIT_TEMP_DIR)
 
