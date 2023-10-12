@@ -139,7 +139,7 @@ $(LIMA_OUTDIR)/bin/ssh.exe:
 	pwsh.exe -NoLogo -NoProfile -c ./verify_hash.ps1 "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" $(WINGIT_x86_HASH)
 	mkdir -p $(WINGIT_TEMP_DIR)
 	# this takes a long time because of an almost 4:1 compression ratio and needing to extract many small files
-	tar -xvjf "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" -C $(WINGIT_TEMP_DIR)
+	tar --force-local -xvjf "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" -C $(WINGIT_TEMP_DIR)
 	
 	# Lima runtime dependencies
 	mkdir -p $(LIMA_OUTDIR)/bin
