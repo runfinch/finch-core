@@ -1,5 +1,6 @@
 _output/
 downloads/
+wingit-temp/
 *.idea
 *.DS_Store
 *.bak
