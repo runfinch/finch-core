@@ -137,7 +137,7 @@ install.lima-dependencies-wsl2:
 	curl -L --fail $(WINGIT_x86_URL) > $(DEPENDENCIES_DOWNLOAD_DIR)/$(WINGIT_x86_BASENAME)
 	pwsh.exe -NoLogo -NoProfile -c ./verify_hash.ps1 "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" $(WINGIT_x86_HASH)
 	# this takes a long time
-	C:\Windows\System32\tar.exe -xvzf "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" -C $(WINGIT_TEMP_DIR)
+	tar -xvzf "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" -C $(WINGIT_TEMP_DIR)
 	
 	# Lima runtime dependencies
 
@@ -149,7 +149,8 @@ install.lima-dependencies-wsl2:
 	cp $(WINGIT_TEMP_DIR)/usr/bin/tar.exe $(OUTDIR)/bin/
 	# From https://packages.msys2.org/package/openssh?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/ssh.exe $(OUTDIR)/bin/
-	
+	# From https://packages.msys2.org/package/openssh?repo=msys&variant=x86_64
+	cp $(WINGIT_TEMP_DIR)/usr/bin/ssh-keygen.exe $(OUTDIR)/bin/
 	# Dependency DLLs, extracted with https://github.com/lucasg/Dependencies
 	# Dependencies.exe -chain $(WINGIT_TEMP_DIR)\usr\bin\ssh.exe -depth 3 -json
 	# Depth 3 is only needed for ssh.exe, everything else only needs depth 1
@@ -166,6 +167,8 @@ install.lima-dependencies-wsl2:
 
 	# Required by ssh.exe, from https://packages.msys2.org/package/libopenssl?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypto-3.dll $(OUTDIR)/bin/
+	# Required by ssh-keygen.exe, from https://packages.msys2.org/package/libopenssl?repo=msys&variant=x86_64
+	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-crypto-1.1.dll $(OUTDIR)/bin/
 	# Required by ssh.exe, from https://packages.msys2.org/package/zlib-devel?repo=msys&variant=x86_64
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-z.dll $(OUTDIR)/bin/
 	# Required by ssh.exe, from https://packages.msys2.org/package/libcrypt?repo=msys&variant=x86_64
