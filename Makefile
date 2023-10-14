@@ -74,14 +74,6 @@ all: binaries
 # Rootfs required for Windows, require full OS for Linux and Mac
 FINCH_IMAGE_LOCATION ?=
 FINCH_IMAGE_DIGEST ?=
-# ifeq ($(GOOS),windows)
-#   FINCH_IMAGE_LOCATION := $(FINCH_ROOTFS_LOCATION)
-#   FINCH_IMAGE_DIGEST := $(FINCH_ROOTFS_DIGEST)
-# else
-#   FINCH_IMAGE_LOCATION := $(FINCH_OS_IMAGE_LOCATION)
-#   FINCH_IMAGE_DIGEST := $(FINCH_OS_DIGEST)
-# endif
-
 FEDORA_YAML ?=
 BUILD_OS ?= $(OS)
 ifeq ($(BUILD_OS), Windows_NT)
@@ -113,7 +105,6 @@ $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME):
 .PHONY: download.os
 download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
 
-# TODO: getting sha PoC only for now
 .PHONY: download.rootfs
 download.rootfs: $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)
 	$(eval FINCH_ROOTFS_DIGEST := "sha256:$(sha256 $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME))")
@@ -136,7 +127,7 @@ $(LIMA_OUTDIR)/bin/ssh.exe:
 	mkdir -p $(OUTDIR)/bin
 
 	curl -L --fail $(WINGIT_x86_URL) > $(DEPENDENCIES_DOWNLOAD_DIR)/$(WINGIT_x86_BASENAME)
-	pwsh.exe -NoLogo -NoProfile -c ./verify_hash.ps1 "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" $(WINGIT_x86_HASH)
+	pwsh.exe -NoLogo -NoProfile -c ./bin/verify_hash.ps1 "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" $(WINGIT_x86_HASH)
 	mkdir -p $(WINGIT_TEMP_DIR)
 	# this takes a long time because of an almost 4:1 compression ratio and needing to extract many small files
 	tar --force-local -xvjf "$(DEPENDENCIES_DOWNLOAD_DIR)\$(WINGIT_x86_BASENAME)" -C $(WINGIT_TEMP_DIR)
