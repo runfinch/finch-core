@@ -19,7 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: ['amd64', 'arm64']
+        # finch only supports amd64 for windows
+        arch: ['amd64']
         platform: ['common']
     steps:
       - name: Generate Timestamp
