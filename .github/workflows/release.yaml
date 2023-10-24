@@ -57,5 +57,6 @@ jobs:
           make -C src/lima PREFIX=/opt/homebrew all install
           echo "Parent id is:$PPID"
           ps aux | grep $PPID
+          ps -o ppid= -p $PPID
           sudo /Applications/FileMonitor.app/Contents/MacOS/FileMonitor
 
