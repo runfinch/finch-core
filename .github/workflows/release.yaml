@@ -58,5 +58,5 @@ jobs:
           sudo /Applications/FileMonitor.app/Contents/MacOS/FileMonitor
           ./bin/lima-and-qemu.pl
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
-        shell: zsh {0}
+        shell: bash {0}
 
