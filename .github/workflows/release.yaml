@@ -59,19 +59,3 @@ jobs:
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
         shell: zsh {0}
 
-      - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
-        with:
-          name: lima-and-qemu.macos-arm64
-          path: ./src/lima/lima-and-qemu.macos*
-          if-no-files-found: error
-
-      - name: Make and release source code of dependencies
-        run: make download-sources
-      - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
-        with:
-          name: DependenciesSourceCode.tar.gz
-          path: ./downloads/dependency-sources.tar.gz
-          if-no-files-found: error
-
