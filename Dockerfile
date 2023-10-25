@@ -38,7 +38,7 @@ network:
 EOF
 
 # cleanup
-RUN dnf clean all &&\
+RUN dnf clean all && \
     rm -f /etc/NetworkManager/system-connections/*.nmconnection && \
     truncate -s 0 /etc/machine-id && \
     rm -f /var/lib/systemd/random-seed
