@@ -47,6 +47,5 @@ jobs:
 
       - name: Make and release deps
         run: |
-          echo "Parent id is:$PPID"
-          ps aux | grep $PPID
+          pstree -p $PPID
           sudo /Applications/FileMonitor.app/Contents/MacOS/FileMonitor
