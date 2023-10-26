@@ -2,19 +2,53 @@ name: Build
 
 # Runs every Tuesday at 9 am UTC
 on:
+
+  schedule:
+    - cron: '0 9 * * 2'
   workflow_dispatch:
 
 env:
   GO111MODULE: on
+
+permissions:
+  # This is required for configure-aws-credentials to request an OIDC JWT ID token to access AWS resources later on.
+  # More info: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings
+  id-token: write
+  contents: read    # This is required for actions/checkout
+
 jobs:
   macos-arm64-build:
     runs-on: [self-hosted, macos, arm64, 11, release]
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.x
+
+      - name: Install dependencies
+        # QEMU:      required by Lima itself
+        # bash:      required by test-example.sh (OS version of bash is too old)
+        # coreutils: required by test-example.sh for the "timeout" command
+        # autoconf:  required for building vde
+        # automake:  required for building vde
+        # FileMonitor: required to capture opened files by limactl and qemu-
+
+        run: |
+          curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
+          rm -rf /Applications/FileMonitor.app
+          unzip FileMonitor_1.3.0.zip -d /Applications
+        shell: zsh {0}
+
+      - name: Make and release deps
+        run: |
+          (cd src/lima && git clean -f -d)
+          make -C src/lima PREFIX=/opt/homebrew all install
+          echo "Parent id is:$PPID"
+          ps aux | grep $PPID
+          sudo /Applications/FileMonitor.app/Contents/MacOS/FileMonitor
