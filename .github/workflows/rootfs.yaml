@@ -27,7 +27,7 @@ jobs:
         id: timestamp
         run: echo "::set-output name=value::$(date +%s)"
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ secrets.REGION }}
           role-to-assume: ${{ secrets.ROLE }}
