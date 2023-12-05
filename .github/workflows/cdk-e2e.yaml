@@ -5,17 +5,23 @@ on:
   workflow_dispatch:
   # Run every day at 12am
   schedule:
-    - cron: '0 0 * * *'
-  
+    - cron: "0 0 * * *"
+
 jobs:
   build-and-test:
     strategy:
       fail-fast: false
-      matrix: 
-        os: [[self-hosted, macos, amd64, 13, test], [self-hosted, macos, amd64, 12, test], [self-hosted, macos, arm64, 13, test], [self-hosted, macos, arm64, 12, test]]
+      matrix:
+        os:
+          [
+            [self-hosted, macos, amd64, 13, test],
+            [self-hosted, macos, amd64, 14, test],
+            [self-hosted, macos, arm64, 13, test],
+            [self-hosted, macos, arm64, 14, test],
+          ]
     runs-on: ${{ matrix.os }}
     steps:
-      # Cleanup 
+      # Cleanup
       - name: Cleanup Workspace
         run: |
           sudo rm -rf * 
@@ -28,7 +34,7 @@ jobs:
           if pgrep '^socket_vmnet'; then
             sudo pkill '^socket_vmnet'
           fi
-        
+
       - name: Checkout AWS CDK main branch
         uses: actions/checkout@v4
         with:
@@ -38,7 +44,7 @@ jobs:
       - name: Configure Node.js version
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
         run: |
@@ -47,10 +53,10 @@ jobs:
 
       # Setting Node options and running lerna build
       - name: Build with lerna
-        run: | 
+        run: |
           npx lerna run build
           npm install -g @aws-cdk/integ-tests
-          npm install -g @aws-cdk/core      
+          npm install -g @aws-cdk/core
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
 
@@ -60,9 +66,9 @@ jobs:
           repository: runfinch/finch
           ref: main
           path: finch-temp
-          submodules: 'recursive'
+          submodules: "recursive"
 
-    # Setup Go using version specified in go.mod
+      # Setup Go using version specified in go.mod
       - name: Setup Go from Finch's go.mod
         uses: actions/setup-go@v5
         with:
@@ -87,7 +93,7 @@ jobs:
       - name: Run integration tests
         uses: nick-fields/retry@v2
         with:
-         timeout_minutes: 180
-         max_attempts: 3
-         # Drop in replacement for docker in CDK https://github.com/aws/aws-cdk/blob/b23252b99559ad1a1f0e05b6936c60f9c52522ff/packages/cdk-assets/README.md?plain=1#L185
-         command: CDK_DOCKER=finch yarn integ-runner --max-workers=1 --directory packages/@aws-cdk-testing/framework-integ
+          timeout_minutes: 180
+          max_attempts: 3
+          # Drop in replacement for docker in CDK https://github.com/aws/aws-cdk/blob/b23252b99559ad1a1f0e05b6936c60f9c52522ff/packages/cdk-assets/README.md?plain=1#L185
+          command: CDK_DOCKER=finch yarn integ-runner --max-workers=1 --directory packages/@aws-cdk-testing/framework-integ
