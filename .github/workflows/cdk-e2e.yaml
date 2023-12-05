@@ -41,7 +41,9 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: yarn install
+        run: |
+          npm install --global yarn
+          yarn install
 
       # Setting Node options and running lerna build
       - name: Build with lerna
