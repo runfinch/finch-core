@@ -19,7 +19,7 @@ permissions:
 jobs:
   macos-arm64-build:
     runs-on: [self-hosted, macos, arm64, 11, release]
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,7 +77,7 @@ jobs:
 
   macos-x86-build:
     runs-on: [self-hosted, macos, amd64, 11, release]
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
