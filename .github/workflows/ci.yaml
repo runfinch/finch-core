@@ -4,15 +4,15 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**.md'
-      - 'src/**'
+      - "**.md"
+      - "src/**"
   pull_request:
     branches:
       - main
     paths-ignore:
-      - '**.md'
-      - 'contrib/**'
-      - 'Dockerfile'
+      - "**.md"
+      - "contrib/**"
+      - "Dockerfile"
   workflow_dispatch:
 
 concurrency:
@@ -24,7 +24,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [[self-hosted, macos, amd64, 13, test], [self-hosted, macos, amd64, 12, test], [self-hosted, macos, arm64, 13, test], [self-hosted, macos, arm64, 12, test]]
+        os:
+          [
+            [self-hosted, macos, amd64, 13, test],
+            [self-hosted, macos, amd64, 14, test],
+            [self-hosted, macos, arm64, 13, test],
+            [self-hosted, macos, arm64, 14, test],
+          ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
