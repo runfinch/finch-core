@@ -17,11 +17,11 @@ BUILD_TS := $(shell date +%s)
 # Set these variables if they aren't set, or if they are set to ""
 # Allows callers to override these default values
 # From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/
-FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.x86_64-20231026161553.qcow2)
-FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:d0fdd60e4cddd802c4e3846edf9e386f87fa8e8c1bd3d9b80335fb489eeb6bcd")
+FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.x86_64-20231207190935.qcow2)
+FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:635469797bbddb4b3328513cae1f1cfa5505e0606c01604315968b545aaa9550")
 # From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/aarch64/images/
-FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.aarch64-20231026161559.qcow2)
-FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:a1d9a67009aa73b8f88fa1599c1fc331c2adbf98fb9db41661b97c476b62035e")
+FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.aarch64-20231207184228.qcow2)
+FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:c5610d0f1874c92bba62a97fa647973cd0bdf749f6f4dee30b29bf2bd1a2e899")
 
 FINCH_ROOTFS_x86_URL := $(or $(FINCH_ROOTFS_x86_URL),https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1696963702.tar.gz)
 FINCH_ROOTFS_x86_DIGEST := $(or $(FINCH_ROOTFS_x86_DIGEST),"sha256:ed36fb7f4819644efaf409a3417456fe8378c4f4bcff0bd1e0e520954b10ccf5")
