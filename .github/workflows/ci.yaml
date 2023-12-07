@@ -34,7 +34,7 @@ jobs:
           persist-credentials: false
           submodules: true
       - name: Setup go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version-file: e2e/go.mod
           cache-dependency-path: e2e/go.sum
