@@ -79,9 +79,6 @@ jobs:
           # In finch the file sharing is not synchronous by default so the files still show up in the vm for a bit,
           # so it's important to sync the host fs with the vm for the cdk testing framework.
           sed -i '' '/sshfs:/,/9p:/s/cache: null/cache: false/' finch.yaml
-          
-          # Make it able to run finch build with --ssh option #696
-          sed -i '' 's/forwardAgent: null/forwardAgent: true/' finch.yaml
           sudo make clean 
           make
           sudo make install
