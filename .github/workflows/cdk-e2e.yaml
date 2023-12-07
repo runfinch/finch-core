@@ -64,7 +64,7 @@ jobs:
 
     # Setup Go using version specified in go.mod
       - name: Setup Go from Finch's go.mod
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version-file: finch-temp/go.mod
 
