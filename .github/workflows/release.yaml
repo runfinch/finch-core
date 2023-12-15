@@ -60,7 +60,7 @@ jobs:
         shell: zsh {0}
 
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lima-and-qemu.macos-arm64
           path: ./src/lima/lima-and-qemu.macos*
@@ -69,7 +69,7 @@ jobs:
       - name: Make and release source code of dependencies
         run: make download-sources
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: DependenciesSourceCode.tar.gz
           path: ./downloads/dependency-sources.tar.gz
@@ -118,7 +118,7 @@ jobs:
         shell: zsh {0}
 
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lima-and-qemu.macos-x86
           path: ./src/lima/lima-and-qemu.macos*
@@ -145,7 +145,7 @@ jobs:
             tar cfz limactl.ventura.arm64.tar.gz -C _output/bin limactl
 
         - name: Upload Ventura build
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: limactl.ventura.arm64
             path: src/lima/limactl.ventura.arm64.tar.gz
@@ -172,7 +172,7 @@ jobs:
           tar cfz limactl.ventura.x86_64.tar.gz -C _output/bin limactl
 
       - name: Upload Ventura build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: limactl.ventura.x86_64
           path: src/lima/limactl.ventura.x86_64.tar.gz
