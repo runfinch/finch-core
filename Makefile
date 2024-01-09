@@ -23,8 +23,8 @@ FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:635469797bbddb4b33285
 FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-38-1.6.aarch64-20231207184228.qcow2)
 FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:c5610d0f1874c92bba62a97fa647973cd0bdf749f6f4dee30b29bf2bd1a2e899")
 
-FINCH_ROOTFS_x86_URL := $(or $(FINCH_ROOTFS_x86_URL),https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1696963702.tar.gz)
-FINCH_ROOTFS_x86_DIGEST := $(or $(FINCH_ROOTFS_x86_DIGEST),"sha256:ed36fb7f4819644efaf409a3417456fe8378c4f4bcff0bd1e0e520954b10ccf5")
+FINCH_ROOTFS_x86_URL := $(or $(FINCH_ROOTFS_x86_URL),https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1704738038.tar.gz)
+FINCH_ROOTFS_x86_DIGEST := $(or $(FINCH_ROOTFS_x86_DIGEST),"sha256:f8346046ca5152f452558e50ecc041451bf93ed5a733ef14362846dd3fcd1a35")
 
 LIMA_DEPENDENCY_FILE_NAME ?= lima-and-qemu.tar.gz
 .DEFAULT_GOAL := all
