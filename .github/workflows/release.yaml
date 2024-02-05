@@ -21,13 +21,14 @@ jobs:
     runs-on: [self-hosted, macos, arm64, 11, release]
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 1
+          fetch-tags: true
           submodules: recursive
           persist-credentials: false
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version: 1.20.x
 
@@ -60,7 +61,7 @@ jobs:
         shell: zsh {0}
 
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
           name: lima-and-qemu.macos-arm64
           path: ./src/lima/lima-and-qemu.macos*
@@ -69,7 +70,7 @@ jobs:
       - name: Make and release source code of dependencies
         run: make download-sources
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
           name: DependenciesSourceCode.tar.gz
           path: ./downloads/dependency-sources.tar.gz
@@ -79,13 +80,13 @@ jobs:
     runs-on: [self-hosted, macos, amd64, 11, release]
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version: 1.20.x
 
@@ -118,7 +119,7 @@ jobs:
         shell: zsh {0}
 
       - name: Upload MacOS build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
           name: lima-and-qemu.macos-x86
           path: ./src/lima/lima-and-qemu.macos*
@@ -128,13 +129,13 @@ jobs:
     runs-on:  [self-hosted, macos, arm64, 13, release]
     timeout-minutes: 60
     steps:
-        - uses: actions/checkout@v4
+        - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
           with:
             fetch-depth: 1
             submodules: recursive
             persist-credentials: false
 
-        - uses: actions/setup-go@v5
+        - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
           with:
             go-version: 1.20.x
 
@@ -145,7 +146,7 @@ jobs:
             tar cfz limactl.ventura.arm64.tar.gz -C _output/bin limactl
 
         - name: Upload Ventura build
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
           with:
             name: limactl.ventura.arm64
             path: src/lima/limactl.ventura.arm64.tar.gz
@@ -155,13 +156,13 @@ jobs:
     runs-on:  [self-hosted, macos, amd64, 13, release]
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 1
           submodules: recursive
           persist-credentials: false
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version: 1.20.x
 
@@ -172,7 +173,7 @@ jobs:
           tar cfz limactl.ventura.x86_64.tar.gz -C _output/bin limactl
 
       - name: Upload Ventura build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
           name: limactl.ventura.x86_64
           path: src/lima/limactl.ventura.x86_64.tar.gz
@@ -188,38 +189,38 @@ jobs:
       - macos-arm64-ventura-build
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 1
           persist-credentials: false
 
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
         with:
           role-to-assume: ${{ secrets.ROLE }}
           role-session-name: dependency-upload-session
           aws-region: ${{ secrets.REGION }}
 
       - name: Download MacOS ARM64 build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2v3
         with:
           name: lima-and-qemu.macos-arm64
           path: build
 
       - name: Download MacOS x86_64 build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2v3
         with:
           name: lima-and-qemu.macos-x86
           path: build
 
       - name: Download MacOS ARM64 Ventura build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2v3
         with:
           name: limactl.ventura.arm64
           path: build
 
       - name: Download MacOS x86_64 Ventura build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2v3
         with:
           name: limactl.ventura.x86_64
           path: build
@@ -245,7 +246,7 @@ jobs:
           sha512sum build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz.sha512sum
 
       - name: Download MacOS dependencies' sources
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2v3
         with:
           name: DependenciesSourceCode.tar.gz
           path: build
