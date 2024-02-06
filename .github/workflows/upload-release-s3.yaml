@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download last release
-        uses: robinraju/release-downloader@v1.9
+        uses: robinraju/release-downloader@368754b9c6f47c345fcfbf42bcb577c2f0f5f395 # v1.9
         with:
           repository: "runfinch/finch-core"
           latest: true
@@ -25,7 +25,7 @@ jobs:
           zipBall: true
 
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
         with:
           role-to-assume: ${{ secrets.ROLE }}
           role-session-name: upload release
