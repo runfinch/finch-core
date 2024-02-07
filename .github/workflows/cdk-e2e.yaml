@@ -77,6 +77,7 @@ jobs:
       # Build and Install Finch
       - name: Build and Install Finch
         run: |
+          brew install go lz4 automake autoconf libtool
           mkdir -p /tmp/finch
           # move to /tmp because UNIX_PATH_MAX = 104 https://github.com/runfinch/finch/issues/11#issue-1460402755
           mv finch-temp /tmp
