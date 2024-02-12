@@ -57,7 +57,7 @@ jobs:
           fi
       - name: Install dependencies
         shell: zsh {0}
-        run: brew install go lz4 automake autoconf libtool
+        run: brew install lz4 automake autoconf libtool
       - name: Build project
         shell: zsh {0}
         run: |
