@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:1.4
-FROM public.ecr.aws/docker/library/fedora:38
+FROM public.ecr.aws/docker/library/fedora:39
 
 # install necessary cloud-server packages
 RUN dnf group install -y cloud-server-environment --exclude=plymouth* \
