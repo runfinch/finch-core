@@ -20,7 +20,7 @@ jobs:
     runs-on: [self-hosted, macos, arm64, 11, release]
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           fetch-depth: 1
           submodules: recursive
@@ -81,7 +81,7 @@ jobs:
     runs-on: [self-hosted, macos, amd64, 11, release]
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           fetch-depth: 1
           submodules: recursive
@@ -133,7 +133,7 @@ jobs:
     runs-on: [self-hosted, macos, arm64, 13, release]
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           fetch-depth: 1
           submodules: recursive
@@ -163,7 +163,7 @@ jobs:
     runs-on: [self-hosted, macos, amd64, 13, release]
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           fetch-depth: 1
           submodules: recursive
@@ -199,7 +199,7 @@ jobs:
       - macos-arm64-ventura-build
 
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           fetch-depth: 1
           persist-credentials: false
