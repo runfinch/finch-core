@@ -20,8 +20,8 @@ BUILD_TS := $(shell date +%s)
 FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-39-1.5.x86_64-20240322192200.qcow2)
 FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:5e3a1f2a583908f2f236d4c7246d96485877df30042039302f47f2c58249f44f")
 # From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/aarch64/images/
-FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-39-1.5.aarch64-20240322192225.qcow2)
-FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:cadec2a3cf42dd43facb3a7c61bba1a0d770f9db396c74daac66110a22e85f85")
+FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-39-1.5.aarch64-20240322230317.qcow2)
+FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:5e30a8ad79079c316280cff3482d5a62823be3f7c8e06e197f6df863faccee80")
 
 FINCH_ROOTFS_x86_URL := $(or $(FINCH_ROOTFS_x86_URL),https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1711139710.tar.gz)
 FINCH_ROOTFS_x86_DIGEST := $(or $(FINCH_ROOTFS_x86_DIGEST),"sha256:18649edabf48f20716e6b121861fc884dbf5f048fc2f5482c75f37c9e3b0db95")
