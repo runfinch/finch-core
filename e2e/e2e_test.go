@@ -44,6 +44,7 @@ func TestE2e(t *testing.T) {
 
 	ginkgo.SynchronizedBeforeSuite(func() []byte {
 		command.New(o, "start", vmConfigFile).WithTimeoutInSeconds(600).Run()
+		tests.SetupLocalRegistry(o)
 		return nil
 	}, func(bytes []byte) {})
 
