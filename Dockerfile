@@ -1,5 +1,26 @@
 # syntax = docker/dockerfile:1.4
-FROM public.ecr.aws/docker/library/fedora:39
+
+FROM public.ecr.aws/docker/library/fedora:40 as build
+
+WORKDIR /work
+
+# download and install cosign
+RUN curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-2.2.4-1.x86_64.rpm && \
+    curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-2.2.4-1.x86_64.rpm-keyless.pem && \
+    curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-2.2.4-1.x86_64.rpm-keyless.sig && \
+    rpm -ivh cosign-2.2.4-1.x86_64.rpm
+
+# use cosign to verify itself
+RUN cosign verify-blob \
+    --certificate cosign-2.2.4-1.x86_64.rpm-keyless.pem \
+    --signature cosign-2.2.4-1.x86_64.rpm-keyless.sig \
+    --certificate-identity keyless@projectsigstore.iam.gserviceaccount.com \
+    --cert-oidc-issuer https://accounts.google.com \
+    cosign-2.2.4-1.x86_64.rpm
+
+FROM public.ecr.aws/docker/library/fedora:40
+
+WORKDIR /work
 
 # install necessary cloud-server packages
 RUN dnf group install -y cloud-server-environment --exclude=plymouth* \
@@ -19,10 +40,11 @@ RUN dnf install -y \
   fuse-sshfs \
   btrfs-progs
 
+COPY --from=build /work/cosign-2.2.4-1.x86_64.rpm /work/cosign-2.2.4-1.x86_64.rpm
+  
 # install cosign
-RUN curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.3/cosign-2.2.3-1.x86_64.rpm && \
-    sudo rpm -ivh cosign-2.2.3-1.x86_64.rpm && \
-    rm -rf cosign-2.2.3-1.x86_64.rpm
+RUN rpm -ivh cosign-2.2.4-1.x86_64.rpm && \
+    rm -rf cosign-2.2.4-1.x86_64.rpm
 
 RUN systemctl enable cloud-init cloud-init-local cloud-config cloud-final
 
