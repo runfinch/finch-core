@@ -16,15 +16,15 @@ BUILD_TS := $(shell date +%s)
 
 # Set these variables if they aren't set, or if they are set to ""
 # Allows callers to override these default values
-# From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/
-FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-40-1.14.x86_64-20240503185933.qcow2)
-FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:bf54037097a69c13e5b0eb3fae1b23517d76028f790786b7b76d43bea1395298")
-# From https://dl.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/aarch64/images/
-FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-40-1.14.aarch64-20240503185927.qcow2)
-FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:787c2b3e24774e45fea9fc9bef628d4a309b0893a4d452d064b52785efda002d")
+# From https://dl.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/
+FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-40-1.14.x86_64-20240514214655.qcow2)
+FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:a7d5203d353ea6f5b4de73fdb0f36fe4f58b844c8d401f57015430f553a873c4")
+# From https://dl.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/aarch64/images/
+FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-40-1.14.aarch64-20240514214641.qcow2)
+FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:16268745d1f401cc543cb89bf354c49f8bc3d00ce723d59aa289d21b9c872b60")
 
-FINCH_ROOTFS_x86_URL := $(or $(FINCH_ROOTFS_x86_URL),https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1714767486.tar.gz)
-FINCH_ROOTFS_x86_DIGEST := $(or $(FINCH_ROOTFS_x86_DIGEST),"sha256:6b70063b0522c341f957e9b2ef9eea4dbf6ab2c93879661e70bdd61cd952c41a")
+FINCH_ROOTFS_x86_URL := $(or $(FINCH_ROOTFS_x86_URL),https://deps.runfinch.com/common/x86-64/finch-rootfs-production-amd64-1715724303.tar.gz)
+FINCH_ROOTFS_x86_DIGEST := $(or $(FINCH_ROOTFS_x86_DIGEST),"sha256:8bf3e620782ac8991102120b80c0d1be259cd880451c900dd7e8bd284c86f171")
 
 LIMA_DEPENDENCY_FILE_NAME ?= lima-and-qemu.tar.gz
 .DEFAULT_GOAL := all
