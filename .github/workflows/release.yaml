@@ -48,9 +48,7 @@ jobs:
           brew install cpanm
           brew upgrade
           sudo cpanm install JSON
-          curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
-          rm -rf /Applications/FileMonitor.app
-          unzip FileMonitor_1.3.0.zip -d /Applications
+          bash bin/install-file-monitor.sh
         shell: zsh {0}
 
       - name: Make and release deps
@@ -109,9 +107,7 @@ jobs:
           brew install cpanm
           brew upgrade
           sudo cpanm install JSON
-          curl -OL https://bitbucket.org/objective-see/deploy/downloads/FileMonitor_1.3.0.zip
-          rm -rf /Applications/FileMonitor.app
-          unzip FileMonitor_1.3.0.zip -d /Applications
+          bash bin/install-file-monitor.sh
         shell: zsh {0}
 
       - name: Make and release deps
