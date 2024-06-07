@@ -14,6 +14,8 @@ UNAME := $(shell uname -m)
 ARCH ?= $(UNAME)
 BUILD_TS := $(shell date +%s)
 
+OUTPUT_DIRECTORIES=$(OUTDIR) $(DOWNLOAD_DIR) $(OS_DOWNLOAD_DIR) $(LIMA_DOWNLOAD_DIR) $(LIMA_OUTDIR) $(DEPENDENCIES_DOWNLOAD_DIR)
+
 # Set these variables if they aren't set, or if they are set to ""
 # Allows callers to override these default values
 # From https://dl.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/
@@ -36,7 +38,6 @@ WINGIT_x86_HASH := $(or $(WINGIT_x86_HASH),"sha256:c192e56f8ed3d364acc87ad04d1f5
 
 ifneq (,$(findstring arm64,$(ARCH)))
 	LIMA_ARCH = aarch64
-	LIMA_URL ?= https://deps.runfinch.com/aarch64/lima-and-qemu.macos-aarch64.1715099032.tar.gz
 	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_AARCH64_URL))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_AARCH64_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_AARCH64_DIGEST)
@@ -48,7 +49,6 @@ ifneq (,$(findstring arm64,$(ARCH)))
 
 else ifneq (,$(findstring x86_64,$(ARCH)))
 	LIMA_ARCH = x86_64
-	LIMA_URL ?= https://deps.runfinch.com/x86-64/lima-and-qemu.macos-x86_64.1715099032.tar.gz
 	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_x86_URL))
 	FINCH_OS_IMAGE_URL := $(FINCH_OS_x86_URL)
 	FINCH_OS_DIGEST ?= $(FINCH_OS_x86_DIGEST)
@@ -90,6 +90,9 @@ FINCH_IMAGE_DIGEST := $(FINCH_OS_DIGEST)
 FEDORA_YAML := fedora.yaml
 endif
 
+$(OUTPUT_DIRECTORIES):
+	@mkdir -p $@
+
 $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME):
 	mkdir -p $(OS_DOWNLOAD_DIR)
 	curl -L --fail $(FINCH_OS_IMAGE_URL) > "$(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)"
@@ -109,9 +112,10 @@ download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
 download.rootfs: $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)
 	$(eval FINCH_ROOTFS_DIGEST := "sha256:$(sha256 $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME))")
 
-$(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME):
-	mkdir -p $(DEPENDENCIES_DOWNLOAD_DIR)
-	curl -L --fail $(LIMA_URL) > "$(DEPENDENCIES_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)"
+$(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME): $(LIMA_DOWNLOAD_DIR) $(CURDIR)/deps/lima-bundles.conf
+	bash deps/install.sh \
+	  --output $@ \
+	  $(CURDIR)/deps/lima-bundles.conf
 	mkdir -p ${OUTDIR}
 	tar -xvzf ${DEPENDENCIES_DOWNLOAD_DIR}/${LIMA_DEPENDENCY_FILE_NAME} -C ${OUTDIR}
 
@@ -122,7 +126,7 @@ download.lima-dependencies: $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)
 install.lima-dependencies: download.lima-dependencies
 
 # Only redownload/extract if this file is missing (there's no particular reason for choosing this file instead of any other)
-$(LIMA_OUTDIR)/bin/ssh.exe:
+$(LIMA_OUTDIR)/bin/ssh.exe: $(LIMA_OUTDIR)
 	mkdir -p $(DEPENDENCIES_DOWNLOAD_DIR)
 	mkdir -p $(OUTDIR)/bin
 
