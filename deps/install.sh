@@ -5,11 +5,12 @@
 
 # A script for pulling and unpacking a dependency artifact.
 #
-# Usage: bash install.sh [-o|--output <FILEPATH>] <SOURCES_FILE>
+# Usage: bash install.sh [-o|--output <FILEPATH>] [-p|--platform <PLATFORM>] <SOURCES_FILE>
 
 set -euxo pipefail
 
 file=""
+platform=""
 sources=""
 
 while [[ $# -gt 0 ]]; do
@@ -17,6 +18,11 @@ while [[ $# -gt 0 ]]; do
     --output|-o)
       shift # past argument
       file=$1
+      shift # past value
+      ;;
+    --platform|-p)
+      shift # past argument
+      platform=$1
       shift # past value
       ;;
     --*|-*)
@@ -38,6 +44,10 @@ fi
 source "${sources}"
 
 DEPENDENCY_BASE_URL="https://deps.runfinch.com"
+if [[ -n "$platform" ]]; then
+  DEPENDENCY_BASE_URL="${DEPENDENCY_BASE_URL}/${platform}"
+fi
+
 AARCH64="aarch64"
 X86_64="x86-64"
 
@@ -47,8 +57,12 @@ digest=""
 arch="$(uname -m)"
 case "${arch}" in
   "arm64")
-    artifact="${AARCH64}/${AARCH64_ARTIFACT}"
-    digest=${AARCH64_512_DIGEST}
+    if [[ -z "$AARCH64_ARTIFACT" ]]; then
+      echo "error: ARM architecture not supported for dependency" && exit 1
+    else 
+      artifact="${AARCH64}/${AARCH64_ARTIFACT}"
+      digest=${AARCH64_512_DIGEST}
+    fi
     ;;
   "x86_64")
     artifact="${X86_64}/${X86_64_ARTIFACT}"
@@ -65,4 +79,4 @@ curl -L --fail "${url}" > "${file}"
 
 # validate shasum for downloaded artifact
 (shasum --algorithm 512 "${file}" | cut -d ' ' -f 1 | grep -xq "^${digest}$") || \
-  (echo "error: shasum verification failed for lima dependency" && exit 1)
+  (echo "error: shasum verification failed for dependency" && exit 1)

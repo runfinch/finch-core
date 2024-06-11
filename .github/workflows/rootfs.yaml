@@ -63,11 +63,14 @@ jobs:
           docker container create --platform linux/${{ matrix.arch }} --name ${{ matrix.arch }}-rootfs finch-rootfs-image-production:intermediate
           docker container export -o finch-rootfs-production-${{ matrix.arch }}.tar ${{ matrix.arch }}-rootfs
 
-          gzip -9 -c finch-rootfs-production-${{ matrix.arch }}.tar > finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz
+          compressed_archive=finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz
+          gzip -9 -c finch-rootfs-production-${{ matrix.arch }}.tar > $compressed_archive
+          sha512sum $compressed_archive | cut -d " " -f 1 > $compressed_archive.sha512sum
 
           ARCHPATH="x86-64"
           if [ ${{ matrix.arch }} == "arm64" ]; then
             ARCHPATH="aarch64"
           fi
 
-          aws s3 cp ./finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${{ matrix.platform }}/$ARCHPATH/
+          # Upload tarball and shasum to S3
+          aws s3 cp ./finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz* s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${{ matrix.platform }}/$ARCHPATH/
