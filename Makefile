@@ -2,57 +2,26 @@
 PREFIX ?= $(CURDIR)/_output
 DEST := $(shell echo "$(DESTDIR)/$(PREFIX)" | sed 's:///*:/:g; s://*$$::')
 OUTDIR ?= $(CURDIR)/_output
-HASH_DIR ?= $(CURDIR)/hashes
 DOWNLOAD_DIR := $(CURDIR)/downloads
-OS_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/os
-OS_OUTDIR := $(OUTDIR)/os
 LIMA_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/dependencies
 LIMA_OUTDIR ?= $(OUTDIR)/lima
-SOCKET_VMNET_TEMP_PREFIX ?= $(OUTDIR)/dependencies/lima-socket_vmnet/opt/finch
 UNAME := $(shell uname -m)
 ARCH ?= $(UNAME)
 BUILD_TS := $(shell date +%s)
 
-OUTPUT_DIRECTORIES=$(OUTDIR) $(DOWNLOAD_DIR) $(OS_DOWNLOAD_DIR) $(OS_OUTDIR) $(LIMA_DOWNLOAD_DIR) $(LIMA_OUTDIR)
-
-# Set these variables if they aren't set, or if they are set to ""
-# Allows callers to override these default values
-# From https://dl.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/
-FINCH_OS_x86_URL := $(or $(FINCH_OS_x86_URL),https://deps.runfinch.com/Fedora-Cloud-Base-40-1.14.x86_64-20240514214655.qcow2)
-FINCH_OS_x86_DIGEST := $(or $(FINCH_OS_x86_DIGEST),"sha256:a7d5203d353ea6f5b4de73fdb0f36fe4f58b844c8d401f57015430f553a873c4")
-# From https://dl.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/aarch64/images/
-FINCH_OS_AARCH64_URL := $(or $(FINCH_OS_AARCH64_URL),https://deps.runfinch.com/Fedora-Cloud-Base-40-1.14.aarch64-20240514214641.qcow2)
-FINCH_OS_AARCH64_DIGEST := $(or $(FINCH_OS_AARCH64_DIGEST),"sha256:16268745d1f401cc543cb89bf354c49f8bc3d00ce723d59aa289d21b9c872b60")
+OUTPUT_DIRECTORIES=$(OUTDIR) $(DOWNLOAD_DIR) $(LIMA_DOWNLOAD_DIR) $(LIMA_OUTDIR)
 
 LIMA_DEPENDENCY_FILE_NAME ?= lima-and-qemu.tar.gz
 .DEFAULT_GOAL := all
 
-ifneq (,$(findstring arm64,$(ARCH)))
-	LIMA_ARCH = aarch64
-	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_AARCH64_URL))
-	FINCH_OS_IMAGE_URL := $(FINCH_OS_AARCH64_URL)
-	FINCH_OS_DIGEST ?= $(FINCH_OS_AARCH64_DIGEST)
-	HOMEBREW_PREFIX ?= /opt/homebrew
-
-else ifneq (,$(findstring x86_64,$(ARCH)))
-	LIMA_ARCH = x86_64
-	FINCH_OS_BASENAME := $(notdir $(FINCH_OS_x86_URL))
-	FINCH_OS_IMAGE_URL := $(FINCH_OS_x86_URL)
-	FINCH_OS_DIGEST ?= $(FINCH_OS_x86_DIGEST)
-	HOMEBREW_PREFIX ?= /usr/local
-
-endif
-
-FINCH_OS_IMAGE_LOCATION ?= $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
-FINCH_OS_IMAGE_INSTALLATION_LOCATION ?= $(DEST)/os/$(FINCH_OS_BASENAME)
-
 .PHONY: all
-all: binaries
+all: dependencies
 
-.PHONY: binaries
-.PHONY: download
+# dependencies is a make target defined by the respective platform makefile
+# pull the required finch core dependencies for the platform.
+.PHONY: dependencies
 
-# Rootfs required for Windows, require full OS for Linux and Mac
+# Rootfs required for Windows, require full OS for Mac
 FINCH_IMAGE_LOCATION ?=
 FINCH_IMAGE_DIGEST ?=
 FEDORA_YAML ?=
@@ -60,64 +29,15 @@ BUILD_OS ?= $(OS)
 ifeq ($(BUILD_OS), Windows_NT)
 include Makefile.windows
 else
-binaries: os lima-socket-vmnet lima-template
-download: download.os
-FINCH_IMAGE_LOCATION := $(FINCH_OS_IMAGE_LOCATION)
-FINCH_IMAGE_DIGEST := $(FINCH_OS_DIGEST)
-FEDORA_YAML := fedora.yaml
+include Makefile.darwin
 endif
 
 $(OUTPUT_DIRECTORIES):
 	@mkdir -p $@
 
-$(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME): $(OS_DOWNLOAD_DIR)
-	curl -L --fail $(FINCH_OS_IMAGE_URL) > "$(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)"
-	cd $(OS_DOWNLOAD_DIR) && shasum -a 512 --check $(HASH_DIR)/$(FINCH_OS_BASENAME).sha512 || exit 1
-
-.PHONY: download.os
-download.os: $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME)
-
-.PHONY: download.rootfs
-download.rootfs: $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)
-	$(eval FINCH_ROOTFS_DIGEST := "sha256:$(sha256 $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME))")
-
-$(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME): $(LIMA_DOWNLOAD_DIR) $(CURDIR)/deps/lima-bundles.conf
-	bash deps/install.sh \
-	  --output $@ \
-	  $(CURDIR)/deps/lima-bundles.conf
-	mkdir -p ${OUTDIR}
-	tar -xvzf ${LIMA_DOWNLOAD_DIR}/${LIMA_DEPENDENCY_FILE_NAME} -C ${OUTDIR}
-
-.PHONY: download.lima-dependencies
-download.lima-dependencies: $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)
-
-.PHONY: install.lima-dependencies
-install.lima-dependencies: download.lima-dependencies
-
-.PHONY: lima-template
-lima-template: download
-	mkdir -p $(OUTDIR)/lima-template
-	cp lima-template/fedora.yaml $(OUTDIR)/lima-template
-	# using -i.bak is very intentional, it allows the following commands to succeed for both GNU / BSD sed
-	# this sed command uses the alternative separator of "|" because the image location uses "/"
-	sed -i.bak -e "s|<image_location>|$(FINCH_IMAGE_LOCATION)|g" $(OUTDIR)/lima-template/fedora.yaml
-	sed -i.bak -e "s/<image_arch>/$(LIMA_ARCH)/g" $(OUTDIR)/lima-template/fedora.yaml
-	sed -i.bak -e "s/<image_digest>/$(FINCH_IMAGE_DIGEST)/g" $(OUTDIR)/lima-template/fedora.yaml
-	rm $(OUTDIR)/lima-template/*.yaml.bak
-
-.PHONY: lima-socket-vmnet
-lima-socket-vmnet:
-	git submodule update --init --recursive src/socket_vmnet
-	cd src/socket_vmnet && git clean -f -d
-	cd src/socket_vmnet && PREFIX=$(SOCKET_VMNET_TEMP_PREFIX) "$(MAKE)" install.bin
-
 .PHONY: download-sources
 download-sources:
 	./bin/download-sources.pl
-
-.PHONY: os
-os: $(OS_OUTDIR) download
-	lz4 -dcf $(OS_DOWNLOAD_DIR)/$(FINCH_OS_BASENAME) > "$(OS_OUTDIR)/$(FINCH_OS_BASENAME)"
 
 .PHONY: install
 install: uninstall

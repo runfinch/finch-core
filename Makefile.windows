@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # TODO: Use Finch rootfs in Finch on Windows testing
-ROOTFS_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/os
-ROOTFS_OUTPUT_DIR := $(OS_OUTDIR)
-OUTPUT_DIRECTORIES += $(ROOTFS_DOWNLOAD_DIR) $(ROOTFS_OUTPUT_DIR)
+ROOTFS_OUTPUT_DIR := $(OUTDIR)/os
+OUTPUT_DIRECTORIES += $(ROOTFS_OUTPUT_DIR)
 
 include $(CURDIR)/deps/rootfs.conf
 ifeq ($(ARCH), x86_64)
@@ -14,30 +13,18 @@ else
 $(error Finch on Windows ARM not supported)
 endif
 
-FINCH_IMAGE_LOCATION := $(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME)
-FINCH_IMAGE_DIGEST := "sha512:$(FINCH_ROOTFS_DIGEST)"
-
 WINGIT_TEMP_DIR := $(CURDIR)/wingit-temp
 WINGIT_x86_URL := $(or $(WINGIT_x86_URL),https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/Git-2.42.0.2-64-bit.tar.bz2)
 WINGIT_x86_BASENAME ?= $(notdir $(WINGIT_x86_URL))
 WINGIT_x86_HASH := $(or $(WINGIT_x86_HASH),"sha256:c192e56f8ed3d364acc87ad04d1f5aa6ae03c23b32b67bf65fcc6f9b8f032e65")
 
-binaries: install.rootfs lima
+dependencies: install.rootfs lima
 
 .PHONY: install.rootfs
 install.rootfs: $(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME)
 
-$(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME): $(ROOTFS_OUTPUT_DIR) $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)
-	cp $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME) $@
-
-.PHONY: download.rootfs
-download.rootfs: $(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME)
-
-$(ROOTFS_DOWNLOAD_DIR)/$(FINCH_ROOTFS_BASENAME): $(ROOTFS_DOWNLOAD_DIR) $(CURDIR)/deps/rootfs.conf
-	bash deps/install.sh \
-	  --output $@ \
-	  --platform common \
-	  $(CURDIR)/deps/rootfs.conf
+$(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME): $(ROOTFS_OUTPUT_DIR) $(CURDIR)/deps/rootfs.conf
+	bash deps/install.sh --output $@ $(CURDIR)/deps/rootfs.conf
 
 lima: lima-exe install.lima-dependencies-wsl2
 
