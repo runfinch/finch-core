@@ -65,7 +65,7 @@ jobs:
           which libtool
           # Install socket_vmnet to `_output/bin` which is used in $PATH
           SOCKET_VMNET_TEMP_PREFIX=$(pwd)/_output/ make lima-socket-vmnet
-          make install.lima-dependencies binaries
+          make install.lima-dependencies dependencies
       - name: Run e2e tests
         shell: zsh {0}
         run: make test-e2e
