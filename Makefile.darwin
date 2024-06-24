@@ -19,19 +19,18 @@ endif
 
 FINCH_IMAGE_LOCATION := $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
 FINCH_IMAGE_DIGEST := "sha512:$(FINCH_OS_DIGEST)"
-FEDORA_YAML := fedora.yaml
 
-dependencies: download.os install.lima-dependencies lima-socket-vmnet lima-template
+install.dependencies: install.os install.lima-dependencies install.lima-socket-vmnet
 
-.PHONY: download.os
-download.os: $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
+.PHONY: install.os
+install.os: $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
 
 $(OS_OUTDIR)/$(FINCH_OS_BASENAME): $(OS_OUTDIR) $(CURDIR)/deps/full-os.conf
 	bash deps/install.sh --output $@ $(CURDIR)/deps/full-os.conf
 
 .PHONY: install.lima-dependencies
-install.lima-dependencies: download.lima-dependencies $(OUTDIR)
-	tar -xvzf ${LIMA_DOWNLOAD_DIR}/${LIMA_DEPENDENCY_FILE_NAME} -C $(OUTDIR)
+install.lima-dependencies: download.lima-dependencies $(LIMA_OUTDIR)
+	tar -xvzf ${LIMA_DOWNLOAD_DIR}/${LIMA_DEPENDENCY_FILE_NAME} -C $(LIMA_OUTDIR)
 
 .PHONY: download.lima-dependencies
 download.lima-dependencies: $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)
@@ -39,18 +38,21 @@ download.lima-dependencies: $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)
 $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME): $(LIMA_DOWNLOAD_DIR) $(CURDIR)/deps/lima-bundles.conf
 	bash deps/install.sh --output $@ $(CURDIR)/deps/lima-bundles.conf
 
-.PHONY: lima-socket-vmnet
-lima-socket-vmnet:
+.PHONY: install.lima-socket-vmnet
+install.lima-socket-vmnet:
 	git submodule update --init --recursive src/socket_vmnet
 	cd src/socket_vmnet && git clean -f -d
 	cd src/socket_vmnet && PREFIX=$(SOCKET_VMNET_TEMP_PREFIX) "$(MAKE)" install.bin
 
-.PHONY: lima-template
-lima-template: $(LIMA_TEMPLATE_OUTDIR)
-	cp lima-template/fedora.yaml $(LIMA_TEMPLATE_OUTDIR)
+$(LIMA_TEMPLATE_OUTDIR)/fedora.yaml: $(LIMA_TEMPLATE_OUTDIR)
+	cp lima-template/fedora.yaml $@.template
 	# using -i.bak is very intentional, it allows the following commands to succeed for both GNU / BSD sed
 	# this sed command uses the alternative separator of "|" because the image location uses "/"
-	sed -i.bak -e "s|<image_location>|$(FINCH_IMAGE_LOCATION)|g" $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml
-	sed -i.bak -e "s/<image_arch>/$(LIMA_ARCH)/g" $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml
-	sed -i.bak -e "s/<image_digest>/$(FINCH_IMAGE_DIGEST)/g" $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml
-	rm $(LIMA_TEMPLATE_OUTDIR)/*.yaml.bak
+	sed -i.bak -e "s|<image_location>|$(FINCH_IMAGE_LOCATION)|g" $@.template
+	sed -i.bak -e "s/<image_arch>/$(LIMA_ARCH)/g" $@.template
+	sed -i.bak -e "s/<image_digest>/$(FINCH_IMAGE_DIGEST)/g" $@.template
+
+	# Replace was successful, so cleanup .bak files
+	rm $(LIMA_TEMPLATE_OUTDIR)/*.yaml.template.bak
+
+	mv $@.template $@

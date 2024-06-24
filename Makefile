@@ -15,16 +15,15 @@ LIMA_DEPENDENCY_FILE_NAME ?= lima-and-qemu.tar.gz
 .DEFAULT_GOAL := all
 
 .PHONY: all
-all: dependencies
+all: install.dependencies
 
-# dependencies is a make target defined by the respective platform makefile
+# install.dependencies is a make target defined by the respective platform makefile
 # pull the required finch core dependencies for the platform.
-.PHONY: dependencies
+.PHONY: install.dependencies
 
 # Rootfs required for Windows, require full OS for Mac
 FINCH_IMAGE_LOCATION ?=
 FINCH_IMAGE_DIGEST ?=
-FEDORA_YAML ?=
 BUILD_OS ?= $(OS)
 ifeq ($(BUILD_OS), Windows_NT)
 include Makefile.windows
@@ -60,5 +59,5 @@ clean:
 	-@rm ./*.tar.gz 2>/dev/null || true
 
 .PHONY: test-e2e
-test-e2e:
+test-e2e: $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml
 	cd e2e && go test -timeout 30m -v ./... -ginkgo.v

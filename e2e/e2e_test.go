@@ -18,7 +18,7 @@ import (
 func TestE2e(t *testing.T) {
 	description := "Finch Core E2E Tests"
 
-	limaRelativePath := "./../_output/bin/"
+	limaRelativePath := "./../_output/lima/bin/"
 	limaAbsPath, err := filepath.Abs(limaRelativePath)
 	if err != nil {
 		t.Fatalf("Error getting absolute path: %v", err)
@@ -41,6 +41,9 @@ func TestE2e(t *testing.T) {
 	vmConfigFile := filepath.Join(wd, "./../_output/lima-template/fedora.yaml")
 	vmName := "fedora"
 	limaOpt, err := option.New([]string{subject})
+	if err != nil {
+		t.Fatalf("failed to initialize a testing option %v", err)
+	}
 	nerdctlOpt, err := option.New([]string{subject, "shell", "fedora", "sudo", "-E", "nerdctl"})
 	if err != nil {
 		t.Fatalf("failed to initialize a testing option: %v", err)

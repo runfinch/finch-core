@@ -18,7 +18,7 @@ WINGIT_x86_URL := $(or $(WINGIT_x86_URL),https://github.com/git-for-windows/git/
 WINGIT_x86_BASENAME ?= $(notdir $(WINGIT_x86_URL))
 WINGIT_x86_HASH := $(or $(WINGIT_x86_HASH),"sha256:c192e56f8ed3d364acc87ad04d1f5aa6ae03c23b32b67bf65fcc6f9b8f032e65")
 
-dependencies: install.rootfs lima
+install.dependencies: install.rootfs install.lima
 
 .PHONY: install.rootfs
 install.rootfs: $(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME)
@@ -26,14 +26,14 @@ install.rootfs: $(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME)
 $(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME): $(ROOTFS_OUTPUT_DIR) $(CURDIR)/deps/rootfs.conf
 	bash deps/install.sh --output $@ $(CURDIR)/deps/rootfs.conf
 
-lima: lima-exe install.lima-dependencies-wsl2
+.PHONY: install.lima
+install.lima: lima-exe install.lima-dependencies-wsl2
 
-.PHONY: lima lima-exe
-lima-exe:
+.PHONY: lima-exe
+lima-exe: $(LIMA_OUTDIR)
 	cd src/lima && \
 	"$(MAKE)" exe _output/share/lima/lima-guestagent.Linux-x86_64
-	mkdir -p $(OUTDIR)/lima
-	cp -r src/lima/_output/* $(OUTDIR)/lima
+	cp -r src/lima/_output/* $(LIMA_OUTDIR)
 
 .PHONY: install.lima-dependencies-wsl2
 install.lima-dependencies-wsl2: $(LIMA_OUTDIR)/bin/ssh.exe
