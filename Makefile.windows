@@ -16,7 +16,7 @@ endif
 WINGIT_TEMP_DIR := $(CURDIR)/wingit-temp
 WINGIT_x86_URL := $(or $(WINGIT_x86_URL),https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/Git-2.42.0.2-64-bit.tar.bz2)
 WINGIT_x86_BASENAME ?= $(notdir $(WINGIT_x86_URL))
-WINGIT_x86_HASH := $(or $(WINGIT_x86_HASH),"sha256:c192e56f8ed3d364acc87ad04d1f5aa6ae03c23b32b67bf65fcc6f9b8f032e65")
+WINGIT_x86_HASH := $(or $(WINGIT_x86_HASH),"sha512:795a2e7e0be5ab78f2d28d0bd971961d121b9c808a95dec795343dc5af943574dcf54f63a8580c5a5102075abdae387d7a67135c165821428afc07f11ef7543d")
 
 install.dependencies: install.rootfs install.lima
 
