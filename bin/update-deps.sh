@@ -16,8 +16,8 @@ PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/.." && pwd)"
 source "${PROJECT_ROOT}/bin/utility.sh"
 
 DEPENDENCY_CLOUDFRONT_URL="https://deps.runfinch.com"
-AARCH64_FILENAME_PATTERN="lima-and-qemu.macos-aarch64.[0-9].*\.gz$"
-AMD64_FILENAME_PATTERN="lima-and-qemu.macos-x86_64.[0-9].*\.gz$"
+AARCH64_FILENAME_PATTERN="lima-and-qemu.macos-aarch64\.[0-9]+\.tar\.gz$"
+AMD64_FILENAME_PATTERN="lima-and-qemu.macos-x86_64\.[0-9]+\.tar\.gz$"
 AARCH64="aarch64"
 X86_64="x86-64"
 

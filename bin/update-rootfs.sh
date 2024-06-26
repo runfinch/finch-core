@@ -16,7 +16,7 @@ PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/.." && pwd)"
 source "${PROJECT_ROOT}/bin/utility.sh"
 
 DEPENDENCY_CLOUDFRONT_URL="https://deps.runfinch.com"
-AMD64_FILENAME_PATTERN="finch-rootfs-production-amd64-[0-9]+\.tar.gz"
+AMD64_FILENAME_PATTERN="finch-rootfs-production-amd64-[0-9]+\.tar\.gz$"
 PLATFORM="common"
 # ARM not currently supported for Finch on Windows
 # AARCH64="aarch64"
