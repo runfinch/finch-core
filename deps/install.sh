@@ -76,7 +76,7 @@ os="$(uname -s)"
 case "${os}" in
   "Darwin")
     ;;
-  CYGWIN*|MINGW32*|MINGW*|MYSYS*)
+  CYGWIN*|MINGW32*|MINGW*|MSYS*)
     windows=true
     ;;
   *)
