@@ -73,4 +73,4 @@ jobs:
           fi
 
           # Upload tarball and shasum to S3
-          aws s3 cp ./finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz* s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${{ matrix.platform }}/$ARCHPATH/
+          aws s3 cp . s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${{ matrix.platform }}/$ARCHPATH/ --exclude "*" --include "finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz*"
