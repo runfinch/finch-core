@@ -9,6 +9,9 @@
 
 set -euxo pipefail
 
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/.." && pwd)"
+
 file=""
 sources=""
 
@@ -68,9 +71,27 @@ case "${arch}" in
     ;;
 esac
 
+windows=false
+os="$(uname -s)"
+case "${os}" in
+  "Darwin")
+    ;;
+  CYGWIN*|MINGW32*|MINGW*|MYSYS*)
+    windows=true
+    ;;
+  *)
+    echo "error: unsupported operating system" && exit 1
+    ;;
+esac
+
 # pull artifact from dependency repository
 curl -L --fail "${url}/${artifact}" > "${file}"
 
-# validate shasum for downloaded artifact
-(shasum --algorithm 512 "${file}" | cut -d ' ' -f 1 | grep -xq "^${digest}$") || \
-  (echo "error: shasum verification failed for dependency" && rm -f "${file}" && exit 1)
+# validate artifact digest
+if [[ $windows = true ]]; then
+  (pwsh "${PROJECT_ROOT}/bin/verify_hash.ps1" "${file}" "${digest}") || \
+    (echo "error: shasum verification failed for dependency" && rm -f "${file}" && exit 1)
+else
+  (shasum --algorithm 512 "${file}" | cut -d ' ' -f 1 | grep -xq "^${digest}$") || \
+    (echo "error: shasum verification failed for dependency" && rm -f "${file}" && exit 1)
+fi

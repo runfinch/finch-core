@@ -11,7 +11,7 @@ param (
     [string]$DependencyHash = 'out.png'
 )
 
-if (!(Get-FileHash -Algorithm SHA256 "$DependencyFilePath").Hash -eq $DependencyHash) {
+if (!(Get-FileHash -Algorithm SHA512 "$DependencyFilePath").Hash -eq $DependencyHash) {
     $host.SetShouldExit(-1); exit
 } else {
     Write-Output "Verified $DependencyFilePath"
