@@ -20,6 +20,10 @@ endif
 FINCH_IMAGE_LOCATION := $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
 FINCH_IMAGE_DIGEST := "sha512:$(FINCH_OS_DIGEST)"
 
+# Virtualization framework is the default virtual machine type on Finch on macOS
+# This is only used for testing of Finch core bundles.
+FINCH_VM_TYPE ?= vz
+
 install.dependencies: install.os install.lima-dependencies install.lima-socket-vmnet
 
 .PHONY: install.os
