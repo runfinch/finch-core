@@ -29,28 +29,38 @@ func TestE2e(t *testing.T) {
 	// Put ./../_output/bin first on path to override other installations of lima and qemu
 	newPath := limaAbsPath + string(os.PathListSeparator) + currentPath
 	err = os.Setenv("PATH", newPath)
-
 	if err != nil {
 		t.Fatalf("Error setting PATH: %v", err)
 	}
+
 	wd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("failed to get the current working directory: %v", err)
 	}
-	subject := "limactl"
+
 	vmConfigFile := filepath.Join(wd, "./../_output/lima-template/fedora.yaml")
-	vmName := "fedora"
+
+	subject := "limactl"
 	limaOpt, err := option.New([]string{subject})
-	if err != nil {
-		t.Fatalf("failed to initialize a testing option %v", err)
-	}
-	nerdctlOpt, err := option.New([]string{subject, "shell", "fedora", "sudo", "-E", "nerdctl"})
 	if err != nil {
 		t.Fatalf("failed to initialize a testing option: %v", err)
 	}
 
+	vmName := "fedora"
+
+	nerdctlOpt, err := option.New([]string{subject, "shell", vmName, "sudo", "-E", "nerdctl"})
+	if err != nil {
+		t.Fatalf("failed to initialize a testing option: %v", err)
+	}
+
+	vmType := os.Getenv("VM_TYPE")
+	if vmType == "" {
+		// Virtualization framework is the default Finch launch type on macOS.
+		vmType = "vz"
+	}
+
 	ginkgo.SynchronizedBeforeSuite(func() []byte {
-		command.New(limaOpt, "start", vmConfigFile).WithTimeoutInSeconds(600).Run()
+		command.New(limaOpt, "start", vmConfigFile, "--name", vmName, "--vm-type", vmType).WithTimeoutInSeconds(600).Run()
 		tests.SetupLocalRegistry(nerdctlOpt)
 		return nil
 	}, func(bytes []byte) {})

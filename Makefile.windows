@@ -13,6 +13,9 @@ else
 $(error Finch on Windows ARM not supported)
 endif
 
+# WSL2 is the only virtual machine type supported for Finch on Windows
+FINCH_VM_TYPE := wsl2
+
 WINGIT_TEMP_DIR := $(CURDIR)/wingit-temp
 WINGIT_x86_URL := $(or $(WINGIT_x86_URL),https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.2/Git-2.42.0.2-64-bit.tar.bz2)
 WINGIT_x86_BASENAME ?= $(notdir $(WINGIT_x86_URL))

@@ -24,6 +24,7 @@ all: install.dependencies
 # Rootfs required for Windows, require full OS for Mac
 FINCH_IMAGE_LOCATION ?=
 FINCH_IMAGE_DIGEST ?=
+FINCH_VM_TYPE ?=
 BUILD_OS ?= $(OS)
 ifeq ($(BUILD_OS), Windows_NT)
 include Makefile.windows
@@ -60,4 +61,4 @@ clean:
 
 .PHONY: test-e2e
 test-e2e: $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml
-	cd e2e && go test -timeout 30m -v ./... -ginkgo.v
+	cd e2e && VM_TYPE=$(FINCH_VM_TYPE) go test -timeout 30m -v ./... -ginkgo.v
