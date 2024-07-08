@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Generate Timestamp
         id: timestamp
-        run: echo "::set-output name=value::$(date +%s)"
+        run: echo "{value}={$(date +%s)}" >> $GITHUB_OUTPUT
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:

@@ -233,7 +233,7 @@ jobs:
 
       - name: Generate Timestamp
         id: timestamp
-        run: echo "::set-output name=value::$(date +%s)"
+        run: echo "{value}={$(date +%s)}" >> $GITHUB_OUTPUT
 
       - name: Add Ventura builds to tarballs
         run: |
