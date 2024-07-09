@@ -4,6 +4,8 @@ FROM public.ecr.aws/docker/library/fedora:40 as build
 
 WORKDIR /work
 
+RUN dnf update --best -y
+
 # download and install cosign
 RUN curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-2.2.4-1.x86_64.rpm && \
     curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-2.2.4-1.x86_64.rpm-keyless.pem && \
@@ -21,6 +23,8 @@ RUN cosign verify-blob \
 FROM public.ecr.aws/docker/library/fedora:40
 
 WORKDIR /work
+
+RUN dnf update --best -y
 
 # install necessary cloud-server packages
 RUN dnf group install -y cloud-server-environment --exclude=plymouth* \
