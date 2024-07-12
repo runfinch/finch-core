@@ -13,6 +13,7 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/.." && pwd)"
 
 file=""
+arch=""
 sources=""
 
 while [[ $# -gt 0 ]]; do
@@ -20,6 +21,11 @@ while [[ $# -gt 0 ]]; do
     --output|-o)
       shift # past argument
       file=$1
+      shift # past value
+      ;;
+    --arch|-a)
+      shift # past argument
+      arch=$1
       shift # past value
       ;;
     --*|-*)
@@ -44,7 +50,6 @@ artifact=""
 digest=""
 url="${ARTIFACT_BASE_URL}"
 
-arch="$(uname -m)"
 case "${arch}" in
   "arm64")
     if [[ -z "$AARCH64_ARTIFACT" ]]; then

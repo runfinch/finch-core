@@ -27,7 +27,7 @@ install.dependencies: install.rootfs install.lima
 install.rootfs: $(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME)
 
 $(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME): $(ROOTFS_OUTPUT_DIR) $(CURDIR)/deps/rootfs.conf
-	bash deps/install.sh --output $@ $(CURDIR)/deps/rootfs.conf
+	bash deps/install.sh --arch $(ARCH) --output $@ $(CURDIR)/deps/rootfs.conf
 
 .PHONY: install.lima
 install.lima: lima-exe install.lima-dependencies-wsl2

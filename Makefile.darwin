@@ -30,7 +30,7 @@ install.dependencies: install.os install.lima-dependencies install.lima-socket-v
 install.os: $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
 
 $(OS_OUTDIR)/$(FINCH_OS_BASENAME): $(OS_OUTDIR) $(CURDIR)/deps/full-os.conf
-	bash deps/install.sh --output $@ $(CURDIR)/deps/full-os.conf
+	bash deps/install.sh --arch $(ARCH) --output $@ $(CURDIR)/deps/full-os.conf
 
 .PHONY: install.lima-dependencies
 install.lima-dependencies: download.lima-dependencies $(LIMA_OUTDIR)
@@ -40,7 +40,7 @@ install.lima-dependencies: download.lima-dependencies $(LIMA_OUTDIR)
 download.lima-dependencies: $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME)
 
 $(LIMA_DOWNLOAD_DIR)/$(LIMA_DEPENDENCY_FILE_NAME): $(LIMA_DOWNLOAD_DIR) $(CURDIR)/deps/lima-bundles.conf
-	bash deps/install.sh --output $@ $(CURDIR)/deps/lima-bundles.conf
+	bash deps/install.sh --arch $(ARCH) --output $@ $(CURDIR)/deps/lima-bundles.conf
 
 .PHONY: install.lima-socket-vmnet
 install.lima-socket-vmnet:
