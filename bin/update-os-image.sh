@@ -36,11 +36,15 @@ aarch64_deps=$(find_latest_object_match_from_s3 "${AARCH64_FILENAME_PATTERN}" "$
 aarch64_deps_shasum_url="${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}.sha512sum"
 aarch64_deps_shasum=$(curl -L --fail "${aarch64_deps_shasum_url}")
 
+pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}" "${aarch64_deps_shasum}"
+
 amd64_deps=$(find_latest_object_match_from_s3 "${AMD64_FILENAME_PATTERN}" "${dependency_bucket}")
 [[ -z "$amd64_deps" ]] && { echo "Error: x86_64 dependency not found"; exit 1; }
 
 amd64_deps_shasum_url="${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}.sha512sum"
 amd64_deps_shasum=$(curl -L --fail "${amd64_deps_shasum_url}")
+
+pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}" "${amd64_deps_shasum}"
 
 # Update base os file with latest artifacts and digests
 OS_FILE="${PROJECT_ROOT}/deps/full-os.conf"
@@ -49,10 +53,10 @@ truncate -s 0 "${OS_FILE}"
     echo "ARTIFACT_BASE_URL=${DEPENDENCY_CLOUDFRONT_URL}"
     echo ""
     echo "# From https://dl.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/aarch64/images/"
-    echo "AARCH64_ARTIFACT=${aarch64_deps}"
+    echo "AARCH64_ARTIFACT=$(basename "${aarch64_deps}")"
     echo "AARCH64_512_DIGEST=${aarch64_deps_shasum}"
     echo ""
     echo "# From https://dl.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/"
-    echo "X86_64_ARTIFACT=${amd64_deps}"
+    echo "X86_64_ARTIFACT=$(basename "${amd64_deps}")"
     echo "X86_64_512_DIGEST=${amd64_deps_shasum}"
 } >> "${OS_FILE}"

@@ -37,11 +37,15 @@ aarch64_deps=$(find_latest_object_match_from_s3 "${AARCH64_FILENAME_PATTERN}" "$
 aarch64_deps_shasum_url="${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}.sha512sum"
 aarch64_deps_shasum=$(curl -L --fail "${aarch64_deps_shasum_url}")
 
+pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}" "${aarch64_deps_shasum}"
+
 amd64_deps=$(find_latest_object_match_from_s3 "${AMD64_FILENAME_PATTERN}" "${dependency_bucket}/${X86_64}")
 [[ -z "$amd64_deps" ]] && { echo "Error: x86_64 dependency not found"; exit 1; }
 
 amd64_deps_shasum_url="${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}.sha512sum"
 amd64_deps_shasum=$(curl -L --fail "${amd64_deps_shasum_url}")
+
+pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}" "${amd64_deps_shasum}"
 
 # Update bundles file with latest artifacts and digests.
 BUNDLES_FILE="${PROJECT_ROOT}/deps/lima-bundles.conf"
