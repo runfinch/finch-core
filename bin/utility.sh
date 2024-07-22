@@ -22,3 +22,20 @@ find_latest_object_match_from_s3() {
 
     echo "$object"
 }
+
+# pull_artifact_and_verify_shasum is a function for pulling a Finch core
+# artifact and verifying its shasum.
+#
+# @param artifact_url - URL to artifact
+# @param expected_shasum - the expected SHA512SUM for the artifact
+pull_artifact_and_verify_shasum() {
+    local artifact_url="$1"
+    local expected_shasum="$2"
+
+    local artifact
+    artifact=$(basename "$artifact_url")
+
+    curl -L --fail "${artifact_url}" > "${artifact}"
+    shasum --algorithm 512 "${artifact}" | cut -d ' ' -f 1 | grep -xq "^${expected_shasum}$" || \
+      (echo "error: shasum verification failed for \"${artifact}\" dependency" && rm -f "${artifact}" && exit 1)
+}

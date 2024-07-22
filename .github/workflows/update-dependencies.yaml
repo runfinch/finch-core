@@ -25,11 +25,14 @@ jobs:
           role-session-name: dependency-upload-session
           aws-region: ${{ secrets.REGION }}
 
-      # This step fetches the latest set of released dependencies from s3 and updates the Makefile to use the same.
-      - name: update dependencies url
-        run: |
-          ./bin/update-deps.sh -d ${{ secrets.DEPENDENCY_BUCKET_NAME }}
-          ./bin/update-rootfs.sh -d ${{ secrets.DEPENDENCY_BUCKET_NAME }}
+      - name: Update Lima dependencies archive for Finch on macOS
+        run: bash bin/update-deps.sh -d ${{ secrets.DEPENDENCY_BUCKET_NAME }}
+      
+      - name: Update base OS for Finch on macOS
+        run: bash bin/update-os-image.sh -d ${{ secrets.DEPENDENCY_BUCKET_NAME }}
+
+      - name: Update rootfs for Finch on Windows
+        run: bash bin/update-rootfs.sh -d ${{ secrets.DEPENDENCY_BUCKET_NAME }}
 
       - name: create PR
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0

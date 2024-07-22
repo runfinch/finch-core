@@ -38,6 +38,8 @@ amd64_deps=$(find_latest_object_match_from_s3 "${AMD64_FILENAME_PATTERN}" "${dep
 amd64_deps_shasum_url="${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}.sha512sum"
 amd64_deps_shasum=$(curl -L --fail "${amd64_deps_shasum_url}")
 
+pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}" "${amd64_deps_shasum}"
+
 # Update rootfs file with latest artifacts and digests
 ROOTFS_FILE="${PROJECT_ROOT}/deps/rootfs.conf"
 truncate -s 0 "${ROOTFS_FILE}"
