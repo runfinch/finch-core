@@ -4,6 +4,7 @@ wingit-temp/
 *.idea
 *.DS_Store
 *.bak
+**/*.qcow2
 **/*.tar.gz
 .vscode/
 **/node_modules
