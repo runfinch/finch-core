@@ -20,6 +20,7 @@ all: install.dependencies
 # install.dependencies is a make target defined by the respective platform makefile
 # pull the required finch core dependencies for the platform.
 .PHONY: install.dependencies
+install.dependencies: $(OUTDIR)/finch-daemon
 
 # Rootfs required for Windows, require full OS for Mac
 FINCH_IMAGE_LOCATION ?=
@@ -38,6 +39,12 @@ $(OUTPUT_DIRECTORIES):
 .PHONY: download-sources
 download-sources:
 	./bin/download-sources.pl
+
+$(OUTDIR)/finch-daemon:
+	git submodule update --init --recursive src/finch-daemon
+	cd src/finch-daemon && git clean -f -d
+	cd src/finch-daemon && STATIC=1 GOOS=$(BUILD_OS) GOARCH=$(ARCH) "$(MAKE)"
+	cp src/finch-daemon/bin/finch-daemon $@
 
 .PHONY: install
 install: uninstall

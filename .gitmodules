@@ -4,3 +4,6 @@
 [submodule "src/socket_vmnet"]
 	path = src/socket_vmnet
 	url = https://github.com/lima-vm/socket_vmnet
+[submodule "src/finch-daemon"]
+	path = src/finch-daemon
+	url = https://github.com/runfinch/finch-daemon.git
