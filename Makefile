@@ -34,6 +34,14 @@ else
 include Makefile.darwin
 endif
 
+# transform some common results of uname -m to be compatible with Go
+GOARCH ?= $(ARCH)
+ifeq ($(GOARCH), x86_64)
+GOARCH = amd64
+else ifeq ($(GOARCH), aarch64)
+GOARCH = arm64
+endif
+
 $(OUTPUT_DIRECTORIES):
 	@mkdir -p $@
 
@@ -44,7 +52,7 @@ download-sources:
 $(FINCH_DAEMON_OUTDIR)/finch-daemon: $(OUTPUT_DIRECTORIES)
 	git submodule update --init --recursive src/finch-daemon
 	cd src/finch-daemon && git clean -f -d
-	cd src/finch-daemon && STATIC=1 GOOS=linux GOARCH=$(ARCH) "$(MAKE)"
+	cd src/finch-daemon && STATIC=1 GOOS=linux GOARCH=$(GOARCH) "$(MAKE)"
 	cp src/finch-daemon/bin/finch-daemon $@
 
 .PHONY: install
