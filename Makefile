@@ -5,11 +5,12 @@ OUTDIR ?= $(CURDIR)/_output
 DOWNLOAD_DIR := $(CURDIR)/downloads
 LIMA_DOWNLOAD_DIR := $(DOWNLOAD_DIR)/dependencies
 LIMA_OUTDIR ?= $(OUTDIR)/lima
+FINCH_DAEMON_OUTDIR ?= $(OUTDIR)/finch-daemon
 UNAME := $(shell uname -m)
 ARCH ?= $(UNAME)
 BUILD_TS := $(shell date +%s)
 
-OUTPUT_DIRECTORIES=$(OUTDIR) $(DOWNLOAD_DIR) $(LIMA_DOWNLOAD_DIR) $(LIMA_OUTDIR)
+OUTPUT_DIRECTORIES=$(OUTDIR) $(DOWNLOAD_DIR) $(LIMA_DOWNLOAD_DIR) $(LIMA_OUTDIR) $(FINCH_DAEMON_OUTDIR)
 
 LIMA_DEPENDENCY_FILE_NAME ?= lima-and-qemu.tar.gz
 .DEFAULT_GOAL := all
@@ -20,7 +21,7 @@ all: install.dependencies
 # install.dependencies is a make target defined by the respective platform makefile
 # pull the required finch core dependencies for the platform.
 .PHONY: install.dependencies
-install.dependencies: $(OUTDIR)/finch-daemon
+install.dependencies: $(FINCH_DAEMON_OUTDIR)/finch-daemon
 
 # Rootfs required for Windows, require full OS for Mac
 FINCH_IMAGE_LOCATION ?=
@@ -40,7 +41,7 @@ $(OUTPUT_DIRECTORIES):
 download-sources:
 	./bin/download-sources.pl
 
-$(OUTDIR)/finch-daemon:
+$(FINCH_DAEMON_OUTDIR)/finch-daemon: $(OUTPUT_DIRECTORIES)
 	git submodule update --init --recursive src/finch-daemon
 	cd src/finch-daemon && git clean -f -d
 	cd src/finch-daemon && STATIC=1 GOOS=$(BUILD_OS) GOARCH=$(ARCH) "$(MAKE)"
