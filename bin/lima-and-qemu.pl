@@ -14,7 +14,7 @@ my $arch = $proc =~ /86/ ? "x86_64" : "aarch64";
 # This script creates a tarball containing lima and qemu, plus all their
 # dependencies from /usr/local/** or /opt/homebrew/.
 # Files opened by limactl and qemu are captured using https://github.com/objective-see/FileMonitor
-# `limactl start examples/alpine.yaml; limactl stop alpine; limactrl delete alpine`.
+# `limactl start templates/alpine.yaml; limactl stop alpine; limactrl delete alpine`.
 
 # {"event":"ES_EVENT_TYPE_NOTIFY_WRITE","timestamp":"2022-11-02 02:19:42 +0000","file":
 # {"destination":"/Users/siravara/.lima/default/cidata.iso","
@@ -50,14 +50,26 @@ system("sudo -b /Applications/FileMonitor.app/Contents/MacOS/FileMonitor >$filem
 sleep(1) until -s $filemonitor;
 
 my $repo_root = join('/', dirname($FindBin::Bin), 'src', 'lima');
-for my $example (@ARGV) {
-    my $config = "$repo_root/examples/$example.yaml", ;
+my $templatedir = "$repo_root/templates";
+if (qx"limactl --version" =~ m/^limactl version (\d+)\.(\d+)\.(\d+)(-.*)*$/) {
+    # version 1.0.0-alpha.0 was the last one with the old directory structure
+    if ($1 le 0 or ($1 eq 1 and $4 eq "-alpha.0")) {
+        print "limactl version ($1.$2.$3$4), falling back to pre-1.0 templatedir\n";
+        $templatedir = "$repo_root/examples";
+    }
+} else {
+    print "unknown limactl version, falling back to pre-1.0 templatedir\n";
+    $templatedir = "$repo_root/examples";
+}
+
+for my $template (@ARGV) {
+    my $config = "$templatedir/$template.yaml", ;
     die "Config $config not found" unless -f $config;
-    system("limactl delete -f $example") if -d "$ENV{HOME}/.lima/$example";
+    system("limactl delete -f $template") if -d "$ENV{HOME}/.lima/$template";
     system("limactl start --tty=false $config");
-    system("limactl shell $example uname");
-    system("limactl stop $example");
-    system("limactl delete $example");
+    system("limactl shell $template uname");
+    system("limactl stop $template");
+    system("limactl delete $template");
 }
 system("sudo pkill FileMonitor");
 
