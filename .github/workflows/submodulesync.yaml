@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update sub modules
+      - name: Update submodules
         run: |
           git submodule update --remote
           # pin submodule to a commit, https://github.com/lima-vm/lima/commit/bd7442e34ebdccb4945828a007b5d102781bea92
@@ -24,6 +24,11 @@ jobs:
           TAG=`cd src/lima && git describe --tags $(git rev-list --tags --max-count=1)`
           echo "Pulling changes from release: $TAG"
           (cd src/lima && git checkout $TAG)
+          # finch-daemon
+          (cd src/finch-daemon && git fetch --tags)
+          FINCH_DAEMON_TAG=`cd src/finch-daemon && git describe --tags $(git rev-list --tags --max-count=1)`
+          echo "Pulling changes from release: $FINCH_DAEMON_TAG"
+          (cd src/finch-daemon && git checkout $FINCH_DAEMON_TAG)
 
       - name: Create PR
         uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
