@@ -145,7 +145,7 @@ jobs:
       - name: Create Ventura limactl tarball
         working-directory: src/lima
         run: |
-          make clean && make exe codesign
+          make clean && make exe
           tar cfz limactl.ventura.arm64.tar.gz -C _output/bin limactl
 
       - name: Upload Ventura build
@@ -175,7 +175,7 @@ jobs:
       - name: Create Ventura limactl tarball
         working-directory: src/lima
         run: |
-          make clean && make exe codesign
+          make clean && make exe
           tar cfz limactl.ventura.x86_64.tar.gz -C _output/bin limactl
 
       - name: Upload Ventura build
