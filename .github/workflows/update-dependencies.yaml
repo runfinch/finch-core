@@ -44,3 +44,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           signoff: true
           title: 'build(deps): Bump finch dependencies'
+          branch: create-pull-request/bump-finch-dependencies
