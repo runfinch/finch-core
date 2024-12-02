@@ -117,10 +117,13 @@ containerd:
   user: false
 #  # Override containerd archive
 #  # 🟢 Builtin default: hard-coded URL with hard-coded digest (see the output of `limactl info | jq .defaultTemplate.containerd.archives`)
-#  archives:
-#  - location: "~/Downloads/nerdctl-full-X.Y.Z-linux-amd64.tar.gz"
-#    arch: "x86_64"
-#    digest: "sha256:..."
+  archives:
+   - location: "https://github.com/containerd/nerdctl/releases/download/v1.7.7/nerdctl-full-1.7.7-linux-amd64.tar.gz"
+     arch: "x86_64"
+     digest: "sha256:a731eac93e8e9dda1a0d76dc1606438deb0668ea7d6bd5c5af436353ed9f65c5"
+   - location: "https://github.com/containerd/nerdctl/releases/download/v1.7.7/nerdctl-full-1.7.7-linux-arm64.tar.gz"
+     arch: "aarch64"
+     digest: "sha256:b161a20c0e41f9ad999e8411e23c58ece4b3e584ae90b4252b76a39eee4a0c31"
 
 # Provisioning scripts need to be idempotent because they might be called
 # multiple times, e.g. when the host VM is being restarted.
