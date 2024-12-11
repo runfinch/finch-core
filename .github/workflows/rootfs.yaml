@@ -13,6 +13,7 @@ permissions:
   # More info: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings
   id-token: write
   contents: write
+  pull-requests: write
 
 jobs:
   build-rootfs-image:
@@ -65,12 +66,35 @@ jobs:
 
           compressed_archive=finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz
           gzip -9 -c finch-rootfs-production-${{ matrix.arch }}.tar > $compressed_archive
-          sha512sum $compressed_archive | cut -d " " -f 1 > $compressed_archive.sha512sum
+          sha512_digest=$(sha512sum $compressed_archive | cut -d " " -f 1)
+          echo $sha512_digest > $compressed_archive.sha512sum
 
           ARCHPATH="x86-64"
+          ARTIFACT_KEY="X86_64"
           if [ ${{ matrix.arch }} == "arm64" ]; then
             ARCHPATH="aarch64"
+            ARTIFACT_KEY="ARM64"
           fi
 
           # Upload tarball and shasum to S3
           aws s3 cp . s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${{ matrix.platform }}/$ARCHPATH/ --recursive --exclude "*" --include "finch-rootfs-production-${{ matrix.arch }}-"$TIMESTAMP".tar.gz*"
+
+          cat <<EOL > deps/rootfs.conf
+          ARTIFACT_BASE_URL=https://deps.runfinch.com
+
+          ${ARTIFACT_KEY}_ARTIFACT_PATHING=common/$ARCHPATH
+          ${ARTIFACT_KEY}_ARTIFACT=$compressed_archive
+          ${ARTIFACT_KEY}_512_DIGEST=$sha512_digest
+          EOL
+
+      - name: create pr
+        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          signoff: true
+          branch: create-rootfs-${{ matrix.arch }}-${{ steps.timestamp.outputs.value }}
+          delete-branch: true
+          title: 'build(deps): Update windows rootfs'
+          add-paths: deps/rootfs.conf
+          body: |  
+            Update the rootfs for the windows platform.
