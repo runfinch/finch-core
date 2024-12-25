@@ -1,4 +1,4 @@
-name: CI
+name: macOS CI
 on:
   push:
     branches:
@@ -9,10 +9,14 @@ on:
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - "**.md"
-      - "contrib/**"
-      - "Dockerfile"
+    paths:
+      - .github/workflows/macos-ci.yaml
+      - deps/full-os.conf
+      - deps/lima.conf
+      - e2e/**
+      - lima-template/**
+      - Makefile
+      - Makefile.darwin
   workflow_dispatch:
 
 concurrency:
@@ -21,14 +25,14 @@ concurrency:
 
 jobs:
   install-dependencies:
-    # This is a spot check for make install.dependencies on macOS and Windows platforms.
+    # This is a spot check for make install.dependencies on macOS x86/ARM platforms.
     # Finch-core provides the core dependencies needed to run Finch such as the base OS
     # image, rootfs, and Lima bundle. Validate the mechanism used to install the core
-    # dependencies works on the respective platforms.
+    # dependencies works on macOS.
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-13-xlarge, windows-2022]
+        os: [macos-13, macos-13-xlarge]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
