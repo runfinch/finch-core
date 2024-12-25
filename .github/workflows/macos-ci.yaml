@@ -11,6 +11,7 @@ on:
       - main
     paths:
       - .github/workflows/macos-ci.yaml
+      - deps/container-runtime-full-archive.conf
       - deps/full-os.conf
       - deps/lima.conf
       - e2e/**

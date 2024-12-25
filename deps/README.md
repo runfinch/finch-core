@@ -33,12 +33,16 @@ supported so the ARM configuration is not required in
 
 ## Updating artifact configuration
 
-Artifact configuration for the Lima bundle for Finch on macOS and the rootfs
-for Finch on Windows is updated via the 
+Artifact configuration for the Finch on macOS virtual machine image,
+Lima bundles, rootfs for Finch on Windows, and
+container runtime full archive is updated via the 
 [update dependencies](../.github/workflows/update-dependencies.yaml)
-GitHub Actions workflow. The workflow scans S3 for more up-to-date 
-versions of the required dependency and opens a pull request with
-the configuration updates.
+GitHub Actions workflow. 
 
-Artifact configuration for the Finch on macOS virtual machine image
-is still manually updated.
+For Finch on macOS virtual machine image, Lima bundles, and Finch on Windows rootfs,
+the workflow scans S3 for more up-to-date versions of the required dependency and 
+opens a pull request with the configuration updates.
+
+For Finch on macOS and Windows container runtime full archive, the workflow checks
+upstream for new upstream nerdctl releases and opens a pull request with the configuration
+updates.

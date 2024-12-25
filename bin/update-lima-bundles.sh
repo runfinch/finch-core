@@ -5,7 +5,7 @@
 
 # A script to update the lima dependency used for Finch on MacOS and Windows.
 #
-# Usage: bash update-deps.sh -d <S3 bucket>
+# Usage: bash update-lima-bundles.sh -d <S3 bucket>
 
 set -euxo pipefail
 
