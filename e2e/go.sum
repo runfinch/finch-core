@@ -1,3 +1,5 @@
+github.com/austinvazquez/common-tests v0.0.0-20241228033531-2c57bf1e7377 h1:f8P2rb2tIblxIx3NtBU+sJFS5EaKxAEsF1SgvxfAOcA=
+github.com/austinvazquez/common-tests v0.0.0-20241228033531-2c57bf1e7377/go.mod h1:SWUscDCM6J/IysgeMOU9RrUqozilSpH7ef5OS8LD7jA=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=
@@ -14,8 +16,6 @@ github.com/onsi/gomega v1.36.1 h1:bJDPBO7ibjxcbHMgSCoo4Yj18UWbKDlLwX1x9sybDcw=
 github.com/onsi/gomega v1.36.1/go.mod h1:PvZbdDc8J6XJEpDK4HCuRBm8a6Fzp9/DmhC9C7yFlog=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/runfinch/common-tests v0.7.22 h1:LnQiSrQmmYUIc600FVsMk265kPnzCeFw94DbbCVDOwo=
-github.com/runfinch/common-tests v0.7.22/go.mod h1:zzjBhz8poviFC3/kOmmJsUdiKGxMRoAh/AIUyy3YqGQ=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 golang.org/x/net v0.33.0 h1:74SYHlV8BIgHIFC/LrYkOGIwL19eTYXQ5wc6TBuO36I=
