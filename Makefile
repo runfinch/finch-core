@@ -24,9 +24,6 @@ all: install.dependencies
 install.dependencies: $(FINCH_DAEMON_OUTDIR)/finch-daemon
 
 # Rootfs required for Windows, require full OS for Mac
-FINCH_IMAGE_LOCATION ?=
-FINCH_IMAGE_DIGEST ?=
-FINCH_VM_TYPE ?=
 BUILD_OS ?= $(OS)
 ifeq ($(BUILD_OS), Windows_NT)
 include Makefile.windows

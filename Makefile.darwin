@@ -8,17 +8,23 @@ SOCKET_VMNET_TEMP_PREFIX ?= $(OUTDIR)/dependencies/lima-socket_vmnet/opt/finch
 
 include $(CURDIR)/deps/full-os.conf
 ifeq ($(ARCH),x86_64)
-FINCH_OS_BASENAME ?= $(X86_64_ARTIFACT)
-FINCH_OS_DIGEST ?= $(X86_64_512_DIGEST)
+FINCH_OS_BASENAME := $(X86_64_ARTIFACT)
+FINCH_OS_DIGEST := $(X86_64_512_DIGEST)
 LIMA_ARCH = x86_64
 else
-FINCH_OS_BASENAME ?= $(AARCH64_ARTIFACT)
-FINCH_OS_DIGEST ?= $(AARCH64_512_DIGEST)
+FINCH_OS_BASENAME := $(AARCH64_ARTIFACT)
+FINCH_OS_DIGEST := $(AARCH64_512_DIGEST)
 LIMA_ARCH = aarch64
 endif
 
-FINCH_IMAGE_LOCATION := $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
-FINCH_IMAGE_DIGEST := "sha512:$(FINCH_OS_DIGEST)"
+FINCH_IMAGE_LOCATION ?= $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
+FINCH_IMAGE_DIGEST ?= "sha512:$(FINCH_OS_DIGEST)"
+
+include $(CURDIR)/deps/container-runtime-full-archive.conf
+CONTAINER_RUNTIME_ARCHIVE_AARCH64_LOCATION ?= "$(ARTIFACT_BASE_URL)/$(AARCH64_ARTIFACT)"
+CONTAINER_RUNTIME_ARCHIVE_AARCH64_DIGEST ?= "sha256:$(AARCH64_256_DIGEST)"
+CONTAINER_RUNTIME_ARCHIVE_X86_64_LOCATION ?= "$(ARTIFACT_BASE_URL)/$(X86_64_ARTIFACT)"
+CONTAINER_RUNTIME_ARCHIVE_X86_64_DIGEST ?= "sha256:$(X86_64_256_DIGEST)"
 
 # Virtualization framework is the default virtual machine type on Finch on macOS
 # This is only used for testing of Finch core bundles.
@@ -55,6 +61,10 @@ $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml: $(LIMA_TEMPLATE_OUTDIR)
 	sed -i.bak -e "s|<image_location>|$(FINCH_IMAGE_LOCATION)|g" $@.template
 	sed -i.bak -e "s/<image_arch>/$(LIMA_ARCH)/g" $@.template
 	sed -i.bak -e "s/<image_digest>/$(FINCH_IMAGE_DIGEST)/g" $@.template
+	sed -i.bak -e "s|<container_runtime_archive_aarch64_location>|$(CONTAINER_RUNTIME_ARCHIVE_AARCH64_LOCATION)|g" $@.template
+	sed -i.bak -e "s/<container_runtime_archive_aarch64_digest>/$(CONTAINER_RUNTIME_ARCHIVE_AARCH64_DIGEST)/g" $@.template
+	sed -i.bak -e "s|<container_runtime_archive_x86_64_location>|$(CONTAINER_RUNTIME_ARCHIVE_X86_64_LOCATION)|g" $@.template
+	sed -i.bak -e "s/<container_runtime_archive_x86_64_digest>/$(CONTAINER_RUNTIME_ARCHIVE_X86_64_DIGEST)/g" $@.template
 
 	# Replace was successful, so cleanup .bak files
 	rm $(LIMA_TEMPLATE_OUTDIR)/*.yaml.template.bak
