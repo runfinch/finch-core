@@ -6,11 +6,13 @@ on:
       - main
     paths:
       - 'rootfs/Dockerfile'
+      - 'rootfs/cosign/go.mod'
   pull_request:
     branches:
       - main
     paths:
       - 'rootfs/Dockerfile'
+      - 'rootfs/cosign/go.mod'
   workflow_dispatch:
 
 permissions:
@@ -37,10 +39,15 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Setup Go
+        uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
+
       - name: Set build variables
         id: vars
         run: |
           echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
+          cosign_tag=$(cd rootfs/cosign && go list -m github.com/sigstore/cosign/v2 | cut -d " " -f 2)
+          echo "cosign_version=${cosign_tag#v}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3.2.0
@@ -56,6 +63,8 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           push: false
           tags: finch-rootfs-image-production:intermediate
+          build-args: |
+            COSIGN_VERSION=${{ steps.vars.outputs.cosign_version }}
           outputs: type=docker,dest=finch-rootfs-${{ matrix.arch }}-${{ steps.vars.outputs.timestamp }}.tar
 
       - name: Upload container image artifact
