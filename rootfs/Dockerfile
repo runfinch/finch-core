@@ -7,18 +7,19 @@ WORKDIR /work
 RUN dnf update --best -y
 
 # download and install cosign
-RUN curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-2.2.4-1.x86_64.rpm && \
-    curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-2.2.4-1.x86_64.rpm-keyless.pem && \
-    curl -L -O https://github.com/sigstore/cosign/releases/download/v2.2.4/cosign-2.2.4-1.x86_64.rpm-keyless.sig && \
-    rpm -ivh cosign-2.2.4-1.x86_64.rpm
+ARG COSIGN_VERSION
+RUN curl -L -O https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-${COSIGN_VERSION}-1.x86_64.rpm && \
+    curl -L -O https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-${COSIGN_VERSION}-1.x86_64.rpm-keyless.pem && \
+    curl -L -O https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-${COSIGN_VERSION}-1.x86_64.rpm-keyless.sig && \
+    rpm -ivh cosign-${COSIGN_VERSION}-1.x86_64.rpm
 
 # use cosign to verify itself
 RUN cosign verify-blob \
-    --certificate cosign-2.2.4-1.x86_64.rpm-keyless.pem \
-    --signature cosign-2.2.4-1.x86_64.rpm-keyless.sig \
+    --certificate cosign-${COSIGN_VERSION}-1.x86_64.rpm-keyless.pem \
+    --signature cosign-${COSIGN_VERSION}-1.x86_64.rpm-keyless.sig \
     --certificate-identity keyless@projectsigstore.iam.gserviceaccount.com \
     --cert-oidc-issuer https://accounts.google.com \
-    cosign-2.2.4-1.x86_64.rpm
+    cosign-${COSIGN_VERSION}-1.x86_64.rpm
 
 FROM public.ecr.aws/docker/library/fedora:40
 
@@ -44,11 +45,12 @@ RUN dnf install -y \
   fuse-sshfs \
   btrfs-progs
 
-COPY --from=build /work/cosign-2.2.4-1.x86_64.rpm /work/cosign-2.2.4-1.x86_64.rpm
+ARG COSIGN_VERSION
+COPY --from=build /work/cosign-${COSIGN_VERSION}-1.x86_64.rpm /work/cosign-${COSIGN_VERSION}-1.x86_64.rpm
   
 # install cosign
-RUN rpm -ivh cosign-2.2.4-1.x86_64.rpm && \
-    rm -rf cosign-2.2.4-1.x86_64.rpm
+RUN rpm -ivh cosign-${COSIGN_VERSION}-1.x86_64.rpm && \
+    rm -rf cosign-${COSIGN_VERSION}-1.x86_64.rpm
 
 RUN systemctl enable cloud-init cloud-init-local cloud-config cloud-final
 

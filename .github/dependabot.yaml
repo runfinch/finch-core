@@ -14,3 +14,11 @@ updates:
   commit-message:
     prefix: "ci"
     include: "scope"
+- package-ecosystem: "gomod"
+  directory: "/rootfs/cosign"
+  dependency-type: direct
+  schedule:
+    interval: "daily"
+  commit-message:
+    prefix: "build"
+    include: "scope"
