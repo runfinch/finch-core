@@ -17,7 +17,7 @@ updates:
 - package-ecosystem: "gomod"
   directory: "/rootfs/cosign"
   allow:
-    dependency-type: direct
+    - dependency-type: direct
   schedule:
     interval: "daily"
   commit-message:
