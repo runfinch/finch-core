@@ -48,7 +48,10 @@ func TestE2e(t *testing.T) {
 
 	vmName := "fedora"
 
-	nerdctlOpt, err := option.New([]string{subject, "shell", vmName, "sudo", "-E", "nerdctl"})
+	nerdctlOpt, err := option.New(
+		[]string{subject, "shell", vmName, "sudo", "-E", "nerdctl"},
+		option.WithNoEnvironmentVariablePassthrough(),
+	)
 	if err != nil {
 		t.Fatalf("failed to initialize a testing option: %v", err)
 	}
