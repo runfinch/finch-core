@@ -7,7 +7,7 @@ toolchain go1.23.4
 require (
 	github.com/onsi/ginkgo/v2 v2.22.1
 	github.com/onsi/gomega v1.36.1
-	github.com/runfinch/common-tests v0.9.0
+	github.com/runfinch/common-tests v0.9.1
 )
 
 require (
