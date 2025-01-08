@@ -16,6 +16,7 @@ on:
       - deps/lima-bundles.conf
       - e2e/**
       - lima-template/**
+      - src/socket_vmnet/**
       - Makefile
       - Makefile.darwin
   workflow_dispatch:
