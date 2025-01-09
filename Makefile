@@ -72,6 +72,7 @@ clean:
 	-@rm -rf $(DOWNLOAD_DIR) 2>/dev/null || true
 	-@rm ./*.tar.gz 2>/dev/null || true
 	-@cd src/finch-daemon && make clean 2>/dev/null || true
+	-@cd src/socket_vmnet && make clean 2>/dev/null || true
 
 .PHONY: test-e2e
 test-e2e: $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml
