@@ -33,7 +33,9 @@ RUN dnf group install -y cloud-server-environment --exclude=plymouth* \
     --exclude=firewalld* \
     --exclude=grub* \
     --exclude=dracut* \
-    --exclude=shim-*
+    --exclude=shim-* \
+    --exclude=audit \
+    --exclude=audit-rules
 
 # install packages needed by Lima
 RUN dnf install -y \
