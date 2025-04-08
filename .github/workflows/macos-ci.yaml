@@ -11,12 +11,12 @@ on:
       - main
     paths:
       - .github/workflows/macos-ci.yaml
+      - .gitmodules
       - deps/container-runtime-full-archive.conf
       - deps/full-os.conf
       - deps/lima-bundles.conf
       - e2e/**
       - lima-template/**
-      - src/socket_vmnet/**
       - Makefile
       - Makefile.darwin
   workflow_dispatch:
