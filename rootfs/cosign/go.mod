@@ -1,6 +1,7 @@
 module github.com/runfinch/finch-core/rootfs/cosign
 
-go 1.23.2
+go 1.23.8
+
 toolchain go1.24.1
 
 require github.com/sigstore/cosign/v2 v2.5.0
@@ -111,7 +112,7 @@ require (
 	github.com/go-openapi/swag v0.23.1 // indirect
 	github.com/go-openapi/validate v0.24.0 // indirect
 	github.com/go-piv/piv-go/v2 v2.3.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
