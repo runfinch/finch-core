@@ -50,7 +50,8 @@ $(FINCH_DAEMON_OUTDIR)/finch-daemon: $(OUTPUT_DIRECTORIES)
 	git submodule update --init --recursive src/finch-daemon
 	cd src/finch-daemon && git clean -f -d
 	cd src/finch-daemon && STATIC=1 GOOS=linux GOARCH=$(GOARCH) "$(MAKE)"
-	cp src/finch-daemon/bin/finch-daemon $@
+	cp src/finch-daemon/bin/finch-daemon $(FINCH_DAEMON_OUTDIR)/finch-daemon
+	cp src/finch-daemon/bin/docker-credential-finch $(FINCH_DAEMON_OUTDIR)/docker-credential-finch
 
 .PHONY: install
 install: uninstall
