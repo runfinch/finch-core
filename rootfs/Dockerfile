@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.4
 
-FROM public.ecr.aws/docker/library/fedora:40 as build
+FROM public.ecr.aws/docker/library/fedora:41 as build
 
 WORKDIR /work
 
@@ -21,7 +21,7 @@ RUN cosign verify-blob \
     --cert-oidc-issuer https://accounts.google.com \
     cosign-${COSIGN_VERSION}-1.x86_64.rpm
 
-FROM public.ecr.aws/docker/library/fedora:40
+FROM public.ecr.aws/docker/library/fedora:41
 
 WORKDIR /work
 
