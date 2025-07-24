@@ -22,8 +22,8 @@ RUN cosign verify-blob \
     cosign-${COSIGN_VERSION}-1.x86_64.rpm
 
 RUN curl \
-  https://raw.githubusercontent.com/rpm-software-management/distribution-gpg-keys/refs/heads/main/keys/fedora/RPM-GPG-KEY-fedora-40-primary \
-  | sudo tee /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-40 > /dev/null
+  -o /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-40 \
+  https://raw.githubusercontent.com/rpm-software-management/distribution-gpg-keys/refs/heads/main/keys/fedora/RPM-GPG-KEY-fedora-40-primary
 
 RUN <<EOF cat >> /etc/yum.repos.d/fedora40.repo
 [fedora40]
