@@ -39,8 +39,8 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-40
 skip_if_unavailable=False
 EOF
 
-# Specify the -aarch64, -arm, and -x86 packages as they weren't getting removed/installed
-# with the qemu-user-static package.
+# Download all qemu-user-static* packages from Fedora 40's update repo
+# for installation in the final image
 RUN dnf download \
   --repo fedora40 \
   'qemu-user-static*'
