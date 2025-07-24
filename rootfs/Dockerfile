@@ -43,13 +43,13 @@ EOF
 # specific version of qemu-user-mode emulators from fedora40 repo.
 # Specify the -aarch64m -arm and -x86 packages as they weren't getting removed
 # with the qemu-user-static package.
-RUN sudo dnf remove -y \
+RUN dnf remove -y \
   qemu-user-static \
   qemu-user-static-aarch64 \
   qemu-user-static-arm \
   qemu-user-static-x86
 
-RUN sudo dnf download \
+RUN dnf download \
   --repo fedora40 \
   qemu-user-static-aarch64-8.2.9-1.fc40 \
   qemu-user-static-arm-8.2.9-1.fc40 \
