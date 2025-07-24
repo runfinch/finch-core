@@ -21,6 +21,30 @@ RUN cosign verify-blob \
     --cert-oidc-issuer https://accounts.google.com \
     cosign-${COSIGN_VERSION}-1.x86_64.rpm
 
+RUN curl \
+  -o /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-40 \
+  https://raw.githubusercontent.com/rpm-software-management/distribution-gpg-keys/refs/heads/main/keys/fedora/RPM-GPG-KEY-fedora-40-primary
+
+RUN <<EOF cat >> /etc/yum.repos.d/fedora40.repo
+[fedora40]
+name=Fedora 40
+metalink=https://mirrors.fedoraproject.org/metalink?repo=updates-released-f40&arch=\$basearch
+enabled=1
+countme=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-40
+skip_if_unavailable=False
+EOF
+
+# Download all qemu-user-static* packages from Fedora 40's update repo
+# for installation in the final image
+RUN dnf download \
+  --repo fedora40 \
+  'qemu-user-static*'
+
 FROM public.ecr.aws/docker/library/fedora:41
 
 WORKDIR /work
@@ -37,15 +61,26 @@ RUN dnf group install -y cloud-server-environment --exclude=plymouth* \
     --exclude=audit \
     --exclude=audit-rules
 
-# install packages needed by Lima
-RUN dnf install -y \
-  --setopt=install_weak_deps=False \
+# Remove any existing qemu-user-static packages and then install
+# specific version of qemu-user-mode emulators from fedora40 repo.
+RUN dnf remove -y \
+  qemu-user-static \
   qemu-user-static-aarch64 \
   qemu-user-static-arm \
-  qemu-user-static-x86 \
+  qemu-user-static-x86
+
+RUN mkdir pkg
+COPY --from=build /work/qemu-user-static*.rpm /work/pkg/
+
+# install packages needed by Lima
+RUN cd pkg && dnf install -y \
+  --setopt=install_weak_deps=False \
+  qemu-user-static*.rpm \
   iptables \
   fuse-sshfs \
   btrfs-progs
+
+RUN rm -rf /work/pkg
 
 ARG COSIGN_VERSION
 COPY --from=build /work/cosign-${COSIGN_VERSION}-1.x86_64.rpm /work/cosign-${COSIGN_VERSION}-1.x86_64.rpm
