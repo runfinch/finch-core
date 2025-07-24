@@ -21,6 +21,40 @@ RUN cosign verify-blob \
     --cert-oidc-issuer https://accounts.google.com \
     cosign-${COSIGN_VERSION}-1.x86_64.rpm
 
+RUN curl \
+  https://raw.githubusercontent.com/rpm-software-management/distribution-gpg-keys/refs/heads/main/keys/fedora/RPM-GPG-KEY-fedora-40-primary \
+  | sudo tee /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-40 > /dev/null
+
+RUN <<EOF cat >> /etc/yum.repos.d/fedora40.repo
+[fedora40]
+name=Fedora 40
+metalink=https://mirrors.fedoraproject.org/metalink?repo=updates-released-f40&arch=\$basearch
+enabled=1
+countme=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-40
+skip_if_unavailable=False
+EOF
+
+# Remove any existing qemu-user-static packages and then install
+# specific version of qemu-user-mode emulators from fedora40 repo.
+# Specify the -aarch64m -arm and -x86 packages as they weren't getting removed
+# with the qemu-user-static package.
+RUN sudo dnf remove -y \
+  qemu-user-static \
+  qemu-user-static-aarch64 \
+  qemu-user-static-arm \
+  qemu-user-static-x86
+
+RUN sudo dnf download \
+  --repo fedora40 \
+  qemu-user-static-aarch64-8.2.9-1.fc40 \
+  qemu-user-static-arm-8.2.9-1.fc40 \
+  qemu-user-static-x86-8.2.9-1.fc40
+
 FROM public.ecr.aws/docker/library/fedora:41
 
 WORKDIR /work
@@ -37,15 +71,23 @@ RUN dnf group install -y cloud-server-environment --exclude=plymouth* \
     --exclude=audit \
     --exclude=audit-rules
 
+COPY --from=build /work/qemu-user-static-aarch64-8.2.9-1.fc40.x86_64.rpm /work/qemu-user-static-aarch64-8.2.9-1.fc40.x86_64.rpm 
+COPY --from=build /work/qemu-user-static-arm-8.2.9-1.fc40.x86_64.rpm /work/qemu-user-static-arm-8.2.9-1.fc40.x86_64.rpm 
+COPY --from=build /work/qemu-user-static-x86-8.2.9-1.fc40.x86_64.rpm /work/qemu-user-static-x86-8.2.9-1.fc40.x86_64.rpm 
+
 # install packages needed by Lima
 RUN dnf install -y \
   --setopt=install_weak_deps=False \
-  qemu-user-static-aarch64 \
-  qemu-user-static-arm \
-  qemu-user-static-x86 \
+  /work/qemu-user-static-aarch64-8.2.9-1.fc40.x86_64.rpm \
+  /work/qemu-user-static-arm-8.2.9-1.fc40.x86_64.rpm \
+  /work/qemu-user-static-x86-8.2.9-1.fc40.x86_64.rpm \
   iptables \
   fuse-sshfs \
   btrfs-progs
+
+RUN rm -rf /work/qemu-user-static-aarch64-8.2.9-1.fc40.x86_64.rpm \
+/work/qemu-user-static-arm-8.2.9-1.fc40.x86_64.rpm \
+/work/qemu-user-static-x86-8.2.9-1.fc40.x86_64.rpm
 
 ARG COSIGN_VERSION
 COPY --from=build /work/cosign-${COSIGN_VERSION}-1.x86_64.rpm /work/cosign-${COSIGN_VERSION}-1.x86_64.rpm
