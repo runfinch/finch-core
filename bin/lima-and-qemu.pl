@@ -66,7 +66,7 @@ for my $template (@ARGV) {
     my $config = "$templatedir/$template.yaml", ;
     die "Config $config not found" unless -f $config;
     system("limactl delete -f $template") if -d "$ENV{HOME}/.lima/$template";
-    system("limactl start --tty=false $config");
+    system("limactl start --tty=false --vm-type=qemu $config");
     system("limactl shell $template uname");
     system("limactl stop $template");
     system("limactl delete $template");
