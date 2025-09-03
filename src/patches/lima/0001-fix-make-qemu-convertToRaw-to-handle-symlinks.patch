@@ -1,0 +1,29 @@
+From bf4167ef86259f2339507b35bd4d54119b4018bc Mon Sep 17 00:00:00 2001
+From: Justin Alvarez <alvajus@amazon.com>
+Date: Wed, 3 Sep 2025 13:28:38 -0400
+Subject: [PATCH 1/1] fix: make qemu convertToRaw to handle symlinks
+
+Signed-off-by: Justin Alvarez <alvajus@amazon.com>
+---
+ pkg/qemuimgutil/qemuimgutil.go | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/pkg/qemuimgutil/qemuimgutil.go b/pkg/qemuimgutil/qemuimgutil.go
+index 8872eb56..6ac7b041 100644
+--- a/pkg/qemuimgutil/qemuimgutil.go
++++ b/pkg/qemuimgutil/qemuimgutil.go
+@@ -123,6 +123,11 @@ func convertToRaw(source, dest string) error {
+ 	if err := execQemuImgConvert(source, tempFile); err != nil {
+ 		return err
+ 	}
++	
++	realDest, _ := os.Readlink(dest)
++	if realDest != "" && realDest != dest {
++		dest = realDest
++	}
+ 
+ 	return os.Rename(tempFile, dest)
+ }
+-- 
+2.39.5 (Apple Git-154)
+
