@@ -3,7 +3,7 @@ module finch-core
 go 1.24.5
 
 require (
-	github.com/onsi/ginkgo/v2 v2.25.2
+	github.com/onsi/ginkgo/v2 v2.25.3
 	github.com/onsi/gomega v1.38.2
 	github.com/runfinch/common-tests v0.9.4
 )
