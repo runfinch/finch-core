@@ -1,0 +1,113 @@
+/opt/homebrew/Cellar/capstone/5.0.6/lib/libcapstone.5.dylib [6.8M]
+/opt/homebrew/Cellar/capstone/5.0.6/lib/libcapstone.dylib → libcapstone.5.dylib
+/opt/homebrew/Cellar/dtc/1.7.2/lib/libfdt.1.dylib → libfdt.dylib.1.7.2
+/opt/homebrew/Cellar/dtc/1.7.2/lib/libfdt.dylib → libfdt.1.dylib
+/opt/homebrew/Cellar/dtc/1.7.2/lib/libfdt.dylib.1.7.2 [73K]
+/opt/homebrew/Cellar/gettext/0.26/lib/libintl.8.dylib [225K]
+/opt/homebrew/Cellar/gettext/0.26/lib/libintl.dylib → libintl.8.dylib
+/opt/homebrew/Cellar/glib/2.86.0/lib/libgio-2.0.0.dylib [1.8M]
+/opt/homebrew/Cellar/glib/2.86.0/lib/libgio-2.0.dylib → libgio-2.0.0.dylib
+/opt/homebrew/Cellar/glib/2.86.0/lib/libglib-2.0.0.dylib [1.2M]
+/opt/homebrew/Cellar/glib/2.86.0/lib/libglib-2.0.dylib → libglib-2.0.0.dylib
+/opt/homebrew/Cellar/glib/2.86.0/lib/libgmodule-2.0.0.dylib [70K]
+/opt/homebrew/Cellar/glib/2.86.0/lib/libgmodule-2.0.dylib → libgmodule-2.0.0.dylib
+/opt/homebrew/Cellar/glib/2.86.0/lib/libgobject-2.0.0.dylib [364K]
+/opt/homebrew/Cellar/glib/2.86.0/lib/libgobject-2.0.dylib → libgobject-2.0.0.dylib
+/opt/homebrew/Cellar/gmp/6.3.0/lib/libgmp.10.dylib [442K]
+/opt/homebrew/Cellar/gmp/6.3.0/lib/libgmp.dylib → libgmp.10.dylib
+/opt/homebrew/Cellar/gnutls/3.8.10/lib/libgnutls.30.dylib [1.8M]
+/opt/homebrew/Cellar/gnutls/3.8.10/lib/libgnutls.dylib → libgnutls.30.dylib
+/opt/homebrew/Cellar/jpeg-turbo/3.1.2/lib/libjpeg.8.3.2.dylib [462K]
+/opt/homebrew/Cellar/jpeg-turbo/3.1.2/lib/libjpeg.8.dylib → libjpeg.8.3.2.dylib
+/opt/homebrew/Cellar/jpeg-turbo/3.1.2/lib/libjpeg.dylib → libjpeg.8.dylib
+/opt/homebrew/Cellar/libidn2/2.3.8/lib/libidn2.0.dylib [253K]
+/opt/homebrew/Cellar/libidn2/2.3.8/lib/libidn2.dylib → libidn2.0.dylib
+/opt/homebrew/Cellar/libpng/1.6.50/lib/libpng.dylib → libpng16.dylib
+/opt/homebrew/Cellar/libpng/1.6.50/lib/libpng16.16.dylib [204K]
+/opt/homebrew/Cellar/libpng/1.6.50/lib/libpng16.dylib → libpng16.16.dylib
+/opt/homebrew/Cellar/libslirp/4.9.1/lib/libslirp.0.dylib [164K]
+/opt/homebrew/Cellar/libslirp/4.9.1/lib/libslirp.dylib → libslirp.0.dylib
+/opt/homebrew/Cellar/libssh/0.11.3/lib/libssh.4.10.3.dylib [469K]
+/opt/homebrew/Cellar/libssh/0.11.3/lib/libssh.4.dylib → libssh.4.10.3.dylib
+/opt/homebrew/Cellar/libssh/0.11.3/lib/libssh.dylib → libssh.4.dylib
+/opt/homebrew/Cellar/libtasn1/4.20.0/lib/libtasn1.6.dylib [106K]
+/opt/homebrew/Cellar/libtasn1/4.20.0/lib/libtasn1.dylib → libtasn1.6.dylib
+/opt/homebrew/Cellar/libunistring/1.3/lib/libunistring.5.dylib [1.9M]
+/opt/homebrew/Cellar/libunistring/1.3/lib/libunistring.dylib → libunistring.5.dylib
+/opt/homebrew/Cellar/libusb/1.0.29/lib/libusb-1.0.0.dylib [175K]
+/opt/homebrew/Cellar/libusb/1.0.29/lib/libusb-1.0.dylib → libusb-1.0.0.dylib
+/opt/homebrew/Cellar/lzo/2.10/lib/liblzo2.2.dylib [139K]
+/opt/homebrew/Cellar/lzo/2.10/lib/liblzo2.dylib → liblzo2.2.dylib
+/opt/homebrew/Cellar/ncurses/6.5/lib/libcurses.dylib → libncurses.dylib
+/opt/homebrew/Cellar/ncurses/6.5/lib/libncurses.6.dylib → libncursesw.6.dylib
+/opt/homebrew/Cellar/ncurses/6.5/lib/libncurses.dylib → libncursesw.6.dylib
+/opt/homebrew/Cellar/ncurses/6.5/lib/libncursesw.6.dylib [342K]
+/opt/homebrew/Cellar/ncurses/6.5/lib/libncursesw.dylib → libncursesw.6.dylib
+/opt/homebrew/Cellar/nettle/3.10.2/lib/libhogweed.6.11.dylib [309K]
+/opt/homebrew/Cellar/nettle/3.10.2/lib/libhogweed.6.dylib → libhogweed.6.11.dylib
+/opt/homebrew/Cellar/nettle/3.10.2/lib/libhogweed.dylib → libhogweed.6.11.dylib
+/opt/homebrew/Cellar/nettle/3.10.2/lib/libnettle.8.11.dylib [326K]
+/opt/homebrew/Cellar/nettle/3.10.2/lib/libnettle.8.dylib → libnettle.8.11.dylib
+/opt/homebrew/Cellar/nettle/3.10.2/lib/libnettle.dylib → libnettle.8.11.dylib
+/opt/homebrew/Cellar/openssl@3/3.5.2/lib/libcrypto.3.dylib [4.5M]
+/opt/homebrew/Cellar/openssl@3/3.5.2/lib/libcrypto.dylib → libcrypto.3.dylib
+/opt/homebrew/Cellar/p11-kit/0.25.8/lib/libp11-kit.0.dylib [1.4M]
+/opt/homebrew/Cellar/p11-kit/0.25.8/lib/libp11-kit.dylib → libp11-kit.0.dylib
+/opt/homebrew/Cellar/p11-kit/0.25.8/lib/p11-kit-proxy.dylib → libp11-kit.0.dylib
+/opt/homebrew/Cellar/pcre2/10.46/lib/libpcre2-8.0.dylib [567K]
+/opt/homebrew/Cellar/pcre2/10.46/lib/libpcre2-8.dylib → libpcre2-8.0.dylib
+/opt/homebrew/Cellar/pixman/0.46.4/lib/libpixman-1.0.dylib [611K]
+/opt/homebrew/Cellar/pixman/0.46.4/lib/libpixman-1.dylib → libpixman-1.0.dylib
+/opt/homebrew/Cellar/qemu/10.1.0/bin
+/opt/homebrew/Cellar/qemu/10.1.0/bin/qemu-img [2.0M]
+/opt/homebrew/Cellar/qemu/10.1.0/bin/qemu-system-aarch64 [29M]
+/opt/homebrew/Cellar/qemu/10.1.0/share/qemu/edk2-aarch64-code.fd [64M]
+/opt/homebrew/Cellar/qemu/10.1.0/share/qemu/efi-virtio.rom [157K]
+/opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.1.2.2.dylib [78K]
+/opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.1.dylib → libsnappy.1.2.2.dylib
+/opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.dylib → libsnappy.1.dylib
+/opt/homebrew/Cellar/vde/2.3.3/lib/libvdeplug.3.dylib [70K]
+/opt/homebrew/Cellar/vde/2.3.3/lib/libvdeplug.dylib → libvdeplug.3.dylib
+/opt/homebrew/Cellar/zstd/1.5.7/lib/libzstd.1.5.7.dylib [654K]
+/opt/homebrew/Cellar/zstd/1.5.7/lib/libzstd.1.dylib → libzstd.1.5.7.dylib
+/opt/homebrew/Cellar/zstd/1.5.7/lib/libzstd.dylib → libzstd.1.dylib
+/opt/homebrew/bin/limactl [28M]
+/opt/homebrew/bin/qemu-img [34B]
+/opt/homebrew/bin/qemu-system-aarch64 [45B]
+/opt/homebrew/opt/capstone → ../Cellar/capstone/5.0.6
+/opt/homebrew/opt/dtc → ../Cellar/dtc/1.7.2
+/opt/homebrew/opt/gettext → ../Cellar/gettext/0.26
+/opt/homebrew/opt/glib → ../Cellar/glib/2.86.0
+/opt/homebrew/opt/gmp → ../Cellar/gmp/6.3.0
+/opt/homebrew/opt/gnutls → ../Cellar/gnutls/3.8.10
+/opt/homebrew/opt/jpeg-turbo → ../Cellar/jpeg-turbo/3.1.2
+/opt/homebrew/opt/libidn2 → ../Cellar/libidn2/2.3.8
+/opt/homebrew/opt/libjpeg-turbo → ../Cellar/jpeg-turbo/3.1.2
+/opt/homebrew/opt/libnettle → ../Cellar/nettle/3.10.2
+/opt/homebrew/opt/libpng → ../Cellar/libpng/1.6.50
+/opt/homebrew/opt/libslirp → ../Cellar/libslirp/4.9.1
+/opt/homebrew/opt/libssh → ../Cellar/libssh/0.11.3
+/opt/homebrew/opt/libtasn → ../Cellar/libtasn1/4.20.0
+/opt/homebrew/opt/libtasn1 → ../Cellar/libtasn1/4.20.0
+/opt/homebrew/opt/libunistring → ../Cellar/libunistring/1.3
+/opt/homebrew/opt/libusb → ../Cellar/libusb/1.0.29
+/opt/homebrew/opt/lzo → ../Cellar/lzo/2.10
+/opt/homebrew/opt/ncurses → ../Cellar/ncurses/6.5
+/opt/homebrew/opt/nettle → ../Cellar/nettle/3.10.2
+/opt/homebrew/opt/openssl → ../Cellar/openssl@3/3.5.2
+/opt/homebrew/opt/openssl@3 → ../Cellar/openssl@3/3.5.2
+/opt/homebrew/opt/openssl@3.3 → ../Cellar/openssl@3/3.5.2
+/opt/homebrew/opt/openssl@3.5 → ../Cellar/openssl@3/3.5.2
+/opt/homebrew/opt/p11-kit → ../Cellar/p11-kit/0.25.8
+/opt/homebrew/opt/pcre2 → ../Cellar/pcre2/10.46
+/opt/homebrew/opt/pixman → ../Cellar/pixman/0.46.4
+/opt/homebrew/opt/pzstd → ../Cellar/zstd/1.5.7
+/opt/homebrew/opt/qemu → ../Cellar/qemu/10.1.0
+/opt/homebrew/opt/snappy → ../Cellar/snappy/1.2.2
+/opt/homebrew/opt/vde → ../Cellar/vde/2.3.3
+/opt/homebrew/opt/zstd → ../Cellar/zstd/1.5.7
+/opt/homebrew/share/lima/lima-guestagent.Linux-aarch64.gz [12M]
+/opt/homebrew/share/lima/templates/_default/mounts.yaml [104B]
+/opt/homebrew/share/lima/templates/_images/alpine.yaml [592B]
+/opt/homebrew/share/lima/templates/_images/ubuntu.yaml [2.4K]
+/opt/homebrew/share/qemu → ../Cellar/qemu/10.1.0/share/qemu
