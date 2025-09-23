@@ -39,16 +39,13 @@ jobs:
         # coreutils: required by test-example.sh for the "timeout" command
         # autoconf:  required for building vde
         # automake:  required for building vde
-        # FileMonitor: required to capture opened files by limactl and qemu-
+        # fs_usage:  built-in macOS tool used to capture opened files by limactl and qemu
 
         run: |
           brew update
           brew install qemu bash coreutils
           brew install autoconf automake
-          brew install cpanm
           brew upgrade
-          sudo cpanm install JSON
-          bash bin/install-file-monitor.sh
         shell: zsh {0}
 
       - name: Make and release deps
@@ -98,16 +95,13 @@ jobs:
         # coreutils: required by test-example.sh for the "timeout" command
         # autoconf:  required for building vde
         # automake:  required for building vde
-        # FileMonitor: required to capture opened files by limactl and qemu-
+        # fs_usage:  built-in macOS tool used to capture opened files by limactl and qemu
 
         run: |
           brew update
           brew install qemu bash coreutils
           brew install autoconf automake
-          brew install cpanm
           brew upgrade
-          sudo cpanm install JSON
-          bash bin/install-file-monitor.sh
         shell: zsh {0}
 
       - name: Make and release deps
