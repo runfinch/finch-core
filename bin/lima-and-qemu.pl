@@ -344,8 +344,9 @@ sub normalize_path_for_version_comparison {
     my ($path) = @_;
     
     # Normalize versioned packages in opt directory
-    # e.g., /opt/homebrew/opt/openssl@3.3 -> /opt/homebrew/opt/openssl@3
-    $path =~ s|(/opt/[^/]+/opt/[^@]+@)\d+(\.\d+)*$|$1*|;
+    # e.g., /opt/homebrew/opt/openssl@3.3 -> /opt/homebrew/opt/openssl@*
+    # or /usr/local/opt/openssl@3.3 -> /usr/local/opt/openssl@*
+    $path =~ s|($install_dir/opt/[^@]+@)\d+(\.\d+)*$|$1*|;
     
     # Remove version numbers from Cellar paths
     # e.g., /opt/homebrew/Cellar/openssl@3/3.5.2/lib -> /opt/homebrew/Cellar/openssl@3/*/lib
