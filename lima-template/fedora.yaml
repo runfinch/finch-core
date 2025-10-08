@@ -11,7 +11,7 @@ arch: null
 
 # OpenStack-compatible disk image.
 # 🟢 Builtin default: null (must be specified)
-# 🔵 This file: Ubuntu 22.04 Jammy Jellyfish images
+# 🔵 This file: Fedora 42 Cloud Base images
 images:
   - location: "<image_location>"
     arch: "<image_arch>"
@@ -29,8 +29,8 @@ memory: "4GiB"
 # 🟢 Builtin default: "100GiB"
 disk: null
 
-# 9p is broken in Linux v6.9, v6.10, and v6.11 (used by Fedora 41).
-# The issue was fixed in Linux v6.12-rc5 (https://github.com/torvalds/linux/commit/be2ca38).
+# 9p was broken in Linux v6.9, v6.10, and v6.11 (used by Fedora 41).
+# The issue was fixed in Linux v6.12-rc5 (https://github.com/torvalds/linux/commit/be2ca38) and is available in Fedora 42.
 mountType: reverse-sshfs
 
 # Expose host directories to the guest, the mount point might be accessible from all UIDs in the guest
