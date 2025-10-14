@@ -21,8 +21,24 @@ RUN cosign verify-blob \
     --cert-oidc-issuer https://accounts.google.com \
     cosign-${COSIGN_VERSION}-1.x86_64.rpm
 
-# Download qemu-user-static packages from Fedora 42
+RUN <<EOF cat >> /etc/yum.repos.d/fedora40.repo
+[fedora40]
+name=Fedora 40
+metalink=https://mirrors.fedoraproject.org/metalink?repo=updates-released-f40&arch=\$basearch
+enabled=1
+countme=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-40
+skip_if_unavailable=False
+EOF
+
+# Download all qemu-user-static* packages from Fedora 40's update repo
+# for installation in the final image
 RUN dnf download \
+  --repo fedora40 \
   'qemu-user-static*'
 
 FROM public.ecr.aws/docker/library/fedora:42
@@ -42,7 +58,7 @@ RUN dnf group install -y cloud-server-environment --exclude=plymouth* \
     --exclude=audit-rules
 
 # Remove any existing qemu-user-static packages and then install
-# specific version of qemu-user-mode emulators from Fedora 42.
+# specific version of qemu-user-mode emulators from Fedora 40.
 RUN dnf remove -y \
   qemu-user-static \
   qemu-user-static-aarch64 \
