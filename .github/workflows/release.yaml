@@ -63,6 +63,13 @@ jobs:
           path: ./src/lima/lima-and-qemu.macos*
           if-no-files-found: error
 
+      - name: Upload dependency mapping ARM64
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dep-version-mapping-aarch64
+          path: ./src/lima/dep-version-mapping-aarch64.json
+          if-no-files-found: error
+
       - name: Make and release source code of dependencies
         run: make download-sources
       - name: Upload MacOS build
@@ -119,6 +126,49 @@ jobs:
           path: ./src/lima/lima-and-qemu.macos*
           if-no-files-found: error
 
+      - name: Upload dependency mapping x86_64
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dep-version-mapping-x86_64
+          path: ./src/lima/dep-version-mapping-x86_64.json
+          if-no-files-found: error
+
+  upload-dependency-mappings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - macos-x86-build
+      - macos-arm64-build
+
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.DEPENDENCY_MAPPING_BUCKET_ROLE }}
+          role-session-name: dependency-mapping-upload-session
+          aws-region: ${{ secrets.DEPENDENCY_MAPPING_BUCKET_REGION }}
+
+      - name: Download dependency mapping ARM64
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: dep-version-mapping-aarch64
+          path: build
+
+      - name: Download dependency mapping x86_64
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: dep-version-mapping-x86_64
+          path: build
+
+      - name: Upload dependency mappings to S3
+        run: |
+          aws s3 cp ./build/dep-version-mapping-aarch64.json s3://${{ secrets.DEPENDENCY_MAPPING_BUCKET_NAME }}/aarch64/dep-version-mapping.json
+          aws s3 cp ./build/dep-version-mapping-x86_64.json s3://${{ secrets.DEPENDENCY_MAPPING_BUCKET_NAME }}/x86-64/dep-version-mapping.json
 
   release:
     runs-on: ubuntu-latest

@@ -142,6 +142,39 @@ my $repo_root = join('/', dirname($FindBin::Bin), 'src', 'lima');
 unlink("$repo_root/$dist.tar.gz");
 system("tar cvfz $repo_root/$dist.tar.gz -C /tmp/$dist $files");
 
+# Extract package versions from Cellar and export to JSON
+my %package_versions;
+for my $file (keys %deps) {
+    # Extract package info from Cellar path: /opt/homebrew/Cellar/package/version/...
+    if ($file =~ m|/Cellar/([^/]+)/([^/]+)/|) {
+        my ($package, $version) = ($1, $2);
+        $package_versions{$package} = {
+            "package" => $package,
+            "version" => $version
+        };
+    }
+    # Handle direct bin files (like limactl) that might not be in Cellar
+    elsif ($file =~ m|^$install_dir/bin/([^/]+)$|) {
+        my $binary_name = $1;
+        # Try to get version from the binary itself
+        my $version_output = qx($file --version 2>/dev/null | head -1);
+        if ($version_output =~ /(\d+\.\d+\.\d+[^\s]*)/) {
+            $package_versions{$binary_name} = {
+                "package" => $binary_name,
+                "version" => $1
+            };
+        }
+    }
+}
+
+# Export to JSON
+use JSON qw( encode_json );
+my $json_file = "$repo_root/dep-version-mapping-$arch.json";
+open(my $json_fh, ">", $json_file) or die "Can't write $json_file: $!";
+print $json_fh encode_json(\%package_versions);
+close($json_fh);
+print "Generated dependency mapping: $json_file\n";
+
 exit;
 
 # File references may involve multiple symlinks that need to be recorded as well, e.g.
