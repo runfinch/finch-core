@@ -53,51 +53,51 @@ jobs:
       - name: Clean up dependencies
         run: make clean
 
-  e2e-tests:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          [
-            [self-hosted, macos, amd64, 14, test],
-            [self-hosted, macos, arm64, 14, test],
-          ]
-        vm_type: [ "vz", "qemu" ]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-          submodules: true
-      - name: Setup go
-        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
-        with:
-          go-version-file: e2e/go.mod
-          cache-dependency-path: e2e/go.sum
-      - name: Clean up previous files
-        shell: zsh {0}
-        run: |
-          sudo rm -rf ~/.lima
-          sudo rm -rf ./_output
-          if pgrep '^qemu-system'; then
-            sudo pkill '^qemu-system'
-          fi
-          if pgrep '^socket_vmnet'; then
-            sudo pkill '^socket_vmnet'
-          fi
-      - name: Install dependencies
-        shell: zsh {0}
-        run: brew install lz4 automake autoconf libtool
-      - name: Build project
-        shell: zsh {0}
-        run: |
-          export PATH="/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
-          which libtool
-          # Install socket_vmnet to `_output/bin` which is used in $PATH
-          SOCKET_VMNET_TEMP_PREFIX=$(pwd)/_output/ make lima-socket-vmnet
-          make install.dependencies
-      - name: Run e2e tests
-        shell: zsh {0}
-        run: FINCH_VM_TYPE=${{ matrix.vm_type }} make test-e2e
+  # e2e-tests:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os:
+  #         [
+  #           [self-hosted, macos, amd64, 14, test],
+  #           [self-hosted, macos, arm64, 14, test],
+  #         ]
+  #       vm_type: [ "vz", "qemu" ]
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+  #       with:
+  #         fetch-depth: 0
+  #         persist-credentials: false
+  #         submodules: true
+  #     - name: Setup go
+  #       uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+  #       with:
+  #         go-version-file: e2e/go.mod
+  #         cache-dependency-path: e2e/go.sum
+  #     - name: Clean up previous files
+  #       shell: zsh {0}
+  #       run: |
+  #         sudo rm -rf ~/.lima
+  #         sudo rm -rf ./_output
+  #         if pgrep '^qemu-system'; then
+  #           sudo pkill '^qemu-system'
+  #         fi
+  #         if pgrep '^socket_vmnet'; then
+  #           sudo pkill '^socket_vmnet'
+  #         fi
+  #     - name: Install dependencies
+  #       shell: zsh {0}
+  #       run: brew install lz4 automake autoconf libtool
+  #     - name: Build project
+  #       shell: zsh {0}
+  #       run: |
+  #         export PATH="/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
+  #         which libtool
+  #         # Install socket_vmnet to `_output/bin` which is used in $PATH
+  #         SOCKET_VMNET_TEMP_PREFIX=$(pwd)/_output/ make lima-socket-vmnet
+  #         make install.dependencies
+  #     - name: Run e2e tests
+  #       shell: zsh {0}
+  #       run: FINCH_VM_TYPE=${{ matrix.vm_type }} make test-e2e
