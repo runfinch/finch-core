@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-13-xlarge]
+        os: [macos-14, macos-15, macos-15-intel]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -59,9 +59,7 @@ jobs:
       matrix:
         os:
           [
-            [self-hosted, macos, amd64, 13, test],
             [self-hosted, macos, amd64, 14, test],
-            [self-hosted, macos, arm64, 13, test],
             [self-hosted, macos, arm64, 14, test],
           ]
         vm_type: [ "vz", "qemu" ]
