@@ -32,6 +32,13 @@ endif
 CONTAINER_RUNTIME_ARCHIVE_X86_64_LOCATION ?= "$(ARTIFACT_BASE_URL)/$(X86_64_ARTIFACT)"
 CONTAINER_RUNTIME_ARCHIVE_X86_64_DIGEST ?= "sha256:$(X86_64_256_DIGEST)"
 
+# Include runc override configuration
+include $(CURDIR)/deps/runc-override.conf
+RUNC_OVERRIDE_AARCH64_LOCATION ?= "$(ARTIFACT_BASE_URL)/$(AARCH64_ARTIFACT)"
+RUNC_OVERRIDE_AARCH64_DIGEST ?= "$(AARCH64_256_DIGEST)"
+RUNC_OVERRIDE_X86_64_LOCATION ?= "$(ARTIFACT_BASE_URL)/$(X86_64_ARTIFACT)"
+RUNC_OVERRIDE_X86_64_DIGEST ?= "$(X86_64_256_DIGEST)"
+
 # Virtualization framework is the default virtual machine type on Finch on macOS
 # This is only used for testing of Finch core bundles.
 FINCH_VM_TYPE ?= vz
@@ -71,6 +78,10 @@ $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml: $(LIMA_TEMPLATE_OUTDIR)
 	sed -i.bak -e "s/<container_runtime_archive_aarch64_digest>/$(CONTAINER_RUNTIME_ARCHIVE_AARCH64_DIGEST)/g" $@.template
 	sed -i.bak -e "s|<container_runtime_archive_x86_64_location>|$(CONTAINER_RUNTIME_ARCHIVE_X86_64_LOCATION)|g" $@.template
 	sed -i.bak -e "s/<container_runtime_archive_x86_64_digest>/$(CONTAINER_RUNTIME_ARCHIVE_X86_64_DIGEST)/g" $@.template
+	sed -i.bak -e "s|<runc_override_aarch64_location>|$(RUNC_OVERRIDE_AARCH64_LOCATION)|g" $@.template
+	sed -i.bak -e "s/<runc_override_aarch64_digest>/$(RUNC_OVERRIDE_AARCH64_DIGEST)/g" $@.template
+	sed -i.bak -e "s|<runc_override_x86_64_location>|$(RUNC_OVERRIDE_X86_64_LOCATION)|g" $@.template
+	sed -i.bak -e "s/<runc_override_x86_64_digest>/$(RUNC_OVERRIDE_X86_64_DIGEST)/g" $@.template
 
 	# Replace was successful, so cleanup .bak files
 	rm $(LIMA_TEMPLATE_OUTDIR)/*.yaml.template.bak
