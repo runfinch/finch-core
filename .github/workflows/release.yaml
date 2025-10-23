@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   macos-arm64-build:
-    runs-on: [self-hosted, macos, arm64, "14", release]
+    runs-on: [self-hosted, macos, arm64, "15", release]
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -73,7 +73,7 @@ jobs:
           if-no-files-found: error
 
   macos-x86-build:
-    runs-on: [self-hosted, macos, amd64, "14", release]
+    runs-on: [self-hosted, macos, amd64, "15", release]
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
