@@ -52,7 +52,7 @@ jobs:
         run: |
           (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
           make -C src/lima PREFIX=/opt/homebrew all install
-          ./bin/lima-and-qemu.pl
+          python3 ./bin/lima-and-qemu.py
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
         shell: zsh {0}
 
@@ -108,7 +108,7 @@ jobs:
         run: |
           (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
           make -C src/lima PREFIX=/usr/local all install
-          ./bin/lima-and-qemu.pl
+          python3 ./bin/lima-and-qemu.py
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-x86_64.tar.gz
         shell: zsh {0}
 
