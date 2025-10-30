@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 9 * * 2'
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 env:
   GO111MODULE: on
@@ -45,7 +48,9 @@ jobs:
           brew update
           brew install qemu bash coreutils
           brew install autoconf automake
-          brew upgrade
+          brew cleanup
+          brew upgrade || true
+          brew link --overwrite python@3.13 || true
         shell: zsh {0}
 
       - name: Make and release deps
@@ -61,6 +66,13 @@ jobs:
         with:
           name: lima-and-qemu.macos-arm64
           path: ./src/lima/lima-and-qemu.macos*
+          if-no-files-found: error
+
+      - name: Upload dependency mapping ARM64
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dep-version-mapping-aarch64
+          path: ./src/lima/dep-version-mapping-aarch64.json
           if-no-files-found: error
 
       - name: Make and release source code of dependencies
@@ -101,7 +113,9 @@ jobs:
           brew update
           brew install qemu bash coreutils
           brew install autoconf automake
-          brew upgrade
+          brew cleanup
+          brew upgrade || true
+          brew link --overwrite python@3.13 || true
         shell: zsh {0}
 
       - name: Make and release deps
@@ -119,8 +133,14 @@ jobs:
           path: ./src/lima/lima-and-qemu.macos*
           if-no-files-found: error
 
+      - name: Upload dependency mapping x86_64
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dep-version-mapping-x86_64
+          path: ./src/lima/dep-version-mapping-x86_64.json
+          if-no-files-found: error
 
-  release:
+  upload-dependency-mappings:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs:
@@ -137,50 +157,22 @@ jobs:
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           role-to-assume: ${{ secrets.ROLE }}
-          role-session-name: dependency-upload-session
+          role-session-name: dependency-mapping-upload-session
           aws-region: ${{ secrets.REGION }}
 
-      - name: Download MacOS ARM64 build
+      - name: Download dependency mapping ARM64
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: lima-and-qemu.macos-arm64
+          name: dep-version-mapping-aarch64
           path: build
 
-      - name: Download MacOS x86_64 build
+      - name: Download dependency mapping x86_64
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: lima-and-qemu.macos-x86
+          name: dep-version-mapping-x86_64
           path: build
 
-
-      - name: Generate Timestamp
-        id: timestamp
-        run: echo "value=$(date +%s)" >> $GITHUB_OUTPUT
-
-      - name: Prepare tarballs
+      - name: Upload dependency mappings to S3
         run: |
-          timestamp=${{ steps.timestamp.outputs.value }}
-
-          mkdir -p build/lima-and-qemu.macos-aarch64/bin
-          tar -xzf build/lima-and-qemu.macos-aarch64.tar.gz -C build/lima-and-qemu.macos-aarch64
-          tar -czf build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-aarch64 .
-          sha512sum build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz.sha512sum
-
-          mkdir -p build/lima-and-qemu.macos-x86_64/bin
-          tar -xzf build/lima-and-qemu.macos-x86_64.tar.gz -C build/lima-and-qemu.macos-x86_64
-          tar -czf build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-x86_64 .
-          sha512sum build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz.sha512sum
-
-      - name: Download MacOS dependencies' sources
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          name: DependenciesSourceCode.tar.gz
-          path: build
-
-      - name: 'Upload to S3'
-        run: |
-          timestamp=${{ steps.timestamp.outputs.value }}
-
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64.${timestamp}.tar.gz*"
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64.${timestamp}.tar.gz*" 
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} --recursive --exclude "*"  --include "dependency-sources.tar.gz"
+          aws s3 cp ./build/dep-version-mapping-aarch64.json s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch6/dep-version-mapping.json
+          aws s3 cp ./build/dep-version-mapping-x86_64.json s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/dep-version-mapping.json
