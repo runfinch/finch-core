@@ -1,0 +1,120 @@
+name: Build OS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'deps/mkosi/*'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'deps/mkosi/*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-os-image:
+    runs-on:
+      - ${{ matrix.os }}
+    container:
+      image: public.ecr.aws/docker/library/fedora:43
+      options: --privileged
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    timeout-minutes: 15
+    steps:
+      - name: Install packages
+        run: |
+          dnf install -y git \
+            systemd-boot \
+            systemd-repart \
+            systemd-ukify \
+            qemu-img \
+            docker \
+            jq \
+            e2fsprogs \
+            dosfstools \
+            cpio \
+            zstd \
+            procps-ng \
+            distribution-gpg-keys \
+            openssl \
+            mtools \
+            skopeo
+      - name: Checkout repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          submodules: true
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.ROLE }}
+          aws-region: ${{ secrets.REGION }}
+          role-session-name: rootfs-ecr-image-upload-session
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+      - name: Install mkosi
+        run: |
+          mkdir -p "$HOME/.local/bin/"
+          export PATH="/root/.local/bin/:$PATH"
+          export GITHUB_ACTIONS=true
+          ./deps/mkosi/install-mkosi.sh
+      - name: mkosi arch
+        id: mkosi-arch
+        shell: bash
+        run: |
+          arch=""
+          if [ "$(uname -m)" == "aarch64" ]; then
+            arch="arm64"
+          else
+            arch="x86-64"
+          fi
+          echo "arch=${arch}" >> $GITHUB_OUTPUT
+      - name: Run OS image build
+        run: |
+          ln -s "$HOME/.docker" /root/.docker
+          export PATH="/root/.local/bin/:$PATH"
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+          cd ./deps/mkosi
+          PATH="/$HOME/.local/bin/:$PATH" \
+            GITHUB_ACTIONS=true \
+            ECR_CACHE_REPO="${{ secrets.ECR_CACHE_REPO }}" \
+            ./build.sh
+          arch="${{ steps.mkosi-arch.outputs.arch }}"
+          sudo qemu-img convert -f raw -c -O qcow2 "./out/${arch}/os-image.raw" \
+            "./out/${arch}/os-image.qcow2"
+          tar -cvf "./out/${arch}/container-with-kernel-image.tar" -C "./out/${arch}/container-with-kernel" .
+          skopeo copy \
+            "oci-archive:./out/${arch}/container-with-kernel-image.tar" \
+            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.mkosi-arch.outputs.arch }}-with-kernel-${{github.run_id}}"
+      - name: Run container build
+        if: steps.mkosi-arch.outputs.arch == 'x86-64'
+        run: |
+          set -x
+          cd ./deps/mkosi
+          arch="${{ steps.mkosi-arch.outputs.arch }}"
+          PATH="/$HOME/.local/bin/:$PATH" ./mkosi.sh --arch $arch -- --image-id wsl-rootfs
+          tar -cvf "./out/${arch}/wsl-rootfs-image.tar" -C "./out/${arch}/wsl-rootfs" .
+          skopeo copy \
+            "oci-archive:./out/${arch}/wsl-rootfs-image.tar" \
+            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.mkosi-arch.outputs.arch }}-wsl-rootfs-${{github.run_id}}"
+      - name: Upload container image artifacts
+        if: steps.mkosi-arch.outputs.arch == 'x86-64'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: image-oci-${{ steps.mkosi-arch.outputs.arch }}-${{github.run_id}}.tar
+          path: ./deps/mkosi/out/${{ steps.mkosi-arch.outputs.arch }}/wsl-rootfs-image.tar
+          if-no-files-found: error
+      - name: Upload OS image artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: image-${{ steps.mkosi-arch.outputs.arch }}-${{github.run_id}}.qcow2
+          path: ./deps/mkosi/out/${{ steps.mkosi-arch.outputs.arch }}/os-image.qcow2
+          if-no-files-found: error
