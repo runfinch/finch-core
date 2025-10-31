@@ -1,0 +1,305 @@
+From 4597a8c36a5cd043fa27acfe90297a80c9a59f59 Mon Sep 17 00:00:00 2001
+From: Justin Alvarez <alvajus@amazon.com>
+Date: Tue, 2 Dec 2025 17:07:59 -0500
+Subject: [PATCH 1/1] Add support for Amazon Linux 2023
+
+Signed-off-by: Justin Alvarez <alvajus@amazon.com>
+---
+ mkosi.conf.d/amazonlinux.conf                 | 13 ++++
+ mkosi.conf.d/amazonlinux/mkosi.conf           | 20 ++++++
+ .../amazonlinux/mkosi.conf.d/arm64.conf       |  8 +++
+ .../mkosi.conf.d/ext4-orphan-file.conf        | 10 +++
+ .../amazonlinux/mkosi.conf.d/uefi.conf        |  8 +++
+ .../amazonlinux/mkosi.conf.d/x86-64.conf      | 10 +++
+ mkosi/distribution/__init__.py                |  2 +
+ mkosi/distribution/amazonlinux.py             | 69 +++++++++++++++++++
+ mkosi/resources/man/mkosi.1.md                |  5 +-
+ .../mkosi.conf.d/amazonlinux.conf             |  8 +++
+ .../mkosi.profiles/runtime/mkosi.conf         |  2 +
+ .../mkosi.conf                                |  0
+ .../mkosi.conf.d/networkd.conf                |  0
+ .../mkosi.conf.d/uefi.conf                    |  0
+ 14 files changed, 154 insertions(+), 1 deletion(-)
+ create mode 100644 mkosi.conf.d/amazonlinux.conf
+ create mode 100644 mkosi.conf.d/amazonlinux/mkosi.conf
+ create mode 100644 mkosi.conf.d/amazonlinux/mkosi.conf.d/arm64.conf
+ create mode 100644 mkosi.conf.d/amazonlinux/mkosi.conf.d/ext4-orphan-file.conf
+ create mode 100644 mkosi.conf.d/amazonlinux/mkosi.conf.d/uefi.conf
+ create mode 100644 mkosi.conf.d/amazonlinux/mkosi.conf.d/x86-64.conf
+ create mode 100644 mkosi/distribution/amazonlinux.py
+ create mode 100644 mkosi/resources/mkosi-initrd/mkosi.conf.d/amazonlinux.conf
+ rename mkosi/resources/mkosi-vm/mkosi.conf.d/{azure-centos-fedora => azure-amazonlinux-centos-fedora}/mkosi.conf (100%)
+ rename mkosi/resources/mkosi-vm/mkosi.conf.d/{azure-centos-fedora => azure-amazonlinux-centos-fedora}/mkosi.conf.d/networkd.conf (100%)
+ rename mkosi/resources/mkosi-vm/mkosi.conf.d/{azure-centos-fedora => azure-amazonlinux-centos-fedora}/mkosi.conf.d/uefi.conf (100%)
+
+diff --git a/mkosi.conf.d/amazonlinux.conf b/mkosi.conf.d/amazonlinux.conf
+new file mode 100644
+index 00000000..ff8ac2e8
+--- /dev/null
++++ b/mkosi.conf.d/amazonlinux.conf
+@@ -0,0 +1,13 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Distribution=amazonlinux
++
++[Distribution]
++Release=latest
++Repositories=base
++
++[Content]
++ShimBootloader=none
++Packages=
++        kernel-tools
+diff --git a/mkosi.conf.d/amazonlinux/mkosi.conf b/mkosi.conf.d/amazonlinux/mkosi.conf
+new file mode 100644
+index 00000000..87c563d0
+--- /dev/null
++++ b/mkosi.conf.d/amazonlinux/mkosi.conf
+@@ -0,0 +1,20 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Distribution=amazonlinux
++
++[Content]
++Packages=
++        openssh-clients
++        openssh-server
++        python3
++        rpm-build
++        systemd-resolved
++        amazon-cloudwatch-agent
++        amazon-ec2-net-utils
++        amazon-ecr-credential-helper
++        amazon-efs-utils
++        amazon-linux-logos
++        amazon-linux-sb-keys
++        amazon-rpm-config
++        amazon-ssm-agent
+\ No newline at end of file
+diff --git a/mkosi.conf.d/amazonlinux/mkosi.conf.d/arm64.conf b/mkosi.conf.d/amazonlinux/mkosi.conf.d/arm64.conf
+new file mode 100644
+index 00000000..da610d0e
+--- /dev/null
++++ b/mkosi.conf.d/amazonlinux/mkosi.conf.d/arm64.conf
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Architecture=arm64
++
++[Content]
++Packages=
++        grub2-efi-aa64-modules
+diff --git a/mkosi.conf.d/amazonlinux/mkosi.conf.d/ext4-orphan-file.conf b/mkosi.conf.d/amazonlinux/mkosi.conf.d/ext4-orphan-file.conf
+new file mode 100644
+index 00000000..f1c4b2d3
+--- /dev/null
++++ b/mkosi.conf.d/amazonlinux/mkosi.conf.d/ext4-orphan-file.conf
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Architecture=|arm64
++Architecture=|x86-64
++
++[Build]
++# "orphan_file" is enabled by default in recent versions of mkfs.ext4 but not supported by the AL2023 version
++# of e2fsck, so we explicitly disable it.
++Environment=SYSTEMD_REPART_MKFS_OPTIONS_EXT4="-O ^orphan_file"
+diff --git a/mkosi.conf.d/amazonlinux/mkosi.conf.d/uefi.conf b/mkosi.conf.d/amazonlinux/mkosi.conf.d/uefi.conf
+new file mode 100644
+index 00000000..fb636217
+--- /dev/null
++++ b/mkosi.conf.d/amazonlinux/mkosi.conf.d/uefi.conf
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Architecture=uefi
++
++[Content]
++Packages=
++        grub2-efi
+diff --git a/mkosi.conf.d/amazonlinux/mkosi.conf.d/x86-64.conf b/mkosi.conf.d/amazonlinux/mkosi.conf.d/x86-64.conf
+new file mode 100644
+index 00000000..3551c755
+--- /dev/null
++++ b/mkosi.conf.d/amazonlinux/mkosi.conf.d/x86-64.conf
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Architecture=x86-64
++
++[Content]
++Packages=
++        grub2-efi-x64-modules
++        grub2-pc
++        microcode_ctl
+diff --git a/mkosi/distribution/__init__.py b/mkosi/distribution/__init__.py
+index 2b8b632b..e32d7844 100644
+--- a/mkosi/distribution/__init__.py
++++ b/mkosi/distribution/__init__.py
+@@ -42,6 +42,7 @@ class Distribution(StrEnum):
+     rocky = enum.auto()
+     alma = enum.auto()
+     azure = enum.auto()
++    amazonlinux = enum.auto()
+     custom = enum.auto()
+ 
+     def is_centos_variant(self) -> bool:
+@@ -68,6 +69,7 @@ class Distribution(StrEnum):
+             Distribution.openmandriva,
+             Distribution.rocky,
+             Distribution.alma,
++            Distribution.amazonlinux,
+         )
+ 
+     @property
+diff --git a/mkosi/distribution/amazonlinux.py b/mkosi/distribution/amazonlinux.py
+new file mode 100644
+index 00000000..1f607a20
+--- /dev/null
++++ b/mkosi/distribution/amazonlinux.py
+@@ -0,0 +1,69 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++from collections.abc import Iterable
++
++from mkosi.config import Architecture
++from mkosi.context import Context
++from mkosi.distribution import Distribution, fedora, join_mirror
++from mkosi.installer.dnf import Dnf
++from mkosi.installer.rpm import RpmRepository, find_rpm_gpgkey, setup_rpm
++from mkosi.log import die
++
++
++class Installer(fedora.Installer, distribution=Distribution.amazonlinux):
++    @classmethod
++    def pretty_name(cls) -> str:
++        return "Amazon Linux"
++
++    @classmethod
++    def default_release(cls) -> str:
++        return "latest"
++
++    @classmethod
++    def filesystem(cls) -> str:
++        return "ext4"
++
++    @classmethod
++    def setup(cls, context: Context) -> None:
++        setup_rpm(context, dbpath="/var/lib/rpm")
++        Dnf.setup(context, list(cls.repositories(context)), filelists=False)
++
++    @classmethod
++    def install(cls, context: Context) -> None:
++        Dnf.install(context, ["filesystem"], apivfs=False)
++
++    @classmethod
++    def repositories(cls, context: Context) -> Iterable[RpmRepository]:
++        gpgurls = (
++            find_rpm_gpgkey(
++                context,
++                "RPM-GPG-KEY-amazon-linux-2023",
++                "https://raw.githubusercontent.com/rpm-software-management/distribution-gpg-keys/refs/heads/main/keys/amazon-linux/RPM-GPG-KEY-amazon-linux-2023",
++            ),
++        )
++        if context.config.local_mirror:
++            yield RpmRepository("base", f"baseurl={context.config.local_mirror}", gpgurls)
++            return
++
++        if context.config.mirror:
++            url = f"baseurl={join_mirror(context.config.mirror, 'core/mirrors/$releasever')}"
++            yield RpmRepository("base", f"{url}/$basearch", gpgurls)
++            yield RpmRepository("debug", f"{url}/debuginfo/$basearch", gpgurls, enabled=False)
++            yield RpmRepository("source", f"{url}/SRPMS", gpgurls, enabled=False)
++        else:
++            url = "mirrorlist=https://cdn.amazonlinux.com/al2023/core/mirrors/$releasever"
++            yield RpmRepository("base", f"{url}/$basearch/mirror.list", gpgurls)
++            yield RpmRepository("debug", f"{url}/debuginfo/$basearch/mirror.list", gpgurls, enabled=False)
++            yield RpmRepository("source", f"{url}/SRPMS/mirror.list", gpgurls, enabled=False)
++
++    @classmethod
++    def architecture(cls, arch: Architecture) -> str:
++        a = {
++            Architecture.arm64:  "aarch64",
++            Architecture.x86_64: "x86_64",
++        }.get(arch)  # fmt: skip
++
++        if not a:
++            die(f"Architecture {a} is not supported by {cls.pretty_name()}")
++
++        return a
+diff --git a/mkosi/resources/man/mkosi.1.md b/mkosi/resources/man/mkosi.1.md
+index da441e56..0a3596d7 100644
+--- a/mkosi/resources/man/mkosi.1.md
++++ b/mkosi/resources/man/mkosi.1.md
+@@ -487,7 +487,7 @@ boolean argument: either `1`, `yes`, or `true` to enable, or `0`, `no`,
+ :   The distribution to install in the image. Takes one of the following
+     arguments: `fedora`, `debian`, `kali`, `ubuntu`, `arch`, `opensuse`,
+     `mageia`, `centos`, `rhel`, `rhel-ubi`, `openmandriva`, `rocky`, `alma`,
+-    `azure` or `custom`. If not specified, defaults to the distribution of
++    `azure`, `amazonlinux`, or `custom`. If not specified, defaults to the distribution of
+     the host or `custom` if the distribution of the host is not a supported
+     distribution.
+ 
+@@ -535,6 +535,7 @@ boolean argument: either `1`, `yes`, or `true` to enable, or `0`, `no`,
+     | `mageia`       | https://www.mageia.org             |                                |
+     | `openmandriva` | http://mirrors.openmandriva.org    |                                |
+     | `azure`        | https://packages.microsoft.com/    |                                |
++    | `amazonlinux`        | https://cdn.amazonlinux.com/    |                                |
+ 
+ `Snapshot=`
+ :   Download packages from the given snapshot instead of downloading the latest
+@@ -2328,6 +2329,8 @@ distributions:
+ 
+ * *postmarketOS*
+ 
++* *Amazon Linux 2023*
++
+ * *None* (**Requires the user to provide a pre-built rootfs**)
+ 
+ In theory, any distribution may be used on the host for building images
+diff --git a/mkosi/resources/mkosi-initrd/mkosi.conf.d/amazonlinux.conf b/mkosi/resources/mkosi-initrd/mkosi.conf.d/amazonlinux.conf
+new file mode 100644
+index 00000000..b2a63f25
+--- /dev/null
++++ b/mkosi/resources/mkosi-initrd/mkosi.conf.d/amazonlinux.conf
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Distribution=amazonlinux
++
++[Content]
++Packages=
++        util-linux
+diff --git a/mkosi/resources/mkosi-tools/mkosi.profiles/runtime/mkosi.conf b/mkosi/resources/mkosi-tools/mkosi.profiles/runtime/mkosi.conf
+index 67af4d88..1c32c998 100644
+--- a/mkosi/resources/mkosi-tools/mkosi.profiles/runtime/mkosi.conf
++++ b/mkosi/resources/mkosi-tools/mkosi.profiles/runtime/mkosi.conf
+@@ -1,4 +1,6 @@
+ # SPDX-License-Identifier: LGPL-2.1-or-later
++[Match]
++Distribution=!amazonlinux
+ 
+ [Content]
+ Packages=
+diff --git a/mkosi/resources/mkosi-vm/mkosi.conf.d/azure-centos-fedora/mkosi.conf b/mkosi/resources/mkosi-vm/mkosi.conf.d/azure-amazonlinux-centos-fedora/mkosi.conf
+similarity index 100%
+rename from mkosi/resources/mkosi-vm/mkosi.conf.d/azure-centos-fedora/mkosi.conf
+rename to mkosi/resources/mkosi-vm/mkosi.conf.d/azure-amazonlinux-centos-fedora/mkosi.conf
+diff --git a/mkosi/resources/mkosi-vm/mkosi.conf.d/azure-centos-fedora/mkosi.conf.d/networkd.conf b/mkosi/resources/mkosi-vm/mkosi.conf.d/azure-amazonlinux-centos-fedora/mkosi.conf.d/networkd.conf
+similarity index 100%
+rename from mkosi/resources/mkosi-vm/mkosi.conf.d/azure-centos-fedora/mkosi.conf.d/networkd.conf
+rename to mkosi/resources/mkosi-vm/mkosi.conf.d/azure-amazonlinux-centos-fedora/mkosi.conf.d/networkd.conf
+diff --git a/mkosi/resources/mkosi-vm/mkosi.conf.d/azure-centos-fedora/mkosi.conf.d/uefi.conf b/mkosi/resources/mkosi-vm/mkosi.conf.d/azure-amazonlinux-centos-fedora/mkosi.conf.d/uefi.conf
+similarity index 100%
+rename from mkosi/resources/mkosi-vm/mkosi.conf.d/azure-centos-fedora/mkosi.conf.d/uefi.conf
+rename to mkosi/resources/mkosi-vm/mkosi.conf.d/azure-amazonlinux-centos-fedora/mkosi.conf.d/uefi.conf
+-- 
+2.51.0
+
