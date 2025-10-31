@@ -42,8 +42,17 @@ jobs:
         # fs_usage:  built-in macOS tool used to capture opened files by limactl and qemu
 
         run: |
+          # uninstall any previous qemu installations and install pinned qemu version from qemu.conf
+          brew uninstall --force qemu
+          source ./deps/qemu.conf
+          echo "Installing pinned qemu version: $QEMU_VERSION"
+          HOMEBREW_LOCAL_REPO=$(brew --repository)/Library/Taps/homebrew/homebrew-local/Formula
+          mkdir -p $HOMEBREW_LOCAL_REPO
+          curl -o $HOMEBREW_LOCAL_REPO/qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/${QEMU_FORMULA_GH_COMMIT}/Formula/q/qemu.rb
+          brew install homebrew/local/qemu
+
           brew update
-          brew install qemu bash coreutils
+          brew install bash coreutils
           brew install autoconf automake
           brew upgrade
         shell: zsh {0}
@@ -52,7 +61,7 @@ jobs:
         run: |
           (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
           make -C src/lima PREFIX=/opt/homebrew all install
-          ./bin/lima-and-qemu.pl
+          python3 ./bin/lima-and-qemu.py
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
         shell: zsh {0}
 
@@ -98,8 +107,17 @@ jobs:
         # fs_usage:  built-in macOS tool used to capture opened files by limactl and qemu
 
         run: |
+          # uninstall any previous qemu installations and install pinned qemu version from qemu.conf
+          brew uninstall --force qemu
+          source ./deps/qemu.conf
+          echo "Installing pinned qemu version: $QEMU_VERSION"
+          HOMEBREW_LOCAL_REPO=$(brew --repository)/Library/Taps/homebrew/homebrew-local/Formula
+          mkdir -p $HOMEBREW_LOCAL_REPO
+          curl -o $HOMEBREW_LOCAL_REPO/qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/${QEMU_FORMULA_GH_COMMIT}/Formula/q/qemu.rb
+          brew install homebrew/local/qemu
+          
           brew update
-          brew install qemu bash coreutils
+          brew install bash coreutils
           brew install autoconf automake
           brew upgrade
         shell: zsh {0}
@@ -108,7 +126,7 @@ jobs:
         run: |
           (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
           make -C src/lima PREFIX=/usr/local all install
-          ./bin/lima-and-qemu.pl
+          python3 ./bin/lima-and-qemu.py
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-x86_64.tar.gz
         shell: zsh {0}
 
