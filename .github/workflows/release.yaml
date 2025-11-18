@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: '0 9 * * 2'
   workflow_dispatch:
+  pull_request:
 
 env:
   GO111MODULE: on
@@ -164,12 +165,22 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
+      - name: Debug - Check variable values
+        run: |
+          echo "Role ARN length: ${#ROLE_ARN}"
+          echo "Role ARN (masked): ${ROLE_ARN:0:20}...${ROLE_ARN: -20}"
+          echo "Bucket name length: ${#BUCKET_NAME}"
+        env:
+          ROLE_ARN: ${{ vars.DEPENDENCY_MAPPING_BUCKET_ROLE }}
+          BUCKET_NAME: ${{ vars.DEPENDENCY_MAPPING_BUCKET_NAME }}
+
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
-          role-to-assume: ${{ secrets.DEPENDENCY_MAPPING_BUCKET_ROLE }}
+          role-to-assume: ${{ vars.DEPENDENCY_MAPPING_BUCKET_ROLE }}
           role-session-name: dependency-mapping-upload-session
-          aws-region: ${{ secrets.DEPENDENCY_MAPPING_BUCKET_REGION }}
+          aws-region: us-west-2
+          role-duration-seconds: 3600
 
       - name: Download dependency mapping ARM64
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -185,70 +196,70 @@ jobs:
 
       - name: Upload dependency mappings to S3
         run: |
-          aws s3 cp ./build/dep-version-mapping-aarch64.json s3://${{ secrets.DEPENDENCY_MAPPING_BUCKET_NAME }}/aarch64/dep-version-mapping.json
-          aws s3 cp ./build/dep-version-mapping-x86_64.json s3://${{ secrets.DEPENDENCY_MAPPING_BUCKET_NAME }}/x86-64/dep-version-mapping.json
+          aws s3 cp ./build/dep-version-mapping-aarch64.json s3://${{ vars.DEPENDENCY_MAPPING_BUCKET_NAME }}/aarch64/dep-version-mapping.json
+          aws s3 cp ./build/dep-version-mapping-x86_64.json s3://${{ vars.DEPENDENCY_MAPPING_BUCKET_NAME }}/x86-64/dep-version-mapping.json
 
-  release:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs:
-      - macos-x86-build
-      - macos-arm64-build
+  # release:
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   needs:
+  #     - macos-x86-build
+  #     - macos-arm64-build
 
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          fetch-depth: 1
-          persist-credentials: false
+  #   steps:
+  #     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+  #       with:
+  #         fetch-depth: 1
+  #         persist-credentials: false
 
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
-        with:
-          role-to-assume: ${{ secrets.ROLE }}
-          role-session-name: dependency-upload-session
-          aws-region: ${{ secrets.REGION }}
+  #     - name: configure aws credentials
+  #       uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+  #       with:
+  #         role-to-assume: ${{ secrets.ROLE }}
+  #         role-session-name: dependency-upload-session
+  #         aws-region: ${{ secrets.REGION }}
 
-      - name: Download MacOS ARM64 build
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          name: lima-and-qemu.macos-arm64
-          path: build
+  #     - name: Download MacOS ARM64 build
+  #       uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+  #       with:
+  #         name: lima-and-qemu.macos-arm64
+  #         path: build
 
-      - name: Download MacOS x86_64 build
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          name: lima-and-qemu.macos-x86
-          path: build
+  #     - name: Download MacOS x86_64 build
+  #       uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+  #       with:
+  #         name: lima-and-qemu.macos-x86
+  #         path: build
 
 
-      - name: Generate Timestamp
-        id: timestamp
-        run: echo "value=$(date +%s)" >> $GITHUB_OUTPUT
+  #     - name: Generate Timestamp
+  #       id: timestamp
+  #       run: echo "value=$(date +%s)" >> $GITHUB_OUTPUT
 
-      - name: Prepare tarballs
-        run: |
-          timestamp=${{ steps.timestamp.outputs.value }}
+  #     - name: Prepare tarballs
+  #       run: |
+  #         timestamp=${{ steps.timestamp.outputs.value }}
 
-          mkdir -p build/lima-and-qemu.macos-aarch64/bin
-          tar -xzf build/lima-and-qemu.macos-aarch64.tar.gz -C build/lima-and-qemu.macos-aarch64
-          tar -czf build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-aarch64 .
-          sha512sum build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz.sha512sum
+  #         mkdir -p build/lima-and-qemu.macos-aarch64/bin
+  #         tar -xzf build/lima-and-qemu.macos-aarch64.tar.gz -C build/lima-and-qemu.macos-aarch64
+  #         tar -czf build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-aarch64 .
+  #         sha512sum build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-aarch64.${timestamp}.tar.gz.sha512sum
 
-          mkdir -p build/lima-and-qemu.macos-x86_64/bin
-          tar -xzf build/lima-and-qemu.macos-x86_64.tar.gz -C build/lima-and-qemu.macos-x86_64
-          tar -czf build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-x86_64 .
-          sha512sum build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz.sha512sum
+  #         mkdir -p build/lima-and-qemu.macos-x86_64/bin
+  #         tar -xzf build/lima-and-qemu.macos-x86_64.tar.gz -C build/lima-and-qemu.macos-x86_64
+  #         tar -czf build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz -C build/lima-and-qemu.macos-x86_64 .
+  #         sha512sum build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz | cut -d " " -f 1  > build/lima-and-qemu.macos-x86_64.${timestamp}.tar.gz.sha512sum
 
-      - name: Download MacOS dependencies' sources
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          name: DependenciesSourceCode.tar.gz
-          path: build
+  #     - name: Download MacOS dependencies' sources
+  #       uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+  #       with:
+  #         name: DependenciesSourceCode.tar.gz
+  #         path: build
 
-      - name: 'Upload to S3'
-        run: |
-          timestamp=${{ steps.timestamp.outputs.value }}
+  #     - name: 'Upload to S3'
+  #       run: |
+  #         timestamp=${{ steps.timestamp.outputs.value }}
 
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64.${timestamp}.tar.gz*"
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64.${timestamp}.tar.gz*" 
-          aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} --recursive --exclude "*"  --include "dependency-sources.tar.gz"
+  #         aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64.${timestamp}.tar.gz*"
+  #         aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64.${timestamp}.tar.gz*" 
+  #         aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} --recursive --exclude "*"  --include "dependency-sources.tar.gz"
