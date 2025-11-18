@@ -6,6 +6,7 @@ import time
 import shutil
 import re
 import tarfile
+import json
 from enum import Enum
 from collections import defaultdict
 from typing import List, Dict, Set, Literal
@@ -58,6 +59,9 @@ def main():
 
     print("Resigning files...")
     resign(resign_files)
+
+    print("Extracting and exporting package versions...")
+    extract_and_export_package_versions(deps, arch, install_dir)
 
     print("Packaging files and socket_vmnet...")
     package_files_and_socket_vmnet(deps, install_dir, dist_path)
@@ -494,6 +498,60 @@ def normalize_path_for_version_comparison(path: str, install_dir: str):
     path = re.sub(r'/lib([^/]+)\.(\d+(?:\.\d+)*(?:\.\d+)*)(\.dylib)$', r'/lib\1.*\3', path)
     
     return path
+
+def extract_and_export_package_versions(deps: Dict[str, str], arch: Literal[Arch.X86_64, Arch.AARCH64], install_dir: str):
+    """
+    Extract package versions from dependencies and export to JSON.
+    
+    This function:
+    1. Extracts package names and versions from Cellar paths
+    2. Attempts to get version info from binary files directly
+    3. Exports the mapping to a JSON file
+    """
+    package_versions = {}
+    
+    for file_path in deps.keys():
+        # Extract package info from Cellar path: /opt/homebrew/Cellar/package/version/...
+        cellar_match = re.search(r'/Cellar/([^/]+)/([^/]+)/', file_path)
+        if cellar_match:
+            package, version = cellar_match.groups()
+            package_versions[package] = {
+                "package": package,
+                "version": version
+            }
+        # Handle direct bin files (like limactl) that might not be in Cellar
+        elif re.match(rf'^{re.escape(install_dir)}/bin/([^/]+)$', file_path):
+            binary_name = os.path.basename(file_path)
+            # Try to get version from the binary itself
+            try:
+                result = subprocess.run(
+                    [file_path, '--version'],
+                    capture_output=True,
+                    text=True,
+                    stderr=subprocess.DEVNULL,
+                    timeout=5
+                )
+                # Extract version pattern like 1.2.3 or 1.2.3-alpha
+                version_match = re.search(r'(\d+\.\d+\.\d+[^\s]*)', result.stdout)
+                if version_match:
+                    package_versions[binary_name] = {
+                        "package": binary_name,
+                        "version": version_match.group(1)
+                    }
+            except Exception:
+                # Skip if version extraction fails
+                pass
+    
+    # Export to JSON
+    lima_repo_root = os.path.join(os.getcwd(), 'src', 'lima')
+    json_file = f"{lima_repo_root}/dep-version-mapping-{arch}.json"
+    
+    try:
+        with open(json_file, 'w') as f:
+            json.dump(package_versions, f, indent=2)
+        print(f"Generated dependency mapping: {json_file}")
+    except Exception as ex:
+        raise RuntimeError(f"failed to write JSON file {json_file}") from ex
 
 def cleanup():
     # no need to check for failures here
