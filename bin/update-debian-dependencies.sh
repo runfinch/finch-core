@@ -9,8 +9,8 @@ UBUNTU_DEPS="$ROOT_DIR/deps/ubuntu-deps.conf"
 # Function to get latest tag from GitHub API
 get_latest_tag() {
     local repo="$1"
-    curl -s "https://api.github.com/repos/$repo/tags" | \
-    grep '"name":' | \
+    curl -s "https://api.github.com/repos/$repo/releases/latest" | \
+    grep '"tag_name":' | \
     head -1 | \
     cut -d'"' -f4 | \
     sed 's/^v//'
@@ -27,14 +27,21 @@ get_commit_for_tag() {
     cut -d'"' -f4
 }
 
-# Function to get BuildKit version from nerdctl Dockerfile
-get_buildkit_version() {
+# Function to get nerdctl dockerfile content
+get_nerdctl_dockerfile() {
     local nerdctl_tag="$1"
     [[ $nerdctl_tag != v* ]] && nerdctl_tag="v$nerdctl_tag"
-    
+
     local dockerfile_url="https://raw.githubusercontent.com/containerd/nerdctl/$nerdctl_tag/Dockerfile"
     local dockerfile_content=$(curl -s "$dockerfile_url")
-    
+
+    echo "$dockerfile_content"
+}
+
+# Function to get BuildKit version from nerdctl Dockerfile
+get_buildkit_version() {
+    local dockerfile_content="$1"
+
     local buildkit_version=$(echo "$dockerfile_content" | grep -E '^ARG BUILDKIT_VERSION=' | cut -d'=' -f2 | sed 's/@BINARY$//' | sed 's/^v//')
     
     echo "$buildkit_version"
@@ -42,11 +49,7 @@ get_buildkit_version() {
 
 # Function to get cni plugin version from nerdctl Dockerfile
 get_cni_plugin_version() {
-    local nerdctl_tag="$1"
-    [[ $nerdctl_tag != v* ]] && nerdctl_tag="v$nerdctl_tag"
-    
-    local dockerfile_url="https://raw.githubusercontent.com/containerd/nerdctl/$nerdctl_tag/Dockerfile"
-    local dockerfile_content=$(curl -s "$dockerfile_url")
+    local dockerfile_content="$1"
     
     local cni_plugin_version=$(echo "$dockerfile_content" | grep -E '^ARG CNI_PLUGINS_VERSION=' | cut -d'=' -f2 | sed 's/@BINARY$//' | sed 's/^v//')
     
@@ -55,11 +58,7 @@ get_cni_plugin_version() {
 
 # Function to get Cosign version from nerdctl Dockerfile
 get_cosign_version() {
-    local nerdctl_tag="$1"
-    [[ $nerdctl_tag != v* ]] && nerdctl_tag="v$nerdctl_tag"
-    
-    local dockerfile_url="https://raw.githubusercontent.com/containerd/nerdctl/$nerdctl_tag/Dockerfile"
-    local dockerfile_content=$(curl -s "$dockerfile_url")
+    local dockerfile_content="$1"
     
     # Extract Cosign version from COPY instruction
     # Current Format: COPY --from=ghcr.io/sigstore/cosign/cosign:v2.2.3@sha256:... /ko-app/cosign /usr/local/bin/cosign
@@ -99,14 +98,6 @@ NERDCTL_LATEST=$(get_latest_tag "containerd/nerdctl")
 NERDCTL_COMMIT=$(get_commit_for_tag "containerd/nerdctl" "$NERDCTL_LATEST")
 update_dependency "NERDCTL" "$NERDCTL_LATEST" "$NERDCTL_COMMIT"
 
-# Get BuildKit version from nerdctl Dockerfile
-echo "Getting BuildKit version from nerdctl Dockerfile..."
-BUILDKIT_VERSION=$(get_buildkit_version "$NERDCTL_LATEST")
-
-# Get Cosign version from nerdctl Dockerfile
-echo "Getting Cosign version from nerdctl Dockerfile..."
-COSIGN_VERSION=$(get_cosign_version "$NERDCTL_LATEST")
-
 # Update buildkit with version from nerdctl
 echo "Updating buildkit to version $BUILDKIT_VERSION..."
 BUILDKIT_COMMIT=$(get_commit_for_tag "moby/buildkit" "$BUILDKIT_VERSION")
@@ -118,9 +109,21 @@ SOCI_LATEST=$(get_latest_tag "awslabs/soci-snapshotter")
 SOCI_COMMIT=$(get_commit_for_tag "awslabs/soci-snapshotter" "$SOCI_LATEST")
 update_dependency "SOCI" "$SOCI_LATEST" "$SOCI_COMMIT"
 
+# Get nerdctl dockerfile content
+echo "Getting nerdctl dockerfile content..."
+NERDCTL_DOCKERFILE=$(get_nerdctl_dockerfile "$NERDCTL_LATEST")
+
+# Get BuildKit version from nerdctl Dockerfile
+echo "Getting BuildKit version from nerdctl Dockerfile..."
+BUILDKIT_VERSION=$(get_buildkit_version "$NERDCTL_DOCKERFILE")
+
+# Get Cosign version from nerdctl Dockerfile
+echo "Getting Cosign version from nerdctl Dockerfile..."
+COSIGN_VERSION=$(get_cosign_version "$NERDCTL_DOCKERFILE")
+
 # Update CNI plugins
 echo "Updating CNI plugins..."
-CNI_LATEST=$(get_cni_plugin_version "$NERDCTL_LATEST")
+CNI_LATEST=$(get_cni_plugin_version "$NERDCTL_DOCKERFILE")
 CNI_COMMIT=$(get_commit_for_tag "containernetworking/plugins" "$CNI_LATEST")
 update_dependency "CNI" "$CNI_LATEST" "$CNI_COMMIT"
 
