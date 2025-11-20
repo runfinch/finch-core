@@ -62,13 +62,6 @@ jobs:
       tag: ${{ steps.fetch-tag.outputs.tag }}
 
     steps:
-      - name: Checkout nerdctl
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          repository: containerd/nerdctl
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Fetch tag for latest release
         id: fetch-tag
         env:
@@ -78,7 +71,12 @@ jobs:
             echo "tag=$OVERRIDE_TAG" >> $GITHUB_OUTPUT
             echo "Override tag: $OVERRIDE_TAG"
           else
-            latest_tag="$(git tag --sort=-version:refname | head -n 1)"
+            latest_tag="$(\
+              curl -s "https://api.github.com/repos/containerd/nerdctl/releases/latest" | \
+              grep '"tag_name":' | \
+              head -1 | \
+              cut -d'"' -f4 \
+            )"
             echo "tag=$latest_tag" >> $GITHUB_OUTPUT
             echo "Latest tag is ${latest_tag}"
           fi
@@ -119,4 +117,9 @@ jobs:
             and reopened manually to trigger automated checks.
 
   update-ubuntu-dependencies:
+    # Add permissions needed to create a PR
+    permissions:
+      contents: write
+      pull-requests: write
+    
     uses: ./.github/workflows/update-ubuntu-dependencies.yaml
