@@ -98,6 +98,14 @@ NERDCTL_LATEST=$(get_latest_tag "containerd/nerdctl")
 NERDCTL_COMMIT=$(get_commit_for_tag "containerd/nerdctl" "$NERDCTL_LATEST")
 update_dependency "NERDCTL" "$NERDCTL_LATEST" "$NERDCTL_COMMIT"
 
+# Get nerdctl dockerfile content
+echo "Getting nerdctl dockerfile content..."
+NERDCTL_DOCKERFILE=$(get_nerdctl_dockerfile "$NERDCTL_LATEST")
+
+# Get BuildKit version from nerdctl Dockerfile
+echo "Getting BuildKit version from nerdctl Dockerfile..."
+BUILDKIT_VERSION=$(get_buildkit_version "$NERDCTL_DOCKERFILE")
+
 # Update buildkit with version from nerdctl
 echo "Updating buildkit to version $BUILDKIT_VERSION..."
 BUILDKIT_COMMIT=$(get_commit_for_tag "moby/buildkit" "$BUILDKIT_VERSION")
@@ -109,23 +117,15 @@ SOCI_LATEST=$(get_latest_tag "awslabs/soci-snapshotter")
 SOCI_COMMIT=$(get_commit_for_tag "awslabs/soci-snapshotter" "$SOCI_LATEST")
 update_dependency "SOCI" "$SOCI_LATEST" "$SOCI_COMMIT"
 
-# Get nerdctl dockerfile content
-echo "Getting nerdctl dockerfile content..."
-NERDCTL_DOCKERFILE=$(get_nerdctl_dockerfile "$NERDCTL_LATEST")
-
-# Get BuildKit version from nerdctl Dockerfile
-echo "Getting BuildKit version from nerdctl Dockerfile..."
-BUILDKIT_VERSION=$(get_buildkit_version "$NERDCTL_DOCKERFILE")
-
-# Get Cosign version from nerdctl Dockerfile
-echo "Getting Cosign version from nerdctl Dockerfile..."
-COSIGN_VERSION=$(get_cosign_version "$NERDCTL_DOCKERFILE")
-
 # Update CNI plugins
 echo "Updating CNI plugins..."
 CNI_LATEST=$(get_cni_plugin_version "$NERDCTL_DOCKERFILE")
 CNI_COMMIT=$(get_commit_for_tag "containernetworking/plugins" "$CNI_LATEST")
 update_dependency "CNI" "$CNI_LATEST" "$CNI_COMMIT"
+
+# Get Cosign version from nerdctl Dockerfile
+echo "Getting Cosign version from nerdctl Dockerfile..."
+COSIGN_VERSION=$(get_cosign_version "$NERDCTL_DOCKERFILE")
 
 # Update cosign with version from nerdctl
 echo "Updating cosign to version $COSIGN_VERSION..."
