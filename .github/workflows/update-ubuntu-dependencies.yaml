@@ -2,11 +2,7 @@ name: update-ubuntu-dependencies
 
 on:
   workflow_call:
-
-# Add permissions needed to create a PR
-permissions:
-  contents: write
-  pull-requests: write
+  workflow_dispatch:
 
 jobs:
   update-dependencies-and-create-pr:
@@ -37,7 +33,7 @@ jobs:
           fi
 
       - name: Create or update PR
-        if: steps.changes.outputs.changed == 'true'
+        if: github.event_name != 'pull_request' && steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
