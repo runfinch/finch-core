@@ -117,3 +117,6 @@ jobs:
 
             This PR created by [create-pull-request](https://github.com/peter-evans/create-pull-request) must be closed 
             and reopened manually to trigger automated checks.
+
+  update-ubuntu-dependencies:
+    uses: ./.github/workflows/update-ubuntu-dependencies.yaml
