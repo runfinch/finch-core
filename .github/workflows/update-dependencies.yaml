@@ -119,4 +119,9 @@ jobs:
             and reopened manually to trigger automated checks.
 
   update-ubuntu-dependencies:
+    # Add permissions needed to create a PR
+    permissions:
+      contents: write
+      pull-requests: write
+    
     uses: ./.github/workflows/update-ubuntu-dependencies.yaml

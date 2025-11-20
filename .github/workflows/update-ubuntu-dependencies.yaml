@@ -2,15 +2,11 @@ name: update-ubuntu-dependencies
 
 on:
   workflow_call:
-
-# Add permissions needed to create a PR
-permissions:
-  contents: write
-  pull-requests: write
+  workflow_dispatch:
 
 jobs:
   update-dependencies-and-create-pr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  
     steps:
       - name: Checkout
         uses: actions/checkout@v5
