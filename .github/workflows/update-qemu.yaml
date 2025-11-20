@@ -13,6 +13,9 @@ jobs:
     
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     outputs:
       qemu-version: ${{ steps.get-qemu-version-commit-hash.outputs.qemu_version }}
       qemu-commit: ${{ steps.get-qemu-version-commit-hash.outputs.qemu_commit }}
@@ -35,6 +38,9 @@ jobs:
   macos-test:
     needs: get-latest-qemu-version-commit
     name: "Test Lima VM with latest QEMU on macOS"
+
+    permissions:
+      contents: read
     
     strategy:
       matrix:
@@ -101,6 +107,10 @@ jobs:
     name: "Create PR for QEMU update"
     
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: "Checkout finch-core repo"
