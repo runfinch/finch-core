@@ -48,7 +48,8 @@ jobs:
           echo "Installing pinned qemu version: $QEMU_VERSION"
           HOMEBREW_LOCAL_REPO=$(brew --repository)/Library/Taps/homebrew/homebrew-local/Formula
           mkdir -p $HOMEBREW_LOCAL_REPO
-          curl -o $HOMEBREW_LOCAL_REPO/qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/${QEMU_FORMULA_GH_COMMIT}/Formula/q/qemu.rb
+          rm -f $HOMEBREW_LOCAL_REPO/qemu.rb
+          curl -L -o $HOMEBREW_LOCAL_REPO/qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/${QEMU_FORMULA_GH_COMMIT}/Formula/q/qemu.rb
           brew install homebrew/local/qemu
 
           brew update
@@ -120,7 +121,8 @@ jobs:
           echo "Installing pinned qemu version: $QEMU_VERSION"
           HOMEBREW_LOCAL_REPO=$(brew --repository)/Library/Taps/homebrew/homebrew-local/Formula
           mkdir -p $HOMEBREW_LOCAL_REPO
-          curl -o $HOMEBREW_LOCAL_REPO/qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/${QEMU_FORMULA_GH_COMMIT}/Formula/q/qemu.rb
+          rm -f $HOMEBREW_LOCAL_REPO/qemu.rb
+          curl -L -o $HOMEBREW_LOCAL_REPO/qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/${QEMU_FORMULA_GH_COMMIT}/Formula/q/qemu.rb
           brew install homebrew/local/qemu
           
           brew update
