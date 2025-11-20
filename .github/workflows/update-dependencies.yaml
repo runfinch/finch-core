@@ -15,7 +15,6 @@ on:
     paths:
       - .github/workflows/update-dependencies.yaml
       - .github/workflows/update-ubuntu-dependencies.yaml
-      - .github/workflows/update-qemu.yaml
       - bin/update-lima-bundles.sh
       - bin/update-container-runtime-full-archive.sh
       - bin/update-debian-dependencies.sh
@@ -136,11 +135,3 @@ jobs:
       pull-requests: write
     
     uses: ./.github/workflows/update-ubuntu-dependencies.yaml
-  
-  update-qemu:
-    # Add permissions needed to create a PR
-    permissions:
-      contents: write
-      pull-requests: write
-
-    uses: ./.github/workflows/update-qemu.yaml
