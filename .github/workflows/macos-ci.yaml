@@ -25,6 +25,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   install-dependencies:
     # This is a spot check for make install.dependencies on macOS x86/ARM platforms.
