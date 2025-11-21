@@ -49,6 +49,9 @@ jobs:
     runs-on: [self-hosted, macos, "${{ matrix.arch }}", 14, release]
     timeout-minutes: 60
     
+    outputs:
+      failed: ${{ steps.start-vms.outputs.failed }}
+    
     steps:
       - name: "Checkout finch-core repo"
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -79,24 +82,35 @@ jobs:
           make -C src/lima PREFIX=$prefix all install
 
       - name: "Start lima vms with qemu"
+        id: start-vms
         run: |
-          limactl delete --force alpine
-          limactl delete --force default
-          limactl start --tty=false --vm-type=qemu src/lima/templates/alpine.yaml
-          limactl start --tty=false --vm-type=qemu src/lima/templates/default.yaml
+          limactl delete --force alpine || true
+          limactl delete --force default || true
+          
+          failed=false
+          if ! limactl start --tty=false --vm-type=qemu src/lima/templates/alpine.yaml; then
+            echo "Failed to start alpine VM"
+            failed=true
+          fi
+          
+          if ! limactl start --tty=false --vm-type=qemu src/lima/templates/default.yaml; then
+            echo "Failed to start default VM"
+            failed=true
+          fi
+          
+          echo "failed=$failed" >> $GITHUB_OUTPUT
       
       - name: "Check lima vms"
+        if: steps.start-vms.outputs.failed == 'false'
         run: |
           limactl ls
           limactl shell default uname
           limactl shell alpine uname
 
-      - name: "Stop and delete lima vms"
+      - name: "Clean up lima vms"
         run: |
-          limactl stop default
-          limactl stop alpine
-          limactl delete default
-          limactl delete alpine
+          limactl delete --force default || true
+          limactl delete --force alpine || true
 
       - name: "Uninstall qemu"
         run: |
@@ -104,6 +118,7 @@ jobs:
 
   create-pr:
     needs: [get-latest-qemu-version-commit, macos-test]
+    if: needs.macos-test.outputs.failed != 'true' && github.event_name != 'pull_request'
     name: "Create PR for QEMU update"
     
     runs-on: ubuntu-latest
