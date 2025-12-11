@@ -1,4 +1,4 @@
-name: update-ubuntu-dependencies
+name: update-linux-dependencies
 
 on:
   workflow_call:
@@ -16,20 +16,20 @@ jobs:
       - name: Run dependency update
         run: |
           cd bin
-          chmod +x update-debian-dependencies.sh
-          ./update-debian-dependencies.sh
+          chmod +x update-linux-dependencies.sh
+          ./update-linux-dependencies.sh
 
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet deps/ubuntu-deps.conf; then
+          if git diff --quiet deps/ubuntu-deps.conf deps/amazon-linux-deps.conf; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected in dependencies"
             exit 0
           else
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "Changes detected in dependencies:"
-            git diff deps/ubuntu-deps.conf
+            git diff deps/ubuntu-deps.conf deps/amazon-linux-deps.conf
           fi
 
       - name: Create or update PR
@@ -38,18 +38,18 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           signoff: true
-          commit-message: 'chore: update debian dependencies'
-          title: 'chore: update debian dependencies'
+          commit-message: 'chore: update linux dependencies'
+          title: 'chore: update linux dependencies'
           body: |
             This PR updates the following dependencies to their latest versions:
             
-            - finch-daemon
-            - nerdctl
-            - buildkit
-            - soci-snapshotter
-            - CNI plugins
-            - cosign
+            - finch-daemon (for both Ubuntu & AL)
+            - nerdctl (for Ubuntu only)
+            - buildkit (for both Ubuntu & AL)
+            - soci-snapshotter (for both Ubuntu & AL)
+            - CNI plugins (for Ubuntu only)
+            - cosign (for both Ubuntu & AL)
             
             This is an automated update created by the dependency update workflow. Review the changes before approving.
-          branch: update-ubuntu-dependencies
+          branch: update-linux-dependencies
           delete-branch: true

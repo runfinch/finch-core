@@ -14,11 +14,11 @@ on:
       - main
     paths:
       - .github/workflows/update-dependencies.yaml
-      - .github/workflows/update-ubuntu-dependencies.yaml
+      - .github/workflows/update-linux-dependencies.yaml
       - .github/workflows/update-qemu.yaml
       - bin/update-lima-bundles.sh
       - bin/update-container-runtime-full-archive.sh
-      - bin/update-debian-dependencies.sh
+      - bin/update-linux-dependencies.sh
 
 permissions:
   contents: read
@@ -129,13 +129,13 @@ jobs:
             This PR created by [create-pull-request](https://github.com/peter-evans/create-pull-request) must be closed 
             and reopened manually to trigger automated checks.
 
-  update-ubuntu-dependencies:
+  update-linux-dependencies:
     # Add permissions needed to create a PR
     permissions:
       contents: write
       pull-requests: write
     
-    uses: ./.github/workflows/update-ubuntu-dependencies.yaml
+    uses: ./.github/workflows/update-linux-dependencies.yaml
   
   update-qemu:
     # Add permissions needed to create a PR
