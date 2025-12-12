@@ -1,0 +1,26 @@
+From 38bb1fee048bd9b28e6c3f1313908c19b85e0683 Mon Sep 17 00:00:00 2001
+From: Justin Alvarez <alvajus@amazon.com>
+Date: Thu, 30 Oct 2025 19:52:50 +0000
+Subject: [PATCH] disable mounts module patch
+
+Signed-off-by: Justin Alvarez <alvajus@amazon.com>
+---
+ cloud-init.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cloud-init.spec b/cloud-init.spec
+index a1e6be4..dff1054 100644
+--- a/cloud-init.spec
++++ b/cloud-init.spec
+@@ -23,7 +23,7 @@ Patch10004:     0004-config-Create-write-metadata-module.patch
+ Patch10005:     0005-Move-the-maybe_b64decode-function-from-to-util.patch
+ Patch10006:     0006-ec2-handle-base64-encoded-metadata.patch
+ Patch10009:     0009-Determine-services-domain-dynamically.patch
+-Patch10010:     0010-Repair-mounts-module.patch
++# Patch10010:     0010-Repair-mounts-module.patch
+ Patch10014:     0014-Disable-DataSourceEc2Local.patch
+ Patch10103:     0103-Add-Amazon-Linux-support-to-util.system_info.patch
+ Patch10110:     0110-Al2022-Cloud-Config.patch
+-- 
+2.47.3
+
