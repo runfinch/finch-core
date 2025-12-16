@@ -5,15 +5,14 @@ ssh-keygen -A
 
 # install out of tree packages
 ls /opt
-rpm -ivh "/opt/cosign.rpm"
-rm -rf "/opt/cosign.rpm"
+rpm -ivh "/opt/bin/cosign.rpm"
+rm -rf "/opt/bin/"
 
-rpm -ivh "/opt/fuse-sshfs-*.amzn2023.*.rpm"
-rm -rf "/opt/fuse*"
+rpm -ivh "/opt/built/fuse-sshfs-*.amzn2023.*.rpm"
 
 rpm -e --noscripts --nodeps cloud-init
-rpm -ivh "/opt/cloud-init-*.amzn2023*.noarch.rpm"
-rm -rf "/opt/cloud-init*"
+rpm -ivh "/opt/built/cloud-init-*.amzn2023*.noarch.rpm"
+rm -rf "/opt/built/"
 
 echo "Enabling services"
 
