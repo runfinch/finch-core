@@ -43,7 +43,7 @@ This patch should be submitted to mkosi and upstreamed for ease of maintainabili
 
 ### Custom Package Building
 
-- **`al2023-build/`**: Directory containing infrastructure for building custom AL2023 packages
+- **`al2023-package-build/`**: Directory containing infrastructure for building custom AL2023 packages
   - `Dockerfile`: Multi-stage build environment for compiling packages
   - Custom patches and configurations
   - Integration with fuse-sshfs and cloud-init packages
@@ -125,7 +125,6 @@ rm "$HOME/.local/bin/mkosi"
 rm -rf ./mkosi
 mkdir -p "$HOME/.local/bin/"
 export PATH="$HOME/.local/bin/:$PATH"
-export GITHUB_ACTIONS=true
 ./deps/mkosi/install-mkosi.sh
 
 # run build

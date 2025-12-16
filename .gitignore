@@ -15,6 +15,6 @@ deps/mkosi/mkosi.images/base/mkosi.extra/
 deps/mkosi/binfmt/bin
 deps/mkosi/qemu-binfmt-conf.sh
 deps/mkosi/out/
-deps/mkosi/al2023-build/al2023-build*
-deps/mkosi/al2023-build/artifacts
-deps/mkosi/al2023-build/_output
+deps/mkosi/al2023-package-build/al2023-build*
+deps/mkosi/al2023-package-build/artifacts
+deps/mkosi/al2023-package-build/_output
