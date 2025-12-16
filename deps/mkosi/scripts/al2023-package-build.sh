@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-source ./util.sh
+set -xe
+
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/../../.." && pwd)"
+
+source "${CURRENT_DIR}/util.sh"
 
 pushd "${PROJECT_ROOT}/deps/mkosi/al2023-package-build"
 rm -rf ./_output
@@ -42,11 +47,15 @@ else
     done
 fi
 
+PKGDIR="${PROJECT_ROOT}/deps/mkosi/mkosi.images/base/mkosi.extra/opt/built"
+rm -rf "${PKGDIR}"
+mkdir -p "${PKGDIR}"
 
 find . -iregex "\./artifacts/fuse-sshfs-[0-9].*" -exec cp {} "${PKGDIR}" \;
 find . -iregex "\./artifacts/cloud-init-[0-9].*" -exec cp {} "${PKGDIR}" \;
 find . -iregex "\./artifacts/fuse-sshfs-[0-9].*${ARCH}.*" -exec cp {} "${PKGDIR}" \;
 
-ls -lah "${CURRENT_DIR}/mkosi.images/base/mkosi.extra/opt/"
+ls -lah "${PKGDIR}/.."
+ls -lah "${PKGDIR}"
 
 popd

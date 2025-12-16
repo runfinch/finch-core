@@ -93,8 +93,9 @@ jobs:
           ./deps/mkosi/scripts/al2023-package-build.sh
       - name: Build OS image
         run: |
+          arch="${{ steps.mkosi-arch.outputs.arch }}"
           export PATH="$HOME/.local/bin/:$PATH"
-          ./deps/mkosi/mkosi.sh --arch $mkosi_arch -- --image-id os-image
+          ./deps/mkosi/mkosi.sh --arch "${arch}" -- --image-id os-image
       - name: Convert OS image
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"

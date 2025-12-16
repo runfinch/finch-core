@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-source ./util.sh
+set -xe
+
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/../../.." && pwd)"
+
+source "${CURRENT_DIR}/util.sh"
 
 # TODO: integrate with centralized deps tracking
 cosign_version="3.0.2-1"
@@ -8,7 +13,7 @@ cosign_version="3.0.2-1"
 # see: https://github.com/sigstore/cosign/releases/tag/v2.2.3 release for example
 cosign_release="3.0.2"
 
-PKGDIR="${PROJECT_ROOT}/deps/mkosi/mkosi.images/base/mkosi.extra/opt"
+PKGDIR="${PROJECT_ROOT}/deps/mkosi/mkosi.images/base/mkosi.extra/opt/bin"
 rm -rf "${PKGDIR}"
 mkdir -p "${PKGDIR}"
 

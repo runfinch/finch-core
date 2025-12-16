@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
-source ./util.sh
+set -xe
+
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/../../.." && pwd)"
+
+source "${CURRENT_DIR}/util.sh"
 
 git submodule update --remote --merge "${PROJECT_ROOT}/deps/mkosi/binfmt"
 
 # Build
 pushd "${PROJECT_ROOT}/deps/mkosi/binfmt"
-rm -rf bin
+rm -rf ./bin
 
 BUILDER_NAME="qemu-builder"
 
@@ -49,7 +54,7 @@ export HOST_ARCH="${ARCH}"
   -Q /usr/bin \
   --exportdir "${BUILD_OUT_LIB_DIR}/binfmt.d/"
 
-MKOSI_USR_PATH="${CURRENT_DIR}/mkosi.images/base/mkosi.extra/usr"
+MKOSI_USR_PATH="${PROJECT_ROOT}/deps/mkosi/mkosi.images/base/mkosi.extra/usr"
 MKOSI_BINFMT_PATH="${MKOSI_USR_PATH}/lib/binfmt.d"
 MKOSI_USR_BIN_PATH="${MKOSI_USR_PATH}/bin"
 

@@ -2,6 +2,9 @@
 
 set -x
 
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/../.." && pwd)"
+
 PROGRAM_NAME="$(basename "$0")"
 
 usage() {
@@ -9,7 +12,7 @@ usage() {
 ${PROGRAM_NAME} -- a simple wrapper to build multiple types of Finch images.
 
 Usage: ${PROGRAM_NAME}
-       ${PROGRAM_NAME} --arch=[x86_64|aarch64] --format=[oci|disk]
+       ${PROGRAM_NAME} --arch [x86_64|aarch64]
        ${PROGRAM_NAME} -h|--help
 
 Options:
@@ -59,7 +62,7 @@ done
 
 [[ -z "$arch" ]] && { echo "Error: arch not set"; exit 1; }
 
-MKOSI_OUT_DIR="./out/${arch}"
+MKOSI_OUT_DIR="${CURRENT_DIR}/out/${arch}"
 mkdir -p "${MKOSI_OUT_DIR}"
 
 mkosi_arch=""
@@ -84,6 +87,5 @@ case $arch in
         ;;
 esac
 
-# /home/fedora/mkosivenv/bin/mkosi -f --architecture="${mkosi_arch}" --output-directory="${MKOSI_OUT_DIR}" "${mkosi_args[@]}"
-# MKOSI_DNF=/usr/bin/dnf4 is needed on newer distros until this patch is availalbe https://github.com/rpm-software-management/dnf5/issues/1321
-mkosi --debug -f --architecture="${mkosi_arch}" --output-directory="${MKOSI_OUT_DIR}" "${mkosi_args[@]}"
+# MKOSI_DNF=/usr/bin/dnf4 is needed on distros without this patch https://github.com/rpm-software-management/dnf5/issues/1321
+mkosi --debug -C "${CURRENT_DIR}" -f --architecture="${mkosi_arch}" --output-directory="${MKOSI_OUT_DIR}" "${mkosi_args[@]}"
