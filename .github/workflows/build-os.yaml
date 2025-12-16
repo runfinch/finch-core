@@ -64,7 +64,6 @@ jobs:
         run: |
           mkdir -p "$HOME/.local/bin/"
           export PATH="/root/.local/bin/:$PATH"
-          export GITHUB_ACTIONS=true
           ./deps/mkosi/install-mkosi.sh
       - name: mkosi arch
         id: mkosi-arch
@@ -77,33 +76,47 @@ jobs:
             arch="x86-64"
           fi
           echo "arch=${arch}" >> $GITHUB_OUTPUT
-      - name: Run OS image build
+      - name: Fix git permissions
+        run: |
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+      - name: Build QEMU
         run: |
           ln -s "$HOME/.docker" /root/.docker
-          export PATH="/root/.local/bin/:$PATH"
-          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
-          cd ./deps/mkosi
-          PATH="/$HOME/.local/bin/:$PATH" \
-            GITHUB_ACTIONS=true \
-            ECR_CACHE_REPO="${{ secrets.ECR_CACHE_REPO }}" \
-            ./build.sh
+          export ECR_CACHE_REPO="${{ secrets.ECR_CACHE_REPO }}"
+          ./deps/mkosi/scripts/build-qemu.sh
+      - name: Setup binary packages
+        run: |
+          ./deps/mkosi/scripts/bin-packages.sh
+      - name: Build custom AL packages
+        run: |
+          ln -s "$HOME/.docker" /root/.docker
+          ./deps/mkosi/scripts/al2023-package-build.sh
+      - name: Build OS image
+        run: |
+          export PATH="$HOME/.local/bin/:$PATH"
+          ./deps/mkosi/mkosi.sh --arch $mkosi_arch -- --image-id os-image
+      - name: Convert OS image
+        run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
-          sudo qemu-img convert -f raw -c -O qcow2 "./out/${arch}/os-image.raw" \
-            "./out/${arch}/os-image.qcow2"
-          tar -cvf "./out/${arch}/container-with-kernel-image.tar" -C "./out/${arch}/container-with-kernel" .
+          sudo qemu-img convert -f raw -c -O qcow2 "./deps/mkosi/out/${arch}/os-image.raw" \
+            "./deps/mkosi/out/${arch}/os-image.qcow2"
+      - name: Push OS image
+        run: |
+          tar -cvf "./deps/mkosi/out/${arch}/container-with-kernel-image.tar" -C "./deps/mkosi/out/${arch}/container-with-kernel" .
           skopeo copy \
-            "oci-archive:./out/${arch}/container-with-kernel-image.tar" \
+            "oci-archive:./deps/mkosi/out/${arch}/container-with-kernel-image.tar" \
             docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.mkosi-arch.outputs.arch }}-with-kernel-${{github.run_id}}"
       - name: Run container build
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         run: |
-          set -x
-          cd ./deps/mkosi
+          export PATH="$HOME/.local/bin/:$PATH"
+          ./deps/mkosi/mkosi.sh --arch x86-64 -- --image-id wsl-rootfs
+      - name: Push rootfs image
+        run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
-          PATH="/$HOME/.local/bin/:$PATH" ./mkosi.sh --arch $arch -- --image-id wsl-rootfs
-          tar -cvf "./out/${arch}/wsl-rootfs-image.tar" -C "./out/${arch}/wsl-rootfs" .
+          tar -cvf "./deps/mkosi/out/${arch}/wsl-rootfs-image.tar" -C "./deps/mkosi/out/${arch}/wsl-rootfs" .
           skopeo copy \
-            "oci-archive:./out/${arch}/wsl-rootfs-image.tar" \
+            "oci-archive:./deps/mkosi/out/${arch}/wsl-rootfs-image.tar" \
             docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.mkosi-arch.outputs.arch }}-wsl-rootfs-${{github.run_id}}"
       - name: Upload container image artifacts
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
