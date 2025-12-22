@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  contents: write
   pull-requests: write
 
 jobs:
@@ -38,8 +39,6 @@ jobs:
       - name: Create or update PR
         if: github.event_name != 'pull_request' && steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
-        permissions:
-          pull-requests: write
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           signoff: true
