@@ -7,12 +7,11 @@ on:
 
 permissions:
   pull-requests: write
+  contents: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
