@@ -3,7 +3,8 @@
 
 # TODO: Use Finch rootfs in Finch on Windows testing
 ROOTFS_OUTPUT_DIR := $(OUTDIR)/os
-OUTPUT_DIRECTORIES += $(ROOTFS_OUTPUT_DIR)
+CRED_HELPERS_OUTDIR := $(OUTDIR)/cred-helpers
+OUTPUT_DIRECTORIES += $(ROOTFS_OUTPUT_DIR) $(CRED_HELPERS_OUTDIR)
 
 include $(CURDIR)/deps/rootfs.conf
 ifeq ($(ARCH), x86_64)
@@ -21,7 +22,7 @@ WINGIT_x86_URL := $(or $(WINGIT_x86_URL),https://github.com/git-for-windows/git/
 WINGIT_x86_BASENAME ?= $(notdir $(WINGIT_x86_URL))
 WINGIT_x86_HASH := $(or $(WINGIT_x86_HASH),"sha512:795a2e7e0be5ab78f2d28d0bd971961d121b9c808a95dec795343dc5af943574dcf54f63a8580c5a5102075abdae387d7a67135c165821428afc07f11ef7543d")
 
-install.dependencies: install.rootfs install.lima
+install.dependencies: install.rootfs install.lima install.docker-credhelper
 
 .PHONY: install.rootfs
 install.rootfs: $(ROOTFS_OUTPUT_DIR)/$(FINCH_ROOTFS_BASENAME)
@@ -99,3 +100,9 @@ $(LIMA_OUTDIR)/bin/ssh.exe: $(LIMA_OUTDIR) $(LIMA_DOWNLOAD_DIR)
 	cp $(WINGIT_TEMP_DIR)/usr/bin/msys-wind-0.dll $(LIMA_OUTDIR)/bin/
 
 	-@rm -rf $(WINGIT_TEMP_DIR)
+
+.PHONY: install.docker-credhelper
+install.docker-credhelper: $(CRED_HELPERS_OUTDIR)/docker-credential-wincred.exe
+
+$(CRED_HELPERS_OUTDIR)/docker-credential-wincred.exe: $(CRED_HELPERS_OUTDIR) $(CURDIR)/deps/docker-credential-helpers-windows.conf
+	bash deps/install.sh --arch $(ARCH) --output $@ $(CURDIR)/deps/docker-credential-helpers-windows.conf
