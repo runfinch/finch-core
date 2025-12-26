@@ -3,7 +3,8 @@
 
 OS_OUTDIR := $(OUTDIR)/os
 LIMA_TEMPLATE_OUTDIR := $(OUTDIR)/lima-template
-OUTPUT_DIRECTORIES += $(OS_OUTDIR) $(LIMA_TEMPLATE_OUTDIR)
+CRED_HELPERS_OUTDIR := $(OUTDIR)/cred-helpers
+OUTPUT_DIRECTORIES += $(OS_OUTDIR) $(LIMA_TEMPLATE_OUTDIR) $(CRED_HELPERS_OUTDIR)
 SOCKET_VMNET_TEMP_PREFIX ?= $(OUTDIR)/dependencies/lima-socket_vmnet/opt/finch
 
 include $(CURDIR)/deps/full-os.conf
@@ -36,7 +37,7 @@ CONTAINER_RUNTIME_ARCHIVE_X86_64_DIGEST ?= "sha256:$(X86_64_256_DIGEST)"
 # This is only used for testing of Finch core bundles.
 FINCH_VM_TYPE ?= vz
 
-install.dependencies: install.os install.lima-dependencies install.lima-socket-vmnet
+install.dependencies: install.os install.lima-dependencies install.lima-socket-vmnet install.docker-credhelper
 
 .PHONY: install.os
 install.os: $(OS_OUTDIR)/$(FINCH_OS_BASENAME)
@@ -76,3 +77,9 @@ $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml: $(LIMA_TEMPLATE_OUTDIR)
 	rm $(LIMA_TEMPLATE_OUTDIR)/*.yaml.template.bak
 
 	mv $@.template $@
+
+.PHONY: install.docker-credhelper
+install.docker-credhelper: $(CRED_HELPERS_OUTDIR)/docker-credential-osxkeychain
+
+$(CRED_HELPERS_OUTDIR)/docker-credential-osxkeychain: $(CRED_HELPERS_OUTDIR) $(CURDIR)/deps/docker-credential-helpers-macos.conf
+	bash deps/install.sh --arch $(ARCH) --output $@ $(CURDIR)/deps/docker-credential-helpers-macos.conf
