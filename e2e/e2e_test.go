@@ -117,6 +117,7 @@ func TestE2e(t *testing.T) {
 		tests.NetworkInspect(nerdctlOpt)
 		tests.NetworkLs(nerdctlOpt)
 		tests.NetworkRm(nerdctlOpt)
+		tests.HealthCheck(nerdctlOpt)
 	})
 
 	gomega.RegisterFailHandler(ginkgo.Fail)
