@@ -22,8 +22,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prashantv/gostub v1.1.0 h1:BTyx3RfQjRHnUWaGF9oQos79AlQ5k8WNktv7VGvVH4g=
 github.com/prashantv/gostub v1.1.0/go.mod h1:A5zLQHz7ieHGG7is6LLXLz7I8+3LZzsrV0P1IAHhP5U=
-github.com/runfinch/common-tests v0.10.1 h1:noZ9LbolXMLTZgXllAJtNkyO6JQrrnf1mpvN1zknU40=
-github.com/runfinch/common-tests v0.10.1/go.mod h1:PX9VBgtcOm+2Stjm4F6Y6KpovJ2emdSJ+y1X1URnAIU=
+github.com/runfinch/common-tests v0.10.3 h1:V0sKz3QNNf5bCmfxnLCTxFVqsY+lHgOjVpmG+T/Dohc=
+github.com/runfinch/common-tests v0.10.3/go.mod h1:mOOz4glmJ0uVwjgPEXKZPgHG8BzS2KCuE+XWV0Zg4hk=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 go.uber.org/automaxprocs v1.6.0 h1:O3y2/QNTOdbF+e/dpXNNW7Rx2hZ4sTIPyybbxyNqTUs=
