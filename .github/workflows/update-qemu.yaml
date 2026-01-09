@@ -54,7 +54,7 @@ jobs:
     
     steps:
       - name: "Checkout finch-core repo"
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           submodules: recursive
 
@@ -72,7 +72,7 @@ jobs:
           brew list --version qemu
 
       - name: "Setup go"
-        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
           go-version-file: src/lima/go.mod
 
@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: "Checkout finch-core repo"
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: "Update qemu.conf file with new qemu version and commit hash"
         run: |
@@ -140,7 +140,7 @@ jobs:
 
       - name: "Create PR for qemu update"
         if: github.event_name != 'pull_request'
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        uses: peter-evans/create-pull-request@98357b18bf14b5342f975ff684046ec3b2a07725 # v8.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           signoff: true
