@@ -83,3 +83,4 @@ install.docker-credhelper: $(CRED_HELPERS_OUTDIR)/docker-credential-osxkeychain
 
 $(CRED_HELPERS_OUTDIR)/docker-credential-osxkeychain: $(CRED_HELPERS_OUTDIR) $(CURDIR)/deps/docker-credential-helpers-macos.conf
 	bash deps/install.sh --arch $(ARCH) --output $@ $(CURDIR)/deps/docker-credential-helpers-macos.conf
+	chmod +x $(CRED_HELPERS_OUTDIR)/docker-credential-osxkeychain
