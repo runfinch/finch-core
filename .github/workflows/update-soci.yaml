@@ -1,0 +1,69 @@
+name: update-soci
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-soci-and-create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      
+      - name: Get latest SOCI Version
+        id: version
+        run: |
+          latest_tag="$(\
+            curl -sL --fail "https://api.github.com/repos/awslabs/soci-snapshotter/releases/latest" | \
+            grep '"tag_name":' | \
+            head -1 | \
+            cut -d'"' -f4 \
+          )"
+          echo "tag=$latest_tag" >> $GITHUB_OUTPUT
+          echo "Latest tag is ${latest_tag}"
+
+      - name: Update .conf file
+        run: |
+          latest_tag="${{ steps.version.outputs.tag }}"
+          AMD64_DIGEST=$(curl -sL --fail "https://github.com/awslabs/soci-snapshotter/releases/download/${latest_tag}/soci-snapshotter-${latest_tag#v}-linux-amd64.tar.gz.sha256sum" | awk '{print $1}')
+          ARM64_DIGEST=$(curl -sL --fail "https://github.com/awslabs/soci-snapshotter/releases/download/${latest_tag}/soci-snapshotter-${latest_tag#v}-linux-arm64.tar.gz.sha256sum" | awk '{print $1}')
+          
+          cat > deps/soci.conf << EOF
+          SOCI_VERSION=${latest_tag#v}
+          SOCI_AMD64_SHA256_DIGEST=${AMD64_DIGEST}
+          SOCI_ARM64_SHA256_DIGEST=${ARM64_DIGEST}
+          EOF
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet deps/soci.conf; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected in dependencies"
+            exit 0
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected in dependencies:"
+            git diff deps/soci.conf
+          fi
+
+      - name: Create or update PR
+        if: github.event_name != 'pull_request' && steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          signoff: true
+          commit-message: 'chore: update SOCI Snapshotter'
+          title: 'chore: update SOCI Snapshotter'
+          body: |
+            This PR updates SOCI Snapshotter to the latest version
+            This is an automated update created by the dependency update workflow. Review the changes before approving.
+          branch: update-soci
+          delete-branch: true
