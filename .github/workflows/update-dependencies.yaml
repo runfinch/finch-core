@@ -16,6 +16,8 @@ on:
       - .github/workflows/update-dependencies.yaml
       - .github/workflows/update-linux-dependencies.yaml
       - .github/workflows/update-qemu.yaml
+      - .github/workflows/update-ecr-cred-helper.yaml
+      - .github/workflows/update-soci.yaml
       - bin/update-lima-bundles.sh
       - bin/update-container-runtime-full-archive.sh
       - bin/update-linux-dependencies.sh
@@ -144,3 +146,19 @@ jobs:
       pull-requests: write
 
     uses: ./.github/workflows/update-qemu.yaml
+
+  update-ecr-cred-helper:
+    # Add permissions needed to create a PR
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    uses: ./.github/workflows/update-ecr-cred-helper.yaml
+  
+  update-soci:
+    # Add permissions needed to create a PR
+    permissions:
+      contents: write
+      pull-requests: write
+
+    uses: ./.github/workflows/update-soci.yaml
