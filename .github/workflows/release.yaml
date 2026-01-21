@@ -5,6 +5,14 @@ on:
   schedule:
     - cron: '0 9 * * 2'
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release.yaml
+      - src/lima/**
+      - deps/qemu.conf
+      - bin/lima-and-qemu.py
 
 env:
   GO111MODULE: on
@@ -60,14 +68,19 @@ jobs:
 
       - name: Make and release deps
         run: |
-          (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
-          make -C src/lima PREFIX=/opt/homebrew all install
-          python3 ./bin/lima-and-qemu.py
+          # (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
+          cd src/lima
+          sudo make clean native install PREFIX=/opt/homebrew || exit 1
+          echo "Installed limactl version: $(limactl --version)"
+          
+          cd ../../
+          python3 bin/lima-and-qemu.py
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
         shell: zsh {0}
 
       - name: Upload MacOS build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: github.event_name != 'pull_request'
         with:
           name: lima-and-qemu.macos-arm64
           path: ./src/lima/lima-and-qemu.macos*
@@ -75,15 +88,19 @@ jobs:
 
       - name: Upload dependency mapping ARM64
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: github.event_name != 'pull_request'
         with:
           name: dep-version-mapping-aarch64
           path: ./src/lima/dep-version-mapping-aarch64.json
           if-no-files-found: error
 
       - name: Make and release source code of dependencies
+        if: github.event_name != 'pull_request'
         run: make download-sources
+      
       - name: Upload MacOS build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: github.event_name != 'pull_request'
         with:
           name: DependenciesSourceCode.tar.gz
           path: ./downloads/dependency-sources.tar.gz
@@ -133,14 +150,19 @@ jobs:
 
       - name: Make and release deps
         run: |
-          (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
-          make -C src/lima PREFIX=/usr/local all install
-          python3 ./bin/lima-and-qemu.py
+          # (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
+          cd src/lima
+          sudo make clean native install PREFIX=/opt/homebrew || exit 1
+          echo "Installed limactl version: $(limactl --version)"
+          
+          cd ../../
+          python3 bin/lima-and-qemu.py
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-x86_64.tar.gz
         shell: zsh {0}
 
       - name: Upload MacOS build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: github.event_name != 'pull_request'
         with:
           name: lima-and-qemu.macos-x86
           path: ./src/lima/lima-and-qemu.macos*
@@ -148,12 +170,14 @@ jobs:
 
       - name: Upload dependency mapping x86_64
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: github.event_name != 'pull_request'
         with:
           name: dep-version-mapping-x86_64
           path: ./src/lima/dep-version-mapping-x86_64.json
           if-no-files-found: error
 
   upload-dependency-mappings:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs:
@@ -191,6 +215,7 @@ jobs:
           aws s3 cp ./build/dep-version-mapping-x86_64.json s3://${{ secrets.DEPENDENCY_MAPPING_BUCKET_NAME }}/x86-64/dep-version-mapping.json
 
   release:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs:

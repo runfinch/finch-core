@@ -12,7 +12,9 @@ on:
     paths:
       - .github/workflows/windows-ci.yaml
       - .gitmodules
+      - deps/container-runtime-full-archive.conf
       - deps/rootfs.conf
+      - lima-template/**
       - Makefile
       - Makefile.windows
   workflow_dispatch:

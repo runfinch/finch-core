@@ -1,3 +1,4 @@
+/opt/homebrew/libexec/lima/limactl-mcp [6.2M]
 /opt/homebrew/Cellar/capstone/5.0.6/lib/libcapstone.5.dylib [6.8M]
 /opt/homebrew/Cellar/capstone/5.0.6/lib/libcapstone.dylib → libcapstone.5.dylib
 /opt/homebrew/Cellar/dtc/1.7.2/lib/libfdt.1.dylib → libfdt.dylib.1.7.2
