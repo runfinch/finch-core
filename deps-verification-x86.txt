@@ -1,3 +1,5 @@
+/usr/local/libexec/lima/limactl-mcp [6.5M]
+/usr/local/Cellar/qemu/10.2.0/share/qemu/vgabios-stdvga.bin [39K]
 /usr/local/Cellar/capstone/5.0.6/lib/libcapstone.5.dylib [6.9M]
 /usr/local/Cellar/capstone/5.0.6/lib/libcapstone.dylib → libcapstone.5.dylib
 /usr/local/Cellar/dtc/1.7.2/lib/libfdt.1.dylib → libfdt.dylib.1.7.2
@@ -64,7 +66,6 @@
 /usr/local/Cellar/qemu/10.1.0/share/qemu/edk2-x86_64-code.fd [3.5M]
 /usr/local/Cellar/qemu/10.1.0/share/qemu/efi-virtio.rom [157K]
 /usr/local/Cellar/qemu/10.1.0/share/qemu/kvmvapic.bin [9.0K]
-/usr/local/Cellar/qemu/10.1.0/share/qemu/vgabios-virtio.bin [39K]
 /usr/local/Cellar/snappy/1.2.2/lib/libsnappy.1.2.2.dylib [59K]
 /usr/local/Cellar/snappy/1.2.2/lib/libsnappy.1.dylib → libsnappy.1.2.2.dylib
 /usr/local/Cellar/snappy/1.2.2/lib/libsnappy.dylib → libsnappy.1.dylib
