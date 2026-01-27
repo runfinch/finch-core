@@ -1,0 +1,7 @@
+#!/bin/sh
+set -x
+
+<<EOF cat >> /etc/wsl.conf
+[boot]
+systemd=true
+EOF
