@@ -3,7 +3,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# A script to update the rootfs dependency used for Finch on Windows.
+# A script to update the rootfs artifacts in deps/rootfs.conf
 #
 # Usage: bash update-rootfs.sh -d <S3 bucket>
 
@@ -16,7 +16,7 @@ PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/.." && pwd)"
 source "${PROJECT_ROOT}/bin/utility.sh"
 
 DEPENDENCY_CLOUDFRONT_URL="https://deps.runfinch.com"
-AMD64_FILENAME_PATTERN="finch-rootfs-production-amd64-[0-9]+\.tar\.gz$"
+AMD64_FILENAME_PATTERN="finch-al2023-rootfs-x86-64-[0-9]+\.tar\.gz$"
 PLATFORM="common"
 # ARM not currently supported for Finch on Windows
 # AARCH64="aarch64"
