@@ -1,16 +1,18 @@
 name: Build OS
 
 on:
+  schedule:
+    - cron: '0 16 * * *'  # Daily at 8am PST / 4pm UTC
   push:
     branches:
       - main
     paths:
-      - 'deps/mkosi/*'
+      - 'deps/mkosi/**'
   pull_request:
     branches:
       - main
     paths:
-      - 'deps/mkosi/*'
+      - 'deps/mkosi/**'
   workflow_dispatch:
 
 permissions:
@@ -101,6 +103,21 @@ jobs:
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           sudo qemu-img convert -f raw -c -O qcow2 "./deps/mkosi/out/${arch}/os-image.raw" \
             "./deps/mkosi/out/${arch}/os-image.qcow2"
+      - name: Calculate SHA512 checksum for OS image
+        run: |
+          arch="${{ steps.mkosi-arch.outputs.arch }}"
+          cd "./deps/mkosi/out/${arch}"
+          shasum -a 512 os-image.qcow2 | cut -d ' ' -f 1 > os-image.qcow2.sha512sum
+      - name: Upload OS image to S3
+        run: |
+          arch="${{ steps.mkosi-arch.outputs.arch }}"
+          filename="finch-al2023-os-image-${arch}-${{ github.run_id }}.qcow2"
+          aws s3 cp "./deps/mkosi/out/${arch}/os-image.qcow2" \
+            "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}" \
+            --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
+          aws s3 cp "./deps/mkosi/out/${arch}/os-image.qcow2.sha512sum" \
+            "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}.sha512sum" \
+            --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
       - name: Push OS image
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
@@ -121,6 +138,29 @@ jobs:
           skopeo copy \
             "oci-archive:./deps/mkosi/out/${arch}/wsl-rootfs-image.tar" \
             docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.mkosi-arch.outputs.arch }}-wsl-rootfs-${{github.run_id}}"
+      - name: Compress rootfs for S3
+        if: steps.mkosi-arch.outputs.arch == 'x86-64'
+        run: |
+          arch="${{ steps.mkosi-arch.outputs.arch }}"
+          cd "./deps/mkosi/out/${arch}"
+          tar -czf wsl-rootfs.tar.gz -C wsl-rootfs .
+      - name: Calculate SHA512 checksum for rootfs
+        if: steps.mkosi-arch.outputs.arch == 'x86-64'
+        run: |
+          arch="${{ steps.mkosi-arch.outputs.arch }}"
+          cd "./deps/mkosi/out/${arch}"
+          shasum -a 512 wsl-rootfs.tar.gz | cut -d ' ' -f 1 > wsl-rootfs.tar.gz.sha512sum
+      - name: Upload rootfs to S3
+        if: steps.mkosi-arch.outputs.arch == 'x86-64'
+        run: |
+          arch="${{ steps.mkosi-arch.outputs.arch }}"
+          filename="finch-al2023-rootfs-${arch}-${{ github.run_id }}.tar.gz"
+          aws s3 cp "./deps/mkosi/out/${arch}/wsl-rootfs.tar.gz" \
+            "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/common/${arch}/${filename}" \
+            --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
+          aws s3 cp "./deps/mkosi/out/${arch}/wsl-rootfs.tar.gz.sha512sum" \
+            "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/common/${arch}/${filename}.sha512sum" \
+            --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
       - name: Upload container image artifacts
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -134,3 +174,42 @@ jobs:
           name: image-${{ steps.mkosi-arch.outputs.arch }}-${{github.run_id}}.qcow2
           path: ./deps/mkosi/out/${{ steps.mkosi-arch.outputs.arch }}/os-image.qcow2
           if-no-files-found: error
+
+  update-deps-config:
+    needs: build-os-image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.ROLE }}
+          aws-region: ${{ secrets.REGION }}
+          role-session-name: update-deps-config-session
+      - name: Run update-os-image script
+        run: |
+          bash bin/update-os-image.sh \
+            -d "${{ secrets.DEPENDENCY_BUCKET_NAME }}"
+      - name: Run update-rootfs script
+        run: |
+          bash bin/update-rootfs.sh \
+            -d "${{ secrets.DEPENDENCY_BUCKET_NAME }}"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "deps(os): update OS image to run ${{ github.run_id }}"
+          title: "deps(os): update OS image"
+          body: |
+            This PR was automatically created by the [build-os workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            
+            Updates the OS image and rootfs artifacts in:
+            - `deps/full-os.conf` (OS images for both architectures)
+            - `deps/rootfs.conf` (rootfs for x86-64)
+          branch: deps/update-os-image-${{ github.run_id }}
+          delete-branch: true
