@@ -29,9 +29,9 @@
 /usr/local/Cellar/libpng/1.6.50/lib/libpng16.dylib → libpng16.16.dylib
 /usr/local/Cellar/libslirp/4.9.1/lib/libslirp.0.dylib [146K]
 /usr/local/Cellar/libslirp/4.9.1/lib/libslirp.dylib → libslirp.0.dylib
-/usr/local/Cellar/libssh/0.11.3/lib/libssh.4.10.3.dylib [448K]
-/usr/local/Cellar/libssh/0.11.3/lib/libssh.4.dylib → libssh.4.10.3.dylib
-/usr/local/Cellar/libssh/0.11.3/lib/libssh.dylib → libssh.4.dylib
+/usr/local/Cellar/libssh/0.12.0/lib/libssh.4.11.0.dylib [483K]
+/usr/local/Cellar/libssh/0.12.0/lib/libssh.4.dylib → libssh.4.11.0.dylib
+/usr/local/Cellar/libssh/0.12.0/lib/libssh.dylib → libssh.4.dylib
 /usr/local/Cellar/libtasn1/4.20.0/lib/libtasn1.6.dylib [103K]
 /usr/local/Cellar/libtasn1/4.20.0/lib/libtasn1.dylib → libtasn1.6.dylib
 /usr/local/Cellar/libunistring/1.3/lib/libunistring.5.dylib [1.9M]
