@@ -1,4 +1,4 @@
-name: Build
+name: Build Lima & QEMU
 
 # Runs every Tuesday at 9 am UTC
 on:
@@ -68,8 +68,10 @@ jobs:
 
       - name: Make and release deps
         run: |
-          # (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
           cd src/lima
+          git clean -f -d
+          git am ../patches/lima/*.patch
+
           sudo make clean native install PREFIX=/opt/homebrew || exit 1
           echo "Installed limactl version: $(limactl --version)"
           
@@ -150,8 +152,10 @@ jobs:
 
       - name: Make and release deps
         run: |
-          # (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
           cd src/lima
+          git clean -f -d
+          git am ../patches/lima/*.patch
+
           sudo make clean native install PREFIX=/opt/homebrew || exit 1
           echo "Installed limactl version: $(limactl --version)"
           
