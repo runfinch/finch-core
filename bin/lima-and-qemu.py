@@ -250,8 +250,9 @@ def compress_archive(archive_path: str):
     try:
         lima_repo_root = os.path.join(os.getcwd(), 'src', 'lima')
         compressed_tarball_path = f"{lima_repo_root}/lima-and-qemu.tar.gz"
-        with open(archive_path, "rb") as f_in:
-            with gzip.open(compressed_tarball_path, "wb") as f_out:
+        if os.path.exists(compressed_tarball_path):
+            os.unlink(compressed_tarball_path)
+        with open(archive_path, "rb") as f_in, gzip.open(compressed_tarball_path, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
     except Exception as ex:
         raise RuntimeError("failed to compress archive {archive_path}") from ex
@@ -266,7 +267,7 @@ def add_lima_version_archive(archive_path: str, lima_version: str):
         print(f"Created LIMA_VERSION file with content: {lima_version}")
 
         with tarfile.open(archive_path, "a" ) as tar:
-            tar.add("LIMA_VERSION")
+            tar.add("LIMA_VERSION", arcname="LIMA_VERSION")
             print(f"Added LIMA_VERSION file to archive {archive_path}")
     except Exception as ex:
         raise RuntimeError("failed to add LIMA_VERSION to archive") from ex
