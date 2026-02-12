@@ -44,6 +44,6 @@ get_lima_version_from_deps() {
     local artifact_url="$1"
     artifact=$(basename "$artifact_url")
     curl -L --fail "${artifact_url}" > "${artifact}"
-    tar -xzf "${artifact}" LIMA_VERSION
+    tar -xzf "${artifact}" ./LIMA_VERSION
     echo "$(cat LIMA_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 }
