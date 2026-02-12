@@ -156,7 +156,7 @@ jobs:
           git clean -f -d
           git am ../patches/lima/*.patch
 
-          sudo make clean native install PREFIX=/opt/homebrew || exit 1
+          sudo make clean native install PREFIX=/usr/local || exit 1
           echo "Installed limactl version: $(limactl --version)"
           
           cd ../../
