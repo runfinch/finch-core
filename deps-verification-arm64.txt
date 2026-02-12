@@ -109,6 +109,6 @@
 /opt/homebrew/opt/zstd → ../Cellar/zstd/1.5.7
 /opt/homebrew/share/lima/lima-guestagent.Linux-aarch64.gz [12M]
 /opt/homebrew/share/lima/templates/_default/mounts.yaml [104B]
-/opt/homebrew/share/lima/templates/_images/alpine.yaml [592B]
+/opt/homebrew/share/lima/templates/_images/fedora-42.yaml [592B]
 /opt/homebrew/share/lima/templates/_images/ubuntu.yaml [2.4K]
 /opt/homebrew/share/qemu → ../Cellar/qemu/10.1.0/share/qemu
