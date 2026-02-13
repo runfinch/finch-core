@@ -39,3 +39,17 @@ pull_artifact_and_verify_shasum() {
     shasum --algorithm 512 "${artifact}" | cut -d ' ' -f 1 | grep -xq "^${expected_shasum}$" || \
       (echo "error: shasum verification failed for \"${artifact}\" dependency" && rm -f "${artifact}" && exit 1)
 }
+
+# pulls articact, extracts and reads LIMA_VERSION file from the artifact
+#
+# @param artifact_url - URL to artifact
+# @return lima version number
+get_lima_version_from_deps() {
+    local artifact_url="$1"
+    artifact=$(basename "$artifact_url")
+    curl -L --fail "${artifact_url}" > "${artifact}"
+    tar -xzf "${artifact}" ./LIMA_VERSION
+    lima_version="$(cat LIMA_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
+    rm -f "${artifact}" ./LIMA_VERSION
+    echo "${lima_version}"
+}

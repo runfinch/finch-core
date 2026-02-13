@@ -1,0 +1,29 @@
+From 21375c3df1144005159aff95f73b04cd0b455478 Mon Sep 17 00:00:00 2001
+From: Swapnanil Gupta <swpnlg@amazon.com>
+Date: Thu, 12 Feb 2026 18:20:26 +0000
+Subject: [PATCH] fix: make qemu convertToRaw handle symlinked dests
+
+Signed-off-by: Swapnanil Gupta <swpnlg@amazon.com>
+---
+ pkg/qemuimgutil/qemuimgutil.go | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/pkg/qemuimgutil/qemuimgutil.go b/pkg/qemuimgutil/qemuimgutil.go
+index 14ad4d47..9a5b085f 100644
+--- a/pkg/qemuimgutil/qemuimgutil.go
++++ b/pkg/qemuimgutil/qemuimgutil.go
+@@ -120,6 +120,14 @@ func convertToRaw(ctx context.Context, source, dest string) error {
+ 		return nil
+ 	}
+ 
++	realDest, _ := os.Readlink(dest)
++	if realDest != "" && realDest != dest {
++		dest = realDest
++	}
++
+ 	tempFile := dest + ".lima-qemu-convert.tmp"
+ 	defer os.Remove(tempFile)
+ 
+-- 
+2.47.3
+

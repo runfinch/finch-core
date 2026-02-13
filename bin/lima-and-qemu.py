@@ -6,6 +6,7 @@ import time
 import shutil
 import re
 import tarfile
+import gzip
 import json
 from enum import Enum
 from collections import defaultdict
@@ -33,6 +34,9 @@ def main():
     
     qemu_version = get_installed_qemu_version()
     print("using qemu version: ", qemu_version)
+
+    lima_version = get_installed_lima_version()
+    print("using lima version: ", lima_version)
     
     print("recording initial deps...")
     deps = record_initial_deps(arch, install_dir, qemu_version)
@@ -64,7 +68,13 @@ def main():
     extract_and_export_package_versions(deps, arch, install_dir)
 
     print("Packaging files and socket_vmnet...")
-    package_files_and_socket_vmnet(deps, install_dir, dist_path)
+    archive_path = package_files_and_socket_vmnet(deps, install_dir, dist_path)
+
+    print("adding lima version info to built archive...")
+    add_lima_version_to_archive(archive_path, lima_version)
+
+    print("compressing archive...")
+    compress_archive(archive_path)
 
     print("Cleaning up...")
     cleanup()
@@ -72,7 +82,7 @@ def main():
     print("Done")
 
 def get_templates_from_args():
-    default_templates = ["alpine", "default"]
+    default_templates = ["fedora-42", "default"]
     return sys.argv[1:] if len(sys.argv) > 1 else default_templates
 
 def get_system_arch():
@@ -83,6 +93,16 @@ def get_system_arch():
 
 def get_installation_dir(arch: Literal[Arch.X86_64, Arch.AARCH64]):
     return "/usr/local" if arch == Arch.X86_64 else "/opt/homebrew"
+
+def get_installed_lima_version():
+    try:
+        res = subprocess.check_output("limactl --version", shell=True, text=True)
+        lima_version = res.replace("limactl version", "").strip()
+        if not lima_version:
+            raise RuntimeError("failed to get installed lima version")
+        return lima_version
+    except Exception as ex:
+        raise RuntimeError("failed to get installed lima version") from ex
 
 def get_installed_qemu_version():
     try:
@@ -223,6 +243,35 @@ def resign(resign_files: Set[str]):
         except Exception as ex:
             raise RuntimeError(f"failed to resign {file_path}") from ex
 
+def compress_archive(archive_path: str):
+    if not os.path.exists(archive_path):
+        raise RuntimeError("{archive_path} does not exist")
+    
+    try:
+        lima_repo_root = os.path.join(os.getcwd(), 'src', 'lima')
+        compressed_tarball_path = f"{lima_repo_root}/lima-and-qemu.tar.gz"
+        if os.path.exists(compressed_tarball_path):
+            os.unlink(compressed_tarball_path)
+        with open(archive_path, "rb") as f_in, gzip.open(compressed_tarball_path, "wb") as f_out:
+                shutil.copyfileobj(f_in, f_out)
+    except Exception as ex:
+        raise RuntimeError("failed to compress archive {archive_path}") from ex
+
+def add_lima_version_to_archive(archive_path: str, lima_version: str):
+    try:
+        if not os.path.exists(archive_path):
+            raise RuntimeError(f"archive {archive_path} does not exist")
+        
+        with open("LIMA_VERSION", "w") as f:
+            f.write(lima_version)
+        print(f"Created LIMA_VERSION file with content: {lima_version}")
+
+        with tarfile.open(archive_path, "a" ) as tar:
+            tar.add("LIMA_VERSION", arcname="LIMA_VERSION")
+            print(f"Added LIMA_VERSION file to archive {archive_path}")
+    except Exception as ex:
+        raise RuntimeError("failed to add LIMA_VERSION to archive") from ex
+
 def package_files_and_socket_vmnet(deps: Dict[str, str], install_dir: str, dist_path: str):
     tar_files = [path.removeprefix(f"{install_dir}/") for path in deps.keys()]
     
@@ -249,13 +298,14 @@ def package_files_and_socket_vmnet(deps: Dict[str, str], install_dir: str, dist_
 
     try:
         lima_repo_root = os.path.join(os.getcwd(), 'src', 'lima')
-        tarball_path = f"{lima_repo_root}/lima-and-qemu.tar.gz"
+        tarball_path = f"{lima_repo_root}/lima-and-qemu.tar"
         if os.path.exists(tarball_path):
             os.unlink(tarball_path)
-        with tarfile.open(tarball_path, "w:gz") as tar:
+        with tarfile.open(tarball_path, "w") as tar:
             for file in tar_files:
                 print(f"adding {dist_path}/{file} to tarball")
                 tar.add(f"{dist_path}/{file}", arcname=file)
+        return tarball_path
     except Exception as ex:
         raise RuntimeError("failed to package files") from ex
 

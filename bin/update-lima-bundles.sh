@@ -36,7 +36,6 @@ aarch64_deps=$(find_latest_object_match_from_s3 "${AARCH64_FILENAME_PATTERN}" "$
 # Need to pull the shasum of the artifact to store for later verification.
 aarch64_deps_shasum_url="${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}.sha512sum"
 aarch64_deps_shasum=$(curl -L --fail "${aarch64_deps_shasum_url}")
-
 pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}" "${aarch64_deps_shasum}"
 
 amd64_deps=$(find_latest_object_match_from_s3 "${AMD64_FILENAME_PATTERN}" "${dependency_bucket}/${X86_64}")
@@ -44,8 +43,15 @@ amd64_deps=$(find_latest_object_match_from_s3 "${AMD64_FILENAME_PATTERN}" "${dep
 
 amd64_deps_shasum_url="${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}.sha512sum"
 amd64_deps_shasum=$(curl -L --fail "${amd64_deps_shasum_url}")
-
 pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}" "${amd64_deps_shasum}"
+
+# make sure the lima version for both matches
+lima_version_aarch64=$(get_lima_version_from_deps "${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}")
+lima_version_amd64=$(get_lima_version_from_deps "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}")
+if [[ "$lima_version_aarch64" != "$lima_version_amd64" ]]; then
+    echo "Error: lima versions do not match b/w two dependency archives: ${lima_version_aarch64} vs ${lima_version_amd64}"
+    exit 1
+fi
 
 # Update bundles file with latest artifacts and digests.
 BUNDLES_FILE="${PROJECT_ROOT}/deps/lima-bundles.conf"
@@ -60,4 +66,6 @@ truncate -s 0 "${BUNDLES_FILE}"
     echo "X86_64_ARTIFACT_PATHING=${X86_64}"
     echo "X86_64_ARTIFACT=$(basename "${amd64_deps}")"
     echo "X86_64_512_DIGEST=${amd64_deps_shasum}"
+    echo ""
+    echo "LIMA_VERSION=${lima_version_aarch64}"
 } >> "${BUNDLES_FILE}"
