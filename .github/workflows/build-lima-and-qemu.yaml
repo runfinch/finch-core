@@ -1,4 +1,4 @@
-name: Build
+name: Build Lima & QEMU Bundle
 
 # Runs every Tuesday at 9 am UTC
 on:
@@ -9,7 +9,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/release.yaml
+      - .github/workflows/build-lima-and-qemu.yaml
       - src/lima/**
       - deps/qemu.conf
       - bin/lima-and-qemu.py
@@ -68,13 +68,20 @@ jobs:
 
       - name: Make and release deps
         run: |
-          # (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
           cd src/lima
+          git clean -f -d
+          git am ../patches/lima/*.patch
+
           sudo make clean native install PREFIX=/opt/homebrew || exit 1
           echo "Installed limactl version: $(limactl --version)"
           
           cd ../../
           python3 bin/lima-and-qemu.py
+          if [ $? -ne 0 ]; then
+            echo "Failed to create lima-and-qemu archive"
+            exit 1
+          fi
+          
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-aarch64.tar.gz
         shell: zsh {0}
 
@@ -150,13 +157,20 @@ jobs:
 
       - name: Make and release deps
         run: |
-          # (cd src/lima && git clean -f -d && git am ../patches/lima/*.patch)
           cd src/lima
-          sudo make clean native install PREFIX=/opt/homebrew || exit 1
+          git clean -f -d
+          git am ../patches/lima/*.patch
+
+          sudo make clean native install PREFIX=/usr/local || exit 1
           echo "Installed limactl version: $(limactl --version)"
           
           cd ../../
           python3 bin/lima-and-qemu.py
+          if [ $? -ne 0 ]; then
+            echo "Failed to create lima-and-qemu archive"
+            exit 1
+          fi
+
           mv src/lima/lima-and-qemu.tar.gz src/lima/lima-and-qemu.macos-x86_64.tar.gz
         shell: zsh {0}
 
