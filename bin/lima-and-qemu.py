@@ -489,13 +489,9 @@ def normalize_path_for_version_comparison(path: str, install_dir: str):
     # e.g., /opt/homebrew/Cellar/openssl@3/3.5.2/lib -> /opt/homebrew/Cellar/openssl@3/*/lib
     path = re.sub(r'(/Cellar/[^/]+)/[^/]+(/.*)?$', r'\1/*\2', path)
 
-    # Remove version numbers from library filenames
-    # e.g., libssl.3.dylib -> libssl.*.dylib
-    path = re.sub(r'/lib([^/]+)\.(\d+(?:\.\d+)*)(\.dylib)$', r'/lib\1.*\3', path)
-
-    # Remove version numbers from versioned library files
-    # e.g., libssl.3.0.15.dylib -> libssl.*.dylib
-    path = re.sub(r'/lib([^/]+)\.(\d+(?:\.\d+)*(?:\.\d+)*)(\.dylib)$', r'/lib\1.*\3', path)
+    # Remove version numbers from library filenames (handles all version patterns)
+    # e.g., libssl.3.dylib -> libssl.*.dylib, libssh.4.10.3.dylib -> libssh.*.dylib
+    path = re.sub(r'/lib([^.]+)\.(\d+(?:\.\d+)*)(\.dylib)$', r'/lib\1.*\3', path)
     
     return path
 
