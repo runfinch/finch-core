@@ -7,8 +7,6 @@ PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/../../.." && pwd)"
 
 source "${CURRENT_DIR}/util.sh"
 
-git submodule update --remote --merge "${PROJECT_ROOT}/deps/mkosi/binfmt"
-
 # Build
 pushd "${PROJECT_ROOT}/deps/mkosi/binfmt"
 rm -rf ./bin

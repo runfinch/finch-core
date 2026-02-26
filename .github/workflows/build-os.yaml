@@ -202,6 +202,7 @@ jobs:
             -d "${{ secrets.DEPENDENCY_BUCKET_NAME }}"
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+        if: github.event_name != 'pull_request'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "deps(os): update OS image to run ${{ github.run_id }}"
