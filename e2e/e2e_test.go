@@ -69,6 +69,7 @@ func TestE2e(t *testing.T) {
 	}, func(bytes []byte) {})
 
 	ginkgo.SynchronizedAfterSuite(func() {
+		printLimaLogs(vmName)
 		command.New(limaOpt, "stop", vmName).WithTimeoutInSeconds(90).Run()
 		command.New(limaOpt, "remove", vmName).WithTimeoutInSeconds(60).Run()
 	}, func() {})
@@ -122,4 +123,22 @@ func TestE2e(t *testing.T) {
 
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, description)
+}
+
+func printLimaLogs(vmName string) {
+	userHomeDir := os.Getenv("HOME")
+	if userHomeDir == "" {
+		return
+	}
+
+	stdoutLog := filepath.Join(userHomeDir, ".lima", vmName, "ha.stdout.log")
+	stderrLog := filepath.Join(userHomeDir, ".lima", vmName, "ha.stderr.log")
+
+	if stdout, err := os.ReadFile(stdoutLog); err == nil {
+		ginkgo.GinkgoWriter.Printf("\n=== Lima stdout log ===\n%s\n", string(stdout))
+	}
+
+	if stderr, err := os.ReadFile(stderrLog); err == nil {
+		ginkgo.GinkgoWriter.Printf("\n=== Lima stderr log ===\n%s\n", string(stderr))
+	}
 }
