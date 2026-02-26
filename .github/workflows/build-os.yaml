@@ -30,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
-    timeout-minutes: 15
+    timeout-minutes: 60
     steps:
       - name: Install packages
         run: |
@@ -108,7 +108,7 @@ jobs:
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           cd "./deps/mkosi/out/${arch}"
-          shasum -a 512 os-image.qcow2 | cut -d ' ' -f 1 > os-image.qcow2.sha512sum
+          sha512sum os-image.qcow2 | cut -d ' ' -f 1 > os-image.qcow2.sha512sum
       - name: Upload OS image to S3
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
@@ -150,7 +150,7 @@ jobs:
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           cd "./deps/mkosi/out/${arch}"
-          shasum -a 512 wsl-rootfs.tar.gz | cut -d ' ' -f 1 > wsl-rootfs.tar.gz.sha512sum
+          sha512sum wsl-rootfs.tar.gz | cut -d ' ' -f 1 > wsl-rootfs.tar.gz.sha512sum
       - name: Upload rootfs to S3
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         run: |
