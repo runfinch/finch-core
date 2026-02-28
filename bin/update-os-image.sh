@@ -49,9 +49,6 @@ pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}" "${
 # Update base os file with latest artifacts and digests
 OS_FILE="${PROJECT_ROOT}/deps/full-os.conf"
 
-# Source existing config to preserve cosign variables
-source "${OS_FILE}"
-
 # Regenerate the file with OS artifacts and cosign config
 truncate -s 0 "${OS_FILE}"
 {
@@ -64,14 +61,4 @@ truncate -s 0 "${OS_FILE}"
     echo "# Built by mkosi from deps/mkosi"
     echo "X86_64_ARTIFACT=$(basename "${amd64_deps}")"
     echo "X86_64_512_DIGEST=${amd64_deps_shasum}"
-    
-    # Preserve cosign configuration if variables exist
-    if [ -n "${COSIGN_VERSION:-}" ]; then
-        echo ""
-        echo "# Cosign binary for image signing"
-        echo "COSIGN_VERSION=${COSIGN_VERSION}"
-        echo "COSIGN_RELEASE=${COSIGN_RELEASE}"
-        echo "COSIGN_AARCH64_RPM_SHA256_DIGEST=${COSIGN_AARCH64_RPM_SHA256_DIGEST:-}"
-        echo "COSIGN_X86_64_RPM_SHA256_DIGEST=${COSIGN_X86_64_RPM_SHA256_DIGEST:-}"
-    fi
 } >> "${OS_FILE}"

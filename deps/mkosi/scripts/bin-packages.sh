@@ -8,7 +8,7 @@ PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/../../.." && pwd)"
 source "${CURRENT_DIR}/util.sh"
 
 # Source centralized deps config for cosign version
-source "${PROJECT_ROOT}/deps/full-os.conf"
+source "${PROJECT_ROOT}/deps/cosign.conf"
 
 PKGDIR="${PROJECT_ROOT}/deps/mkosi/mkosi.images/base/mkosi.extra/opt/bin"
 rm -rf "${PKGDIR}"
