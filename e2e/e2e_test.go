@@ -63,7 +63,11 @@ func TestE2e(t *testing.T) {
 	}
 
 	ginkgo.SynchronizedBeforeSuite(func() []byte {
-		command.New(limaOpt, "start", vmConfigFile, "--name", vmName, "--vm-type", vmType).WithTimeoutInSeconds(600).Run()
+		limactlStartOpts := []string{"start", vmConfigFile, "--name", vmName, "--vm-type", vmType}
+		if vmType == "vz" {
+			limactlStartOpts = append(limactlStartOpts, "--set", ".ssh.overVsock=false")
+		}
+		command.New(limaOpt, limactlStartOpts...).WithTimeoutInSeconds(600).Run()
 		tests.SetupLocalRegistry(nerdctlOpt)
 		return nil
 	}, func(bytes []byte) {})
