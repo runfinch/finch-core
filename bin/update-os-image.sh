@@ -3,7 +3,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# A script to update the base os image used for Finch on macOS.
+# A script to update the OS image artifacts in deps/full-os.conf
 #
 # Usage: bash update-os-image.sh -d <S3 bucket>
 
@@ -16,8 +16,8 @@ PROJECT_ROOT="$(cd -- "${CURRENT_DIR}/.." && pwd)"
 source "${PROJECT_ROOT}/bin/utility.sh"
 
 DEPENDENCY_CLOUDFRONT_URL="https://deps.runfinch.com"
-AARCH64_FILENAME_PATTERN="Fedora-Cloud-Base-.*\.aarch64-[0-9]+\.qcow2$"
-AMD64_FILENAME_PATTERN="Fedora-Cloud-Base-.*\.x86_64-[0-9]+\.qcow2$"
+AARCH64_FILENAME_PATTERN="finch-al2023-os-image-arm64-[0-9]+\.qcow2$"
+AMD64_FILENAME_PATTERN="finch-al2023-os-image-x86-64-[0-9]+\.qcow2$"
 
 while getopts d: flag
 do
@@ -48,15 +48,17 @@ pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}" "${
 
 # Update base os file with latest artifacts and digests
 OS_FILE="${PROJECT_ROOT}/deps/full-os.conf"
+
+# Regenerate the file with OS artifacts and cosign config
 truncate -s 0 "${OS_FILE}"
 {
     echo "ARTIFACT_BASE_URL=${DEPENDENCY_CLOUDFRONT_URL}"
     echo ""
-    echo "# From https://dl.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/aarch64/images/"
+    echo "# Built by mkosi from deps/mkosi"
     echo "AARCH64_ARTIFACT=$(basename "${aarch64_deps}")"
     echo "AARCH64_512_DIGEST=${aarch64_deps_shasum}"
     echo ""
-    echo "# From https://dl.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/"
+    echo "# Built by mkosi from deps/mkosi"
     echo "X86_64_ARTIFACT=$(basename "${amd64_deps}")"
     echo "X86_64_512_DIGEST=${amd64_deps_shasum}"
 } >> "${OS_FILE}"

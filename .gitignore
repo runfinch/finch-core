@@ -8,3 +8,13 @@ wingit-temp/
 **/*.tar.gz
 .vscode/
 **/node_modules
+deps/mkosi/mkosi.cache/*.*
+!deps/mkosi/mkosi.cache/*.gitkeep
+deps/mkosi/mkosi.builddir/
+deps/mkosi/mkosi.images/base/mkosi.extra/
+deps/mkosi/binfmt/bin
+deps/mkosi/qemu-binfmt-conf.sh
+deps/mkosi/out/
+deps/mkosi/al2023-package-build/al2023-build*
+deps/mkosi/al2023-package-build/artifacts
+deps/mkosi/al2023-package-build/_output

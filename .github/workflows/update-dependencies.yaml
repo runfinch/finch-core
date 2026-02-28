@@ -26,7 +26,7 @@ permissions:
   contents: read
 
 jobs:
-  update-deps:
+  update-lima-bundle:
     runs-on: ubuntu-latest
 
     permissions:
@@ -49,12 +49,6 @@ jobs:
 
       - name: Update Lima bundle archive for Finch on macOS
         run: bash bin/update-lima-bundles.sh -d ${{ secrets.DEPENDENCY_BUCKET_NAME }}
-
-      - name: Update base OS for Finch on macOS
-        run: bash bin/update-os-image.sh -d ${{ secrets.DEPENDENCY_BUCKET_NAME }}
-
-      - name: Update rootfs for Finch on Windows
-        run: bash bin/update-rootfs.sh -d ${{ secrets.DEPENDENCY_BUCKET_NAME }}
 
       - name: create PR
         if: github.event_name != 'pull_request'

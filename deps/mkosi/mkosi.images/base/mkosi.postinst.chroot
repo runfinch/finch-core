@@ -1,0 +1,35 @@
+#!/bin/sh
+set -xeu
+
+ssh-keygen -A
+
+# install out of tree packages
+ls /opt
+rpm -ivh "/opt/bin/cosign.rpm"
+rm -rf "/opt/bin/"
+
+rpm -ivh "/opt/built/fuse-sshfs-*.amzn2023.*.rpm"
+
+rpm -e --noscripts --nodeps cloud-init
+rpm -ivh "/opt/built/cloud-init-*.amzn2023*.noarch.rpm"
+rm -rf "/opt/built/"
+
+echo "Enabling services"
+
+bash -c 'cat << EOF > /usr/lib/systemd/system-preset/91-finch.preset
+enable sshd
+
+# Enable cloud-init services
+# https://bugzilla.redhat.com/show_bug.cgi?id=2233948
+enable cloud-config.service
+enable cloud-final.service
+enable cloud-init.service
+enable cloud-init-local.service
+enable systemd-resolved.service
+enable systemd-networkd.service
+EOF'
+
+# Fix SELinux labels so systemd service can start
+restorecon -R -v /usr/bin/
+
+touch /etc/machine-id

@@ -7,3 +7,6 @@
 [submodule "src/finch-daemon"]
 	path = src/finch-daemon
 	url = https://github.com/runfinch/finch-daemon.git
+[submodule "deps/mkosi/binfmt"]
+	path = deps/mkosi/binfmt
+	url = https://github.com/tonistiigi/binfmt
