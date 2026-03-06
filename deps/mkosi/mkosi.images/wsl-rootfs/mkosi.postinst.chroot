@@ -1,7 +1,29 @@
 #!/bin/sh
 set -x
 
+# enable systemd
 <<EOF cat >> /etc/wsl.conf
 [boot]
 systemd=true
 EOF
+
+# remove ec2-user from cloud-init config (clashes with lima user with UID=1000)
+sed -i '/default_user:/,/shell: \/bin\/bash/d' /etc/cloud/cloud.cfg
+
+# disable imds in cloud-init
+<<EOF cat >> /etc/cloud/cloud.cfg.d/99-disable-imds.cfg
+datasource_list: [None]
+datasource:
+    None: {}
+EOF
+
+# disabled network conf in cloud config
+<<EOF cat >> /etc/cloud/cloud.cfg
+network:
+    config: disabled
+EOF
+
+# disable and mask network service (not needed for WSL)
+systemctl disable --now systemd-networkd-wait-online.service
+systemctl mask systemd-networkd-wait-online.service
+rm -f /etc/NetworkManager/system-connections/*.nmconnection

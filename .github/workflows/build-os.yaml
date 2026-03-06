@@ -126,25 +126,24 @@ jobs:
           skopeo copy \
             "oci-archive:./deps/mkosi/out/${arch}/container-with-kernel-image.tar" \
             docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.mkosi-arch.outputs.arch }}-with-kernel-${{github.run_id}}"
-      - name: Run container build
+      - name: Run wsl rootfs build
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         run: |
           export PATH="$HOME/.local/bin/:$PATH"
           ./deps/mkosi/mkosi.sh --arch x86-64 -- --image-id wsl-rootfs
-      - name: Push rootfs image
+      - name: Remove init -> systemd symlink and delete efi directory
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
-          tar -cvf "./deps/mkosi/out/${arch}/wsl-rootfs-image.tar" -C "./deps/mkosi/out/${arch}/wsl-rootfs" .
-          skopeo copy \
-            "oci-archive:./deps/mkosi/out/${arch}/wsl-rootfs-image.tar" \
-            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.mkosi-arch.outputs.arch }}-wsl-rootfs-${{github.run_id}}"
+          cd "./deps/mkosi/out/${arch}/wsl-rootfs/"
+          rm -f init
+          rm -rf efi
       - name: Compress rootfs for S3
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           cd "./deps/mkosi/out/${arch}"
-          tar -czf wsl-rootfs.tar.gz -C wsl-rootfs .
+          tar -czvf wsl-rootfs.tar.gz -C wsl-rootfs .
       - name: Calculate SHA512 checksum for rootfs
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         run: |
@@ -166,8 +165,8 @@ jobs:
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: image-oci-${{ steps.mkosi-arch.outputs.arch }}-${{github.run_id}}.tar
-          path: ./deps/mkosi/out/${{ steps.mkosi-arch.outputs.arch }}/wsl-rootfs-image.tar
+          name: image-oci-${{ steps.mkosi-arch.outputs.arch }}-${{github.run_id}}.tar.gz
+          path: ./deps/mkosi/out/${{ steps.mkosi-arch.outputs.arch }}/wsl-rootfs.tar.gz
           if-no-files-found: error
       - name: Upload OS image artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
