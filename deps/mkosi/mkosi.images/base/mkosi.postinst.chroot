@@ -27,7 +27,10 @@ enable cloud-init.service
 enable cloud-init-local.service
 enable systemd-resolved.service
 enable systemd-networkd.service
+disable systemd-networkd-wait-online.service
 EOF'
+
+systemctl mask systemd-networkd-wait-online.service
 
 # Fix SELinux labels so systemd service can start
 restorecon -R -v /usr/bin/
