@@ -28,11 +28,18 @@ jobs:
           TAG=`cd src/lima && git describe --tags $(git rev-list --tags --max-count=1)`
           echo "Pulling changes from release: $TAG"
           (cd src/lima && git checkout $TAG)
+          
           # finch-daemon
           (cd src/finch-daemon && git fetch --tags)
           FINCH_DAEMON_TAG=`cd src/finch-daemon && git describe --tags $(git rev-list --tags --max-count=1)`
           echo "Pulling changes from release: $FINCH_DAEMON_TAG"
           (cd src/finch-daemon && git checkout $FINCH_DAEMON_TAG)
+          
+          # binfmt
+          (cd deps/mkosi/binfmt && git fetch --tags)
+          BINFMT_TAG=`cd deps/mkosi/binfmt && git describe --tags $(git rev-list --tags --max-count=1)`
+          echo "Pulling changes from release: $BINFMT_TAG"
+          (cd deps/mkosi/binfmt && git checkout $BINFMT_TAG)
 
       - name: Create PR
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
