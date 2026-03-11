@@ -8,11 +8,13 @@ on:
       - main
     paths:
       - 'deps/mkosi/**'
+      - '.github/workflows/build-os.yaml'
   pull_request:
     branches:
       - main
     paths:
       - 'deps/mkosi/**'
+      - '.github/workflows/build-os.yaml'
   workflow_dispatch:
 
 permissions:
@@ -178,9 +180,9 @@ jobs:
   update-deps-config:
     needs: build-os-image
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
+      id-token: write
       pull-requests: write
     steps:
       - name: Checkout repo
