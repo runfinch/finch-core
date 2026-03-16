@@ -215,5 +215,5 @@ jobs:
             Updates the OS image and rootfs artifacts in:
             - `deps/full-os.conf` (OS images for both architectures)
             - `deps/rootfs.conf` (rootfs for x86-64)
-          branch: deps/update-os-image-${{ github.run_id }}
+          branch: deps/update-os-image
           delete-branch: true
