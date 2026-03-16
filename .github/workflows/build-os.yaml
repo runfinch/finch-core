@@ -206,6 +206,7 @@ jobs:
         if: github.event_name != 'pull_request'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          signoff: true
           commit-message: "deps(os): update OS image to run ${{ github.run_id }}"
           title: "deps(os): update OS image"
           body: |
