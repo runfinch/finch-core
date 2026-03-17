@@ -45,13 +45,21 @@ amd64_deps_shasum_url="${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}.sha512sum"
 amd64_deps_shasum=$(curl -L --fail "${amd64_deps_shasum_url}")
 pull_artifact_and_verify_shasum "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}" "${amd64_deps_shasum}"
 
+# Get Lima version
+# The full Lima version is not used to pull artifacts, but rather as bookkeeping
+# to make it obvious when our Lima version is updated in our automatic bump scripts
+lima_full_version_aarch64=$(get_lima_version_from_deps "${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}")
+lima_full_version_amd64=$(get_lima_version_from_deps "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}")
+
 # make sure the lima version for both matches
-lima_version_aarch64=$(get_lima_version_from_deps "${DEPENDENCY_CLOUDFRONT_URL}/${aarch64_deps}")
-lima_version_amd64=$(get_lima_version_from_deps "${DEPENDENCY_CLOUDFRONT_URL}/${amd64_deps}")
-if [[ "$lima_version_aarch64" != "$lima_version_amd64" ]]; then
-    echo "Error: lima versions do not match b/w two dependency archives: ${lima_version_aarch64} vs ${lima_version_amd64}"
+if [[ "$lima_full_version_aarch64" != "$lima_full_version_amd64" ]]; then
+    echo "Error: lima versions do not match b/w two dependency archives: ${lima_full_version_aarch64} vs ${lima_full_version_amd64}"
     exit 1
 fi
+
+# semver for Lima — this will be read and consumed by Finch
+lima_version_aarch64="$(echo ${lima_full_version_aarch64} | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
+lima_version_amd64="$(echo ${lima_full_version_amd64} | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
 
 # Update bundles file with latest artifacts and digests.
 BUNDLES_FILE="${PROJECT_ROOT}/deps/lima-bundles.conf"
@@ -68,4 +76,5 @@ truncate -s 0 "${BUNDLES_FILE}"
     echo "X86_64_512_DIGEST=${amd64_deps_shasum}"
     echo ""
     echo "LIMA_VERSION=${lima_version_aarch64}"
+    echo "LIMA_FULL_VERSION=${lima_full_version_aarch64}"
 } >> "${BUNDLES_FILE}"
