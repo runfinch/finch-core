@@ -1,4 +1,5 @@
 /usr/local/libexec/lima/limactl-mcp [6.5M]
+/usr/local/libexec/lima/limactl-url-fedora-rawhide [1.3K]
 /usr/local/Cellar/qemu/10.2.0/share/qemu/vgabios-stdvga.bin [39K]
 /usr/local/Cellar/capstone/5.0.6/lib/libcapstone.5.dylib [6.9M]
 /usr/local/Cellar/capstone/5.0.6/lib/libcapstone.dylib → libcapstone.5.dylib
