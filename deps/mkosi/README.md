@@ -32,7 +32,7 @@ At it's core, mkosi is based on configuration files. In our case, these configur
 
 ### mkosi Amazon Linux 2023 Integration
 
-- **`0001-Add-support-for-Amazon-Linux-2023.patch`**: Custom patch for mkosi adding comprehensive AL2023 support to mkosi, including:
+- **`0001-add-support-for-al2023.patch`**: Custom patch for mkosi adding comprehensive AL2023 support to mkosi, including:
   - New Amazon Linux distribution class in mkosi
   - Repository configuration for AL2023 packages
   - Architecture-specific configurations
