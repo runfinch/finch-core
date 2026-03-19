@@ -37,12 +37,6 @@ restorecon -R -v /usr/bin/
 
 touch /etc/machine-id
 
-# disabled network conf in cloud config
-cat > /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg <<EOF
-network:
-    config: disabled
-EOF
-
 # disable imds in cloud-init
 cat > /etc/cloud/cloud.cfg.d/99-disable-imds.cfg <<EOF
 datasource_list: [NoCloud]
