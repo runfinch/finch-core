@@ -31,7 +31,7 @@ jobs:
           has_creds=${{ (github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name) && github.actor != 'dependabot[bot]' }}
           echo "has_creds=$has_creds" >> $GITHUB_OUTPUT
     outputs:
-      has_creds: ${{ steps.user.outputs.has_creds }}
+      has_creds: ${{ steps.vars.outputs.has_creds }}
 
   build-os-image:
     needs: set-vars
@@ -69,15 +69,17 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           submodules: true
+      - name: temp
+        run: echo ${{ needs.set-vars.outputs.has_creds }}
       - name: Configure AWS credentials
-        if: ${{ needs.set-vars.outputs.has_creds }}
+        if: ${{ needs.set-vars.outputs.has_creds == 'true' }}
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           role-to-assume: ${{ secrets.ROLE }}
           aws-region: ${{ secrets.REGION }}
           role-session-name: rootfs-ecr-image-upload-session
       - name: Login to Amazon ECR
-        if: ${{ needs.set-vars.outputs.has_creds }}
+        if: ${{ needs.set-vars.outputs.has_creds == 'true' }}
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
       - name: Install mkosi
         run: |
@@ -126,7 +128,7 @@ jobs:
           cd "./deps/mkosi/out/${arch}"
           sha512sum os-image.qcow2 | cut -d ' ' -f 1 > os-image.qcow2.sha512sum
       - name: Upload OS image to S3
-        if: ${{ needs.set-vars.outputs.has_creds }}
+        if: ${{ needs.set-vars.outputs.has_creds == 'true' }}
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           filename="finch-al2023-os-image-${arch}-${{ github.run_id }}.qcow2"
@@ -137,7 +139,7 @@ jobs:
             "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}.sha512sum" \
             --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
       - name: Push OS image
-        if: ${{ needs.set-vars.outputs.has_creds }}
+        if: ${{ needs.set-vars.outputs.has_creds == 'true' }}
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           tar -cvf "./deps/mkosi/out/${arch}/container-with-kernel-image.tar" -C "./deps/mkosi/out/${arch}/container-with-kernel" .
@@ -195,7 +197,7 @@ jobs:
 
   update-deps-config:
     needs: [set-vars, build-os-image]
-    if: ${{ needs.set-vars.outputs.has_creds }}
+    if: ${{ needs.set-vars.outputs.has_creds == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
