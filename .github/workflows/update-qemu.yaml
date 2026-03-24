@@ -24,13 +24,20 @@ jobs:
       - name: "Get latest qemu formula version & commit hash from homebrew repo"
         id: get-qemu-version-commit-hash
         run: |
-          # the git log will look like "COMMIT_HASH COMMIT_TITLE"
-          # COMMIT_TITLE will contain the qemu version as X.X.X
-          qemu_git_log=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/repos/Homebrew/homebrew-core/commits?path=Formula/q/qemu.rb&per_page=1" \
-          | jq -r '.[0] | "\(.sha) \(.commit.message)"')
-          qemu_commit=$(echo $qemu_git_log | awk '{print $1}')
-          qemu_version=$(echo $qemu_git_log | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+          # ##################################################################
+          # Get the qemu.rb (formula file) latest commit sha from github api.
+          # ##################################################################
+          qemu_commit=$(curl -sL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/Homebrew/homebrew-core/commits?path=Formula/q/qemu.rb&per_page=1" | jq -r '.[0] | "\(.sha)"')
+          
+          # #######################################################################################
+          # Get the contents of the qemu.rb file from the commit hash and parse the version.
+          # Look at "url" in https://github.com/Homebrew/homebrew-core/blob/main/Formula/q/qemu.rb.
+          # Note that content in the api response is base64 encoded.
+          # #######################################################################################
+          qemu_version=$(curl -sL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/Homebrew/homebrew-core/contents/Formula/q/qemu.rb?ref=$qemu_commit" \
+          | jq -r '.content' | base64 -d | sed -n 's/.*qemu-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' | head -1)
           
           echo "qemu_version=$qemu_version" | tee -a $GITHUB_OUTPUT
           echo "qemu_commit=$qemu_commit" | tee -a $GITHUB_OUTPUT
