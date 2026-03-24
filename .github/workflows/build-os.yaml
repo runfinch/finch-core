@@ -22,7 +22,19 @@ permissions:
   id-token: write
 
 jobs:
+  set-vars:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set output variables
+        id: vars
+        run: |
+          has_creds=${{ (github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name) && github.actor != 'dependabot[bot]' }}
+          echo "has_creds=$has_creds" >> $GITHUB_OUTPUT
+    outputs:
+      has_creds: ${{ steps.user.outputs.has_creds }}
+
   build-os-image:
+    needs: set-vars
     runs-on:
       - ${{ matrix.os }}
     container:
@@ -58,12 +70,14 @@ jobs:
         with:
           submodules: true
       - name: Configure AWS credentials
+        if: ${{ needs.set-vars.outputs.has_creds }}
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
           role-to-assume: ${{ secrets.ROLE }}
           aws-region: ${{ secrets.REGION }}
           role-session-name: rootfs-ecr-image-upload-session
       - name: Login to Amazon ECR
+        if: ${{ needs.set-vars.outputs.has_creds }}
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
       - name: Install mkosi
         run: |
@@ -112,6 +126,7 @@ jobs:
           cd "./deps/mkosi/out/${arch}"
           sha512sum os-image.qcow2 | cut -d ' ' -f 1 > os-image.qcow2.sha512sum
       - name: Upload OS image to S3
+        if: ${{ needs.set-vars.outputs.has_creds }}
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           filename="finch-al2023-os-image-${arch}-${{ github.run_id }}.qcow2"
@@ -122,6 +137,7 @@ jobs:
             "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}.sha512sum" \
             --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
       - name: Push OS image
+        if: ${{ needs.set-vars.outputs.has_creds }}
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           tar -cvf "./deps/mkosi/out/${arch}/container-with-kernel-image.tar" -C "./deps/mkosi/out/${arch}/container-with-kernel" .
@@ -153,7 +169,7 @@ jobs:
           cd "./deps/mkosi/out/${arch}"
           sha512sum wsl-rootfs.tar.gz | cut -d ' ' -f 1 > wsl-rootfs.tar.gz.sha512sum
       - name: Upload rootfs to S3
-        if: steps.mkosi-arch.outputs.arch == 'x86-64'
+        if: ${{ needs.set-vars.outputs.has_creds == 'true' && steps.mkosi-arch.outputs.arch == 'x86-64' }}
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
           filename="finch-al2023-rootfs-${arch}-${{ github.run_id }}.tar.gz"
@@ -178,7 +194,8 @@ jobs:
           if-no-files-found: error
 
   update-deps-config:
-    needs: build-os-image
+    needs: [set-vars, build-os-image]
+    if: ${{ needs.set-vars.outputs.has_creds }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -187,6 +204,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          sparse-checkout: |
+            bin/
+            deps/
+          fetch-depth: 0
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
