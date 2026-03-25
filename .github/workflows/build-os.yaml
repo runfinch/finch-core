@@ -28,7 +28,7 @@ jobs:
       - name: Set output variables
         id: vars
         run: |
-          has_creds=${{ (github.event_name == 'push' || github.repository == github.event.pull_request.head.repo.full_name) && github.actor != 'dependabot[bot]' }}
+          has_creds=${{ (github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name) && github.actor != 'dependabot[bot]' }}
           echo "has_creds=$has_creds" >> $GITHUB_OUTPUT
     outputs:
       has_creds: ${{ steps.vars.outputs.has_creds }}
@@ -110,7 +110,7 @@ jobs:
           ./deps/mkosi/scripts/bin-packages.sh
       - name: Build custom AL packages
         run: |
-          ln -s "$HOME/.docker" /root/.docker
+          ln -sf "$HOME/.docker" /root/.docker
           ./deps/mkosi/scripts/al2023-package-build.sh
       - name: Build OS image
         run: |
