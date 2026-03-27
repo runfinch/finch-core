@@ -29,9 +29,13 @@ jobs:
         id: vars
         run: |
           has_creds=${{ (github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name) && github.actor != 'dependabot[bot]' }}
+          version=$(date -u +'%Y.%-m.%-d')-build-${{ github.run_id }}
+          
           echo "has_creds=$has_creds" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
     outputs:
       has_creds: ${{ steps.vars.outputs.has_creds }}
+      version: ${{ steps.vars.outputs.version }}
 
   build-os-image:
     needs: set-vars
@@ -142,10 +146,12 @@ jobs:
         if: ${{ needs.set-vars.outputs.has_creds == 'true' }}
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
+          version="${{ needs.set-vars.outputs.version }}"
+          
           tar -cvf "./deps/mkosi/out/${arch}/container-with-kernel-image.tar" -C "./deps/mkosi/out/${arch}/container-with-kernel" .
           skopeo copy \
             "oci-archive:./deps/mkosi/out/${arch}/container-with-kernel-image.tar" \
-            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.mkosi-arch.outputs.arch }}-with-kernel-${{github.run_id}}"
+            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${version}-${arch}-with-kernel"
       - name: Run wsl rootfs build
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         run: |
