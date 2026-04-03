@@ -53,7 +53,7 @@ jobs:
       matrix:
         arch: [amd64, arm64]
 
-    runs-on: [self-hosted, macos, "${{ matrix.arch }}", 14, release]
+    runs-on: [self-hosted, macos, "${{ matrix.arch }}", 15, release]
     timeout-minutes: 60
     
     outputs:
