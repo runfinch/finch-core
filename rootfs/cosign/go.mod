@@ -2,7 +2,7 @@ module github.com/runfinch/finch-core/rootfs/cosign
 
 go 1.25.5
 
-require github.com/sigstore/cosign/v2 v2.6.2
+require github.com/sigstore/cosign/v2 v2.6.3
 
 require (
 	cloud.google.com/go v0.121.6 // indirect
