@@ -1,0 +1,70 @@
+name: Push Container Image to ECR
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'deps/full-os.conf'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  push-container-image:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [arm64, x86-64]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          sparse-checkout: |
+            bin/
+            deps/full-os.conf
+      - name: Extract github runID from full-os.conf
+        id: vars
+        run: |
+          # Artifacts follow the name "finch-al2023-os-image-arm64-<run_id>.qcow2"
+          run_id=$(grep 'AARCH64_ARTIFACT=' deps/full-os.conf | grep -oP '\d+(?=\.qcow2)')
+          version=$(date -u +'%Y.%-m.%-d')-build-${run_id}
+          echo "run_id=${run_id}" >> $GITHUB_OUTPUT
+          echo "version=${version}" >> $GITHUB_OUTPUT
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.ROLE }}
+          aws-region: ${{ secrets.REGION }}
+          role-session-name: push-container-image-session
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+      - name: Install skopeo
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo
+      - name: Download container image tarball from S3
+        run: |
+          filename="finch-al2023-container-with-kernel-${{ matrix.arch }}-${{ steps.vars.outputs.run_id }}.tar"
+          aws s3 cp \
+            "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}" \
+            container-with-kernel-image.tar \
+            --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
+      - name: Push container image to ECR
+        run: |
+          skopeo copy \
+            "oci-archive:container-with-kernel-image.tar" \
+            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.vars.outputs.version }}-${{ matrix.arch }}-with-kernel"
+      - name: Delete old ECR images
+        run: |
+          bash bin/clean-ecr-images.sh \
+            --repo "${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}" \
+            --arch "${{ matrix.arch }}" \
+            --keep-tag "${{ steps.vars.outputs.version }}-${{ matrix.arch }}-with-kernel"
+      - name: Tag container image as latest
+        run: |
+          skopeo copy \
+            "oci-archive:container-with-kernel-image.tar" \
+            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:latest-${{ matrix.arch }}"

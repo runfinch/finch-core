@@ -29,13 +29,9 @@ jobs:
         id: vars
         run: |
           has_creds=${{ (github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name) && github.actor != 'dependabot[bot]' }}
-          version=$(date -u +'%Y.%-m.%-d')-build-${{ github.run_id }}
-          
           echo "has_creds=$has_creds" >> $GITHUB_OUTPUT
-          echo "version=$version" >> $GITHUB_OUTPUT
     outputs:
       has_creds: ${{ steps.vars.outputs.has_creds }}
-      version: ${{ steps.vars.outputs.version }}
 
   build-os-image:
     needs: set-vars
@@ -67,7 +63,6 @@ jobs:
             distribution-gpg-keys \
             openssl \
             mtools \
-            skopeo \
             awscli2
       - name: Checkout repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -140,16 +135,15 @@ jobs:
           aws s3 cp "./deps/mkosi/out/${arch}/os-image.qcow2.sha512sum" \
             "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}.sha512sum" \
             --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
-      - name: Push OS image
+      - name: Upload container image tarball to S3
         if: ${{ needs.set-vars.outputs.has_creds == 'true' }}
         run: |
           arch="${{ steps.mkosi-arch.outputs.arch }}"
-          version="${{ needs.set-vars.outputs.version }}"
-          
           tar -cvf "./deps/mkosi/out/${arch}/container-with-kernel-image.tar" -C "./deps/mkosi/out/${arch}/container-with-kernel" .
-          skopeo copy \
-            "oci-archive:./deps/mkosi/out/${arch}/container-with-kernel-image.tar" \
-            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${version}-${arch}-with-kernel"
+          filename="finch-al2023-container-with-kernel-${arch}-${{ github.run_id }}.tar"
+          aws s3 cp "./deps/mkosi/out/${arch}/container-with-kernel-image.tar" \
+            "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}" \
+            --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
       - name: Run wsl rootfs build
         if: steps.mkosi-arch.outputs.arch == 'x86-64'
         run: |
@@ -185,19 +179,6 @@ jobs:
           aws s3 cp "./deps/mkosi/out/${arch}/wsl-rootfs.tar.gz.sha512sum" \
             "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/common/${arch}/${filename}.sha512sum" \
             --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
-      - name: Upload container image artifacts
-        if: steps.mkosi-arch.outputs.arch == 'x86-64'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: image-oci-${{ steps.mkosi-arch.outputs.arch }}-${{github.run_id}}.tar.gz
-          path: ./deps/mkosi/out/${{ steps.mkosi-arch.outputs.arch }}/wsl-rootfs.tar.gz
-          if-no-files-found: error
-      - name: Upload OS image artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: image-${{ steps.mkosi-arch.outputs.arch }}-${{github.run_id}}.qcow2
-          path: ./deps/mkosi/out/${{ steps.mkosi-arch.outputs.arch }}/os-image.qcow2
-          if-no-files-found: error
 
   update-deps-config:
     needs: [set-vars, build-os-image]
