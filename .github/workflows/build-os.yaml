@@ -2,7 +2,7 @@ name: Build OS
 
 on:
   schedule:
-    - cron: '0 16 * * *'  # Daily at 8am PST / 4pm UTC
+    - cron: '0 16 * * 1'  # Weekly on Monday at 8am PST / 4pm UTC
   push:
     branches:
       - main
@@ -235,13 +235,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           signoff: true
-          commit-message: "deps(os): update OS image to run ${{ github.run_id }}"
-          title: "deps(os): update OS image"
+          commit-message: "build(deps): update OS image to ${{ needs.set-vars.outputs.version }}"
+          title: "build(deps): update OS image to ${{ needs.set-vars.outputs.version }}"
           body: |
             This PR was automatically created by the [build-os workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
             
             Updates the OS image and rootfs artifacts in:
             - `deps/full-os.conf` (OS images for both architectures)
             - `deps/rootfs.conf` (rootfs for x86-64)
+            
+            **Note:** Close and reopen this PR to trigger macos-ci checks.
           branch: deps/update-os-image
           delete-branch: true
