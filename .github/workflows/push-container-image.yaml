@@ -45,11 +45,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y skopeo
-      - name: Delete old ECR images
-        run: |
-          bash bin/clean-ecr-images.sh \
-            -r "${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}" \
-            -a "${{ matrix.arch }}"
       - name: Download container image tarball from S3
         run: |
           filename="finch-al2023-container-with-kernel-${{ matrix.arch }}-${{ steps.vars.outputs.run_id }}.tar"
@@ -62,6 +57,14 @@ jobs:
           skopeo copy \
             "oci-archive:container-with-kernel-image.tar" \
             docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.vars.outputs.version }}-${{ matrix.arch }}-with-kernel"
+      - name: Delete old ECR images
+        run: |
+          bash bin/clean-ecr-images.sh \
+            --repo "${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}" \
+            --arch "${{ matrix.arch }}" \
+            --keep-tag "${{ steps.vars.outputs.version }}-${{ matrix.arch }}-with-kernel"
+      - name: Tag container image as latest
+        run: |
           skopeo copy \
             "oci-archive:container-with-kernel-image.tar" \
             docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:latest-${{ matrix.arch }}"

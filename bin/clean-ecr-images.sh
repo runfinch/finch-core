@@ -3,27 +3,28 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# Deletes old ECR images for a given architecture, keeping only the
-# image tagged with latest-<arch>.
+# Deletes old ECR images for a given architecture, keeping the
+# image tagged with latest-<arch> and a specific tag.
 
 set -euxo pipefail
 
 usage() {
-  echo "Usage: $0 -r <ecr-repo-uri> -a <arch>"
+  echo "Usage: $0 -r|--repo <ecr-repo-uri> -a|--arch <arch> -t|--keep-tag <keep-tag>"
   exit 1
 }
 
-while getopts r:a: flag
-do
-  case "${flag}" in
-    r) repo=${OPTARG};;
-    a) arch=${OPTARG};;
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -r|--repo) repo="$2"; shift 2;;
+    -a|--arch) arch="$2"; shift 2;;
+    -t|--keep-tag) keep_tag="$2"; shift 2;;
     *) usage;;
   esac
 done
 
 [[ -z "${repo:-}" ]] && usage
 [[ -z "${arch:-}" ]] && usage
+[[ -z "${keep_tag:-}" ]] && usage
 
 repo_name="${repo##*/}"
 latest_tag="latest-${arch}"
@@ -45,8 +46,17 @@ keep_digest=$(echo "${all_images}" | \
     | .imageDigest')
 echo "Keeping image digest: ${keep_digest}"
 
-# Filter out the keep digest
-delete_digests=$(echo "${arch_digests}" | grep -v -F "${keep_digest:-NONE}" || true)
+# Find the digest for the additional keep tag
+keep_tag_digest=$(echo "${all_images}" | \
+  jq -r --arg tag "${keep_tag}" '.imageDetails[]
+    | select(.imageTags // [] | any(. == $tag))
+    | .imageDigest')
+echo "Keeping additional image digest: ${keep_tag_digest}"
+
+# Filter out the keep digests
+delete_digests=$(echo "${arch_digests}" | \
+  grep -v -F "${keep_digest:-NONE}" | \
+  grep -v -F "${keep_tag_digest:-NONE}" || true)
 
 if [[ -z "${delete_digests}" ]]; then
   echo "No images to delete."
