@@ -1,18 +1,19 @@
 name: Build and Push Rootfs Docker Image
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'rootfs/Dockerfile'
-      - 'rootfs/cosign/go.mod'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'rootfs/Dockerfile'
-      - 'rootfs/cosign/go.mod'
+  # Disabling this since we have moved to mkosi based os images and no longer need this to build rootfs images.
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'rootfs/Dockerfile'
+  #     - 'rootfs/cosign/go.mod'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'rootfs/Dockerfile'
+  #     - 'rootfs/cosign/go.mod'
   workflow_dispatch:
 
 permissions:
