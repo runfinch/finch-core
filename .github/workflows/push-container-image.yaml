@@ -69,8 +69,9 @@ jobs:
       # has two tags, e.g.: x86-64-with-kernel-22922664487, latest-x86-64
       - name: Delete existing latest tag from ECR
         run: |
+          REPO="${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}"
           aws ecr batch-delete-image \
-            --repository-name "${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}" \
+            --repository-name "${REPO##*/}" \
             --image-ids imageTag="latest-${{ matrix.arch }}"
       - name: Tag container image as latest
         run: |
