@@ -39,7 +39,8 @@ arch_digests=$(echo "${all_images}" | \
     | select(.imageTags // [] | any(contains($arch)))
     | .imageDigest')
 
-# Find the digest that has the latest-$arch tag (to keep)
+# Find the digest of the image that has the latest-$arch tag (to keep)
+# This is the image that the current prod finch version has shipped
 keep_digest=$(echo "${all_images}" | \
   jq -r --arg tag "${latest_tag}" '.imageDetails[]
     | select(.imageTags // [] | any(. == $tag))
