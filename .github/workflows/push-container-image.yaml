@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'deps/full-os.conf'
+  workflow_dispatch:
 
 permissions:
   contents: read
