@@ -31,7 +31,7 @@ jobs:
         run: |
           # Artifacts follow the name "finch-al2023-os-image-arm64-<run_id>.qcow2"
           run_id=$(grep 'AARCH64_ARTIFACT=' deps/full-os.conf | grep -oP '\d+(?=\.qcow2)')
-          version=0.${run_id}.0+${{ matrix.arch }}-with-kernel
+          version=0.${run_id}.0-${{ matrix.arch }}-with-kernel
           echo "run_id=${run_id}" >> $GITHUB_OUTPUT
           echo "version=${version}" >> $GITHUB_OUTPUT
       - name: Configure AWS credentials
