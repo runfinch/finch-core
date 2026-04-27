@@ -31,9 +31,7 @@ jobs:
         run: |
           # Artifacts follow the name "finch-al2023-os-image-arm64-<run_id>.qcow2"
           run_id=$(grep 'AARCH64_ARTIFACT=' deps/full-os.conf | grep -oP '\d+(?=\.qcow2)')
-          version=0.${run_id}.0-${{ matrix.arch }}-with-kernel
           echo "run_id=${run_id}" >> $GITHUB_OUTPUT
-          echo "version=${version}" >> $GITHUB_OUTPUT
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
@@ -53,17 +51,28 @@ jobs:
             "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}" \
             container-with-kernel-image.tar \
             --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
+      # Get the uploaded date of this os image and construct the version string.
+      # This way, even if the build-os workflow and this workflow run on different days, the image in our ECR repo
+      # will have the correct timestamp in its version string (the datetime when it was built).
+      - name: Parse upload datetime of container image tarball from S3
+        id: parse-upload-datetime
+        run: |
+          filename="finch-al2023-container-with-kernel-${{ matrix.arch }}-${{ steps.vars.outputs.run_id }}.tar"
+          upload_datetime=$(aws s3 ls "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/${filename}" --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}" | sort | tail -n 1 | awk '{print $1, $2}')
+          run_id="${{ steps.vars.outputs.run_id }}"
+          version=$(date -u -d "${upload_datetime}" +'%Y.%-m.%-d')-build-${run_id}-${{ matrix.arch }}-with-kernel
+          echo "version=${version}" >> $GITHUB_OUTPUT
       - name: Push container image to ECR
         run: |
           skopeo copy \
             "oci-archive:container-with-kernel-image.tar" \
-            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.vars.outputs.version }}"
+            docker://"${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}:${{ steps.parse-upload-datetime.outputs.version }}"
       - name: Delete old ECR images
         run: |
           bash bin/clean-ecr-images.sh \
             --repo "${{ secrets.ROOTFS_IMAGE_ECR_REPOSITORY_NAME }}" \
             --arch "${{ matrix.arch }}" \
-            --keep-tag "${{ steps.vars.outputs.version }}"
+            --keep-tag "${{ steps.parse-upload-datetime.outputs.version }}"
       # Because tags are immutable in ECR, we have to delete the existing latest-{arch} tag first
       # Note that this does not actually delete the image because the image in question
       # has two tags, e.g.: x86-64-with-kernel-22922664487, latest-x86-64
