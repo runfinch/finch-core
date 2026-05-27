@@ -50,7 +50,13 @@ jobs:
         # fs_usage:  built-in macOS tool used to capture opened files by limactl and qemu
 
         run: |
-          # uninstall any previous qemu installations and install pinned qemu version from qemu.conf
+          # upgrade all packages first to ensure consistent dependency versions
+          brew update
+          brew install bash coreutils
+          brew install autoconf automake
+          brew upgrade
+
+          # install pinned qemu AFTER brew upgrade to avoid shared library mismatches
           brew uninstall --force qemu
           source ./deps/qemu.conf
           echo "Installing pinned qemu version: $QEMU_VERSION"
@@ -58,12 +64,7 @@ jobs:
           mkdir -p $HOMEBREW_LOCAL_REPO
           rm -f $HOMEBREW_LOCAL_REPO/qemu.rb
           curl -L -o $HOMEBREW_LOCAL_REPO/qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/${QEMU_FORMULA_GH_COMMIT}/Formula/q/qemu.rb
-          brew install homebrew/local/qemu
-
-          brew update
-          brew install bash coreutils
-          brew install autoconf automake
-          brew upgrade
+          brew install --build-from-source homebrew/local/qemu
         shell: zsh {0}
 
       - name: Make and release deps
@@ -93,6 +94,14 @@ jobs:
           name: lima-and-qemu.macos-arm64
           path: ./src/lima/lima-and-qemu.macos*
           if-no-files-found: error
+
+      - name: Upload verification file ARM64
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: deps-verification-arm64
+          path: ./deps-verification-arm64.generated.txt
+          if-no-files-found: warn
 
       - name: Upload dependency mapping ARM64
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -140,7 +149,13 @@ jobs:
         # fs_usage:  built-in macOS tool used to capture opened files by limactl and qemu
 
         run: |
-          # uninstall any previous qemu installations and install pinned qemu version from qemu.conf
+          # upgrade all packages first to ensure consistent dependency versions
+          brew update
+          brew install bash coreutils
+          brew install autoconf automake
+          brew upgrade
+
+          # install pinned qemu AFTER brew upgrade to avoid shared library mismatches
           brew uninstall --force qemu
           source ./deps/qemu.conf
           echo "Installing pinned qemu version: $QEMU_VERSION"
@@ -148,12 +163,7 @@ jobs:
           mkdir -p $HOMEBREW_LOCAL_REPO
           rm -f $HOMEBREW_LOCAL_REPO/qemu.rb
           curl -L -o $HOMEBREW_LOCAL_REPO/qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/${QEMU_FORMULA_GH_COMMIT}/Formula/q/qemu.rb
-          brew install homebrew/local/qemu
-          
-          brew update
-          brew install bash coreutils
-          brew install autoconf automake
-          brew upgrade
+          brew install --build-from-source homebrew/local/qemu
         shell: zsh {0}
 
       - name: Make and release deps
@@ -183,6 +193,14 @@ jobs:
           name: lima-and-qemu.macos-x86
           path: ./src/lima/lima-and-qemu.macos*
           if-no-files-found: error
+
+      - name: Upload verification file x86
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: deps-verification-x86
+          path: ./deps-verification-x86.generated.txt
+          if-no-files-found: warn
 
       - name: Upload dependency mapping x86_64
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -295,3 +313,51 @@ jobs:
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/aarch64/ --recursive --exclude "*" --include "lima-and-qemu.macos-aarch64.${timestamp}.tar.gz*"
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/x86-64/ --recursive --exclude "*" --include "lima-and-qemu.macos-x86_64.${timestamp}.tar.gz*" 
           aws s3 cp ./build/ s3://${{ secrets.DEPENDENCY_BUCKET_NAME }} --recursive --exclude "*"  --include "dependency-sources.tar.gz"
+
+  update-verification-files:
+    needs: [macos-arm64-build, macos-x86-build]
+    if: always() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Download verification file ARM64
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: deps-verification-arm64
+          path: .
+        continue-on-error: true
+
+      - name: Download verification file x86
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: deps-verification-x86
+          path: .
+        continue-on-error: true
+
+      - name: Rename generated files
+        run: |
+          [ -f deps-verification-arm64.generated.txt ] && mv deps-verification-arm64.generated.txt deps-verification-arm64.txt
+          [ -f deps-verification-x86.generated.txt ] && mv deps-verification-x86.generated.txt deps-verification-x86.txt
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          signoff: true
+          commit-message: "chore: update deps verification files"
+          title: "chore: update deps verification files"
+          body: |
+            Auto-generated update of dependency verification files from
+            [build-lima-and-qemu workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+            Please review the dependency changes and merge if expected.
+          branch: chore/update-deps-verification
+          delete-branch: true
