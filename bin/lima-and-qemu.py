@@ -169,6 +169,15 @@ def run_lima_template(template_name: str, template_yaml: str):
         subprocess.run(f"limactl stop {template_name}", shell=True, check=True)
         subprocess.run(f"limactl delete {template_name}", shell=True, check=True)
     except Exception as ex:
+        home_dir = os.getenv("HOME", "")
+        lima_dir = os.path.join(home_dir, ".lima", template_name)
+        for log in ["ha.stderr.log", "ha.stdout.log", "serial.log"]:
+            log_path = os.path.join(lima_dir, log)
+            if os.path.exists(log_path):
+                print(f"=== {log} ===")
+                with open(log_path) as f:
+                    content = f.read()
+                    print(content[-5000:] if len(content) > 5000 else content)
         raise RuntimeError(f"failed to run lima template '{template_name}'") from ex
 
 def copy_deps(deps: Dict[str, str], arch: Literal[Arch.X86_64, Arch.AARCH64], install_dir: str):
@@ -420,16 +429,29 @@ def parse_fs_usage_log(log_file: str, deps: Dict[str, str], install_dir: str):
 
     os.unlink(log_file)
 
+def _write_verification_file(verification_path: str, deps: Dict[str, str]):
+    with open(verification_path, 'w') as f:
+        for path in sorted(deps.keys()):
+            f.write(f"{path} {deps[path]}\n")
+
 def verify_dependencies(current_deps: Dict[str, str], arch: Literal[Arch.X86_64, Arch.AARCH64], install_dir: str):
     print("=== Dependency Verification ===")
     
     # Determine verification file based on architecture
     verification_file = "deps-verification-x86.txt" if arch == Arch.X86_64 else "deps-verification-arm64.txt"
     verification_path = os.path.join(os.getcwd(), verification_file)
-    
+
+    # Always write the current deps to a generated file for the workflow to pick up
+    generated_file = verification_file.replace(".txt", ".generated.txt")
+    generated_path = os.path.join(os.getcwd(), generated_file)
+    _write_verification_file(generated_path, current_deps)
+    print(f"Wrote current dependencies to {generated_file} ({len(current_deps)} entries)")
+
     if not os.path.isfile(verification_path):
-        print(f"WARNING: Verification file {verification_path} not found. Skipping dependency verification.")
-        return
+        print(f"ERROR: Verification file {verification_path} not found.")
+        print("The verification file should always exist in the repo.")
+        print(f"A generated file has been written to {generated_file} for the workflow to create a PR.")
+        raise RuntimeError(f"Verification file {verification_file} not found!")
     
     print(f"Verifying dependencies against {verification_file} (ignoring version mismatches)...")
     
@@ -519,7 +541,7 @@ def verify_dependencies(current_deps: Dict[str, str], arch: Literal[Arch.X86_64,
     
     if verification_failed:
         print("Dependency verification FAILED!")
-        print("Please review the differences above and update the verification file if the changes are expected.")
+        print("Please review the auto-generated PR with updated verification files.")
         print(f"Verification file: {verification_path}")
         raise RuntimeError("Dependency verification FAILED!")
     else:
