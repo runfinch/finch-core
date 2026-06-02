@@ -1,7 +1,7 @@
-/usr/local/Cellar/capstone/5.0.8/lib/libcapstone.5.dylib [6.8M]
-/usr/local/Cellar/capstone/5.0.8/lib/libcapstone.dylib → libcapstone.5.dylib
-/usr/local/Cellar/dtc/1.8.0/lib/libfdt.1.dylib [30K]
-/usr/local/Cellar/dtc/1.8.0/lib/libfdt.dylib → libfdt.1.dylib
+/usr/local/Cellar/capstone/5.0.9/lib/libcapstone.5.dylib [6.8M]
+/usr/local/Cellar/capstone/5.0.9/lib/libcapstone.dylib → libcapstone.5.dylib
+/usr/local/Cellar/dtc/1.8.1/lib/libfdt.1.dylib [35K]
+/usr/local/Cellar/dtc/1.8.1/lib/libfdt.dylib → libfdt.1.dylib
 /usr/local/Cellar/gettext/1.0/lib/libintl.8.dylib [185K]
 /usr/local/Cellar/gettext/1.0/lib/libintl.dylib → libintl.8.dylib
 /usr/local/Cellar/glib/2.88.1/lib/libgio-2.0.0.dylib [1.6M]
@@ -77,8 +77,8 @@
 /usr/local/bin/qemu-system-x86_64 [44B]
 /usr/local/libexec/lima/limactl-mcp [6.9M]
 /usr/local/libexec/lima/limactl-url-fedora-rawhide [1.3K]
-/usr/local/opt/capstone → ../Cellar/capstone/5.0.8
-/usr/local/opt/dtc → ../Cellar/dtc/1.8.0
+/usr/local/opt/capstone → ../Cellar/capstone/5.0.9
+/usr/local/opt/dtc → ../Cellar/dtc/1.8.1
 /usr/local/opt/gettext → ../Cellar/gettext/1.0
 /usr/local/opt/glib → ../Cellar/glib/2.88.1
 /usr/local/opt/gmp → ../Cellar/gmp/6.3.0
@@ -109,7 +109,7 @@
 /usr/local/opt/snappy → ../Cellar/snappy/1.2.2
 /usr/local/opt/vde → ../Cellar/vde/2.3.3
 /usr/local/opt/zstd → ../Cellar/zstd/1.5.7_1
-/usr/local/share/lima/lima-guestagent.Linux-x86_64.gz [7.6M]
+/usr/local/share/lima/lima-guestagent.Linux-x86_64.gz [7.7M]
 /usr/local/share/lima/templates/_default/mounts.yaml [171B]
 /usr/local/share/lima/templates/_images/fedora-42.yaml [889B]
 /usr/local/share/lima/templates/_images/ubuntu.yaml [2.4K]
