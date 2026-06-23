@@ -25,7 +25,7 @@ jobs:
           # pin submodule to a commit, https://github.com/lima-vm/lima/commit/bd7442e34ebdccb4945828a007b5d102781bea92
           # (cd src/lima && git checkout bd7442e34ebdccb4945828a007b5d102781bea92)
           (cd src/lima && git fetch --tags)
-          TAG=`cd src/lima && git describe --tags $(git rev-list --tags --max-count=1)`
+          TAG=`cd src/lima && git tag -l 'v*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1`
           echo "Pulling changes from release: $TAG"
           (cd src/lima && git checkout $TAG)
           
