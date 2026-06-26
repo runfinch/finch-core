@@ -1,7 +1,7 @@
-/opt/homebrew/Cellar/capstone/5.0.8/lib/libcapstone.5.dylib [6.8M]
-/opt/homebrew/Cellar/capstone/5.0.8/lib/libcapstone.dylib → libcapstone.5.dylib
-/opt/homebrew/Cellar/dtc/1.8.0/lib/libfdt.1.dylib [73K]
-/opt/homebrew/Cellar/dtc/1.8.0/lib/libfdt.dylib → libfdt.1.dylib
+/opt/homebrew/Cellar/capstone/5.0.9/lib/libcapstone.5.dylib [6.8M]
+/opt/homebrew/Cellar/capstone/5.0.9/lib/libcapstone.dylib → libcapstone.5.dylib
+/opt/homebrew/Cellar/dtc/1.8.1/lib/libfdt.1.dylib [73K]
+/opt/homebrew/Cellar/dtc/1.8.1/lib/libfdt.dylib → libfdt.1.dylib
 /opt/homebrew/Cellar/gettext/1.0/lib/libintl.8.dylib [225K]
 /opt/homebrew/Cellar/gettext/1.0/lib/libintl.dylib → libintl.8.dylib
 /opt/homebrew/Cellar/glib/2.88.1/lib/libgio-2.0.0.dylib [1.9M]
@@ -75,8 +75,8 @@
 /opt/homebrew/bin/qemu-system-aarch64 [45B]
 /opt/homebrew/libexec/lima/limactl-mcp [6.6M]
 /opt/homebrew/libexec/lima/limactl-url-fedora-rawhide [1.3K]
-/opt/homebrew/opt/capstone → ../Cellar/capstone/5.0.8
-/opt/homebrew/opt/dtc → ../Cellar/dtc/1.8.0
+/opt/homebrew/opt/capstone → ../Cellar/capstone/5.0.9
+/opt/homebrew/opt/dtc → ../Cellar/dtc/1.8.1
 /opt/homebrew/opt/gettext → ../Cellar/gettext/1.0
 /opt/homebrew/opt/glib → ../Cellar/glib/2.88.1
 /opt/homebrew/opt/gmp → ../Cellar/gmp/6.3.0
