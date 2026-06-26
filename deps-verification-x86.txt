@@ -4,14 +4,14 @@
 /usr/local/Cellar/dtc/1.8.1/lib/libfdt.dylib → libfdt.1.dylib
 /usr/local/Cellar/gettext/1.0/lib/libintl.8.dylib [185K]
 /usr/local/Cellar/gettext/1.0/lib/libintl.dylib → libintl.8.dylib
-/usr/local/Cellar/glib/2.88.1/lib/libgio-2.0.0.dylib [1.6M]
-/usr/local/Cellar/glib/2.88.1/lib/libgio-2.0.dylib → libgio-2.0.0.dylib
-/usr/local/Cellar/glib/2.88.1/lib/libglib-2.0.0.dylib [1.1M]
-/usr/local/Cellar/glib/2.88.1/lib/libglib-2.0.dylib → libglib-2.0.0.dylib
-/usr/local/Cellar/glib/2.88.1/lib/libgmodule-2.0.0.dylib [23K]
-/usr/local/Cellar/glib/2.88.1/lib/libgmodule-2.0.dylib → libgmodule-2.0.0.dylib
-/usr/local/Cellar/glib/2.88.1/lib/libgobject-2.0.0.dylib [320K]
-/usr/local/Cellar/glib/2.88.1/lib/libgobject-2.0.dylib → libgobject-2.0.0.dylib
+/usr/local/Cellar/glib/2.88.2/lib/libgio-2.0.0.dylib [1.6M]
+/usr/local/Cellar/glib/2.88.2/lib/libgio-2.0.dylib → libgio-2.0.0.dylib
+/usr/local/Cellar/glib/2.88.2/lib/libglib-2.0.0.dylib [1.1M]
+/usr/local/Cellar/glib/2.88.2/lib/libglib-2.0.dylib → libglib-2.0.0.dylib
+/usr/local/Cellar/glib/2.88.2/lib/libgmodule-2.0.0.dylib [23K]
+/usr/local/Cellar/glib/2.88.2/lib/libgmodule-2.0.dylib → libgmodule-2.0.0.dylib
+/usr/local/Cellar/glib/2.88.2/lib/libgobject-2.0.0.dylib [320K]
+/usr/local/Cellar/glib/2.88.2/lib/libgobject-2.0.dylib → libgobject-2.0.0.dylib
 /usr/local/Cellar/gmp/6.3.0/lib/libgmp.10.dylib [410K]
 /usr/local/Cellar/gmp/6.3.0/lib/libgmp.dylib → libgmp.10.dylib
 /usr/local/Cellar/gnutls/3.8.13_2/lib/libgnutls.30.dylib [2.0M]
@@ -57,13 +57,12 @@
 /usr/local/Cellar/pcre2/10.47_1/lib/libpcre2-8.dylib → libpcre2-8.0.dylib
 /usr/local/Cellar/pixman/0.46.4/lib/libpixman-1.0.dylib [606K]
 /usr/local/Cellar/pixman/0.46.4/lib/libpixman-1.dylib → libpixman-1.0.dylib
-/usr/local/Cellar/qemu/10.2.2/bin [ec2-user]
-/usr/local/Cellar/qemu/10.2.2/bin/qemu-img [1.9M]
-/usr/local/Cellar/qemu/10.2.2/bin/qemu-system-x86_64 [24M]
-/usr/local/Cellar/qemu/10.2.2/share/qemu/edk2-x86_64-code.fd [3.5M]
-/usr/local/Cellar/qemu/10.2.2/share/qemu/efi-virtio.rom [157K]
-/usr/local/Cellar/qemu/10.2.2/share/qemu/kvmvapic.bin [9.0K]
-/usr/local/Cellar/qemu/10.2.2/share/qemu/vgabios-stdvga.bin [39K]
+/usr/local/Cellar/qemu/11.0.1/bin [ec2-user]
+/usr/local/Cellar/qemu/11.0.1/bin/qemu-img [1.9M]
+/usr/local/Cellar/qemu/11.0.1/bin/qemu-system-x86_64 [24M]
+/usr/local/Cellar/qemu/11.0.1/share/qemu/edk2-x86_64-code.fd [3.5M]
+/usr/local/Cellar/qemu/11.0.1/share/qemu/efi-virtio.rom [157K]
+/usr/local/Cellar/qemu/11.0.1/share/qemu/kvmvapic.bin [9.0K]
 /usr/local/Cellar/snappy/1.2.2/lib/libsnappy.1.2.2.dylib [39K]
 /usr/local/Cellar/snappy/1.2.2/lib/libsnappy.1.dylib → libsnappy.1.2.2.dylib
 /usr/local/Cellar/snappy/1.2.2/lib/libsnappy.dylib → libsnappy.1.dylib
@@ -80,7 +79,7 @@
 /usr/local/opt/capstone → ../Cellar/capstone/5.0.9
 /usr/local/opt/dtc → ../Cellar/dtc/1.8.1
 /usr/local/opt/gettext → ../Cellar/gettext/1.0
-/usr/local/opt/glib → ../Cellar/glib/2.88.1
+/usr/local/opt/glib → ../Cellar/glib/2.88.2
 /usr/local/opt/gmp → ../Cellar/gmp/6.3.0
 /usr/local/opt/gnutls → ../Cellar/gnutls/3.8.13_2
 /usr/local/opt/jpeg-turbo → ../Cellar/jpeg-turbo/3.1.4.1
@@ -105,12 +104,12 @@
 /usr/local/opt/pcre2 → ../Cellar/pcre2/10.47_1
 /usr/local/opt/pixman → ../Cellar/pixman/0.46.4
 /usr/local/opt/pzstd → ../Cellar/zstd/1.5.7_1
-/usr/local/opt/qemu → ../Cellar/qemu/10.2.2
+/usr/local/opt/qemu → ../Cellar/qemu/11.0.1
 /usr/local/opt/snappy → ../Cellar/snappy/1.2.2
 /usr/local/opt/vde → ../Cellar/vde/2.3.3
 /usr/local/opt/zstd → ../Cellar/zstd/1.5.7_1
 /usr/local/share/lima/lima-guestagent.Linux-x86_64.gz [7.7M]
 /usr/local/share/lima/templates/_default/mounts.yaml [171B]
 /usr/local/share/lima/templates/_images/fedora-42.yaml [889B]
-/usr/local/share/lima/templates/_images/ubuntu.yaml [2.4K]
-/usr/local/share/qemu → ../Cellar/qemu/10.2.2/share/qemu
+/usr/local/share/lima/templates/_images/ubuntu.yaml [2.6K]
+/usr/local/share/qemu → ../Cellar/qemu/11.0.1/share/qemu

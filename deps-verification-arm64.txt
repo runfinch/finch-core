@@ -4,14 +4,14 @@
 /opt/homebrew/Cellar/dtc/1.8.1/lib/libfdt.dylib → libfdt.1.dylib
 /opt/homebrew/Cellar/gettext/1.0/lib/libintl.8.dylib [225K]
 /opt/homebrew/Cellar/gettext/1.0/lib/libintl.dylib → libintl.8.dylib
-/opt/homebrew/Cellar/glib/2.88.1/lib/libgio-2.0.0.dylib [1.9M]
-/opt/homebrew/Cellar/glib/2.88.1/lib/libgio-2.0.dylib → libgio-2.0.0.dylib
-/opt/homebrew/Cellar/glib/2.88.1/lib/libglib-2.0.0.dylib [1.3M]
-/opt/homebrew/Cellar/glib/2.88.1/lib/libglib-2.0.dylib → libglib-2.0.0.dylib
-/opt/homebrew/Cellar/glib/2.88.1/lib/libgmodule-2.0.0.dylib [70K]
-/opt/homebrew/Cellar/glib/2.88.1/lib/libgmodule-2.0.dylib → libgmodule-2.0.0.dylib
-/opt/homebrew/Cellar/glib/2.88.1/lib/libgobject-2.0.0.dylib [418K]
-/opt/homebrew/Cellar/glib/2.88.1/lib/libgobject-2.0.dylib → libgobject-2.0.0.dylib
+/opt/homebrew/Cellar/glib/2.88.2/lib/libgio-2.0.0.dylib [1.9M]
+/opt/homebrew/Cellar/glib/2.88.2/lib/libgio-2.0.dylib → libgio-2.0.0.dylib
+/opt/homebrew/Cellar/glib/2.88.2/lib/libglib-2.0.0.dylib [1.3M]
+/opt/homebrew/Cellar/glib/2.88.2/lib/libglib-2.0.dylib → libglib-2.0.0.dylib
+/opt/homebrew/Cellar/glib/2.88.2/lib/libgmodule-2.0.0.dylib [70K]
+/opt/homebrew/Cellar/glib/2.88.2/lib/libgmodule-2.0.dylib → libgmodule-2.0.0.dylib
+/opt/homebrew/Cellar/glib/2.88.2/lib/libgobject-2.0.0.dylib [418K]
+/opt/homebrew/Cellar/glib/2.88.2/lib/libgobject-2.0.dylib → libgobject-2.0.0.dylib
 /opt/homebrew/Cellar/gmp/6.3.0/lib/libgmp.10.dylib [442K]
 /opt/homebrew/Cellar/gmp/6.3.0/lib/libgmp.dylib → libgmp.10.dylib
 /opt/homebrew/Cellar/gnutls/3.8.13_2/lib/libgnutls.30.dylib [2.3M]
@@ -57,11 +57,11 @@
 /opt/homebrew/Cellar/pcre2/10.47_1/lib/libpcre2-8.dylib → libpcre2-8.0.dylib
 /opt/homebrew/Cellar/pixman/0.46.4/lib/libpixman-1.0.dylib [620K]
 /opt/homebrew/Cellar/pixman/0.46.4/lib/libpixman-1.dylib → libpixman-1.0.dylib
-/opt/homebrew/Cellar/qemu/10.2.2/bin [ec2-user]
-/opt/homebrew/Cellar/qemu/10.2.2/bin/qemu-img [2.0M]
-/opt/homebrew/Cellar/qemu/10.2.2/bin/qemu-system-aarch64 [29M]
-/opt/homebrew/Cellar/qemu/10.2.2/share/qemu/edk2-aarch64-code.fd [64M]
-/opt/homebrew/Cellar/qemu/10.2.2/share/qemu/efi-virtio.rom [157K]
+/opt/homebrew/Cellar/qemu/11.0.1/bin [ec2-user]
+/opt/homebrew/Cellar/qemu/11.0.1/bin/qemu-img [2.0M]
+/opt/homebrew/Cellar/qemu/11.0.1/bin/qemu-system-aarch64 [30M]
+/opt/homebrew/Cellar/qemu/11.0.1/share/qemu/edk2-aarch64-code.fd [64M]
+/opt/homebrew/Cellar/qemu/11.0.1/share/qemu/efi-virtio.rom [157K]
 /opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.1.2.2.dylib [78K]
 /opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.1.dylib → libsnappy.1.2.2.dylib
 /opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.dylib → libsnappy.1.dylib
@@ -78,7 +78,7 @@
 /opt/homebrew/opt/capstone → ../Cellar/capstone/5.0.9
 /opt/homebrew/opt/dtc → ../Cellar/dtc/1.8.1
 /opt/homebrew/opt/gettext → ../Cellar/gettext/1.0
-/opt/homebrew/opt/glib → ../Cellar/glib/2.88.1
+/opt/homebrew/opt/glib → ../Cellar/glib/2.88.2
 /opt/homebrew/opt/gmp → ../Cellar/gmp/6.3.0
 /opt/homebrew/opt/gnutls → ../Cellar/gnutls/3.8.13_2
 /opt/homebrew/opt/jpeg-turbo → ../Cellar/jpeg-turbo/3.1.4.1
@@ -103,12 +103,12 @@
 /opt/homebrew/opt/pcre2 → ../Cellar/pcre2/10.47_1
 /opt/homebrew/opt/pixman → ../Cellar/pixman/0.46.4
 /opt/homebrew/opt/pzstd → ../Cellar/zstd/1.5.7_1
-/opt/homebrew/opt/qemu → ../Cellar/qemu/10.2.2
+/opt/homebrew/opt/qemu → ../Cellar/qemu/11.0.1
 /opt/homebrew/opt/snappy → ../Cellar/snappy/1.2.2
 /opt/homebrew/opt/vde → ../Cellar/vde/2.3.3
 /opt/homebrew/opt/zstd → ../Cellar/zstd/1.5.7_1
 /opt/homebrew/share/lima/lima-guestagent.Linux-aarch64.gz [6.9M]
 /opt/homebrew/share/lima/templates/_default/mounts.yaml [171B]
 /opt/homebrew/share/lima/templates/_images/fedora-42.yaml [889B]
-/opt/homebrew/share/lima/templates/_images/ubuntu.yaml [2.4K]
-/opt/homebrew/share/qemu → ../Cellar/qemu/10.2.2/share/qemu
+/opt/homebrew/share/lima/templates/_images/ubuntu.yaml [2.6K]
+/opt/homebrew/share/qemu → ../Cellar/qemu/11.0.1/share/qemu
