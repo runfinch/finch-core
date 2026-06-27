@@ -57,7 +57,7 @@ mounts:
     # contents of the symlink. As a result, symlinked files & folders on the Host
     # system will look and feel like regular files directories in the Guest OS.
     # 🟢 Builtin default: false
-    followSymlinks: null
+    followSymlinks: true
     # SFTP driver, "builtin" or "openssh-sftp-server". "openssh-sftp-server" is recommended.
     # 🟢 Builtin default: "openssh-sftp-server" if OpenSSH SFTP Server binary is found, otherwise "builtin"
     sftpDriver: null
