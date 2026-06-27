@@ -66,7 +66,9 @@ gpgkey=file://$FEDORA_KEY_NAME
 skip_if_unavailable=False
 EOF
 
-# 1. download the latest fuse-sshfs SRPM from Fedora repos
+# 1. download a pinned fuse-sshfs SRPM from Fedora repos.
+#    Pinned to 3.7.3 because 3.7.3 is the only other version available.
+#    3.7.6 seems to be breaking `nerdctl cp --follow-link` (EPERM on readlink). 
 # 2. disable all Fedora repos
 # 3. download cloud-init SRPM from default (AL2023) repos
 RUN dnf download \
@@ -74,7 +76,7 @@ RUN dnf download \
     --repo fedora-source \
     --repo fedora-updates \
     --repo fedora-updates-source \
-    --source fuse-sshfs && \
+    --source "fuse-sshfs-3.7.3-12.fc43" && \
     dnf config-manager --set-disabled fedora* && \
     dnf download --source cloud-init
 
