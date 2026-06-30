@@ -21,7 +21,7 @@ jobs:
         arch: [arm64, x86-64]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           sparse-checkout: |
             bin/
@@ -33,13 +33,13 @@ jobs:
           run_id=$(grep 'AARCH64_ARTIFACT=' deps/full-os.conf | grep -oP '\d+(?=\.qcow2)')
           echo "run_id=${run_id}" >> $GITHUB_OUTPUT
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b # v6.2.1
         with:
           role-to-assume: ${{ secrets.ROLE }}
           aws-region: ${{ secrets.REGION }}
           role-session-name: push-container-image-session
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+        uses: aws-actions/amazon-ecr-login@d539f0932e70871a027e9d5a9d8fc38589180a64 # v2.1.6
       - name: Install skopeo
         run: |
           sudo apt-get update
