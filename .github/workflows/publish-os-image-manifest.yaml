@@ -1,0 +1,120 @@
+name: Publish OS Image Manifest
+
+on:
+  # WARN: Be mindful about running this workflow manually, as this will
+  # publish an OS image to users.
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'deps/full-os.conf'
+      - 'deps/rootfs.conf'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/publish-os-image-manifest.yaml
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  write-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          sparse-checkout: |
+            deps/full-os.conf
+            deps/rootfs.conf
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.ROLE }}
+          aws-region: ${{ secrets.REGION }}
+          role-session-name: publish-os-image-manifest-session
+      
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.1.0
+
+      - name: Generate manifest
+        shell: bash
+        run: |
+          # MacOS
+          source deps/full-os.conf
+          os_base_url="${ARTIFACT_BASE_URL}"
+          arm64_url="${os_base_url}/${AARCH64_ARTIFACT}"
+          arm64_digest="sha512:${AARCH64_512_DIGEST}"
+          amd64_url="${os_base_url}/${X86_64_ARTIFACT}"
+          amd64_digest="sha512:${X86_64_512_DIGEST}"
+
+          # Windows
+          source deps/rootfs.conf
+          rootfs_url="${ARTIFACT_BASE_URL}/${X86_64_ARTIFACT_PATHING}/${X86_64_ARTIFACT}"
+          rootfs_digest="sha512:${X86_64_512_DIGEST}"
+
+          # Publish date is today; expiry is 6 months out.
+          published_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          expires_at="$(date -u -d '+6 months' +%Y-%m-%dT%H:%M:%SZ)"
+
+          cat > manifest.json <<EOF
+          {
+            "published_at": "${published_at}",
+            "expires_at": "${expires_at}",
+            "artifacts": [
+              {
+                "platform": "darwin",
+                "arch": "arm64",
+                "url": "${arm64_url}",
+                "digest": "${arm64_digest}"
+              },
+              {
+                "platform": "darwin",
+                "arch": "amd64",
+                "url": "${amd64_url}",
+                "digest": "${amd64_digest}"
+              },
+              {
+                "platform": "windows",
+                "arch": "amd64",
+                "url": "${rootfs_url}",
+                "digest": "${rootfs_digest}"
+              }
+            ]
+          }
+          EOF
+
+          echo "Generated manifest.json:"
+          cat manifest.json
+
+      - name: Sign manifest file with cosign
+        run: cosign sign-blob manifest.json --bundle manifest.json.bundle --yes
+
+      - name: Verify manifest file with cosign for sanity
+        run: |
+          cosign verify-blob manifest.json \
+          --bundle manifest.json.bundle \
+          --certificate-identity "https://github.com/${{ github.workflow_ref }}" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+
+      - name: Upload manifest artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: manifest
+          path: |
+            manifest.json
+            manifest.json.bundle
+
+      - name: Publish manifest to S3
+        if: github.event_name != 'pull_request'
+        run: |
+          aws s3 cp manifest.json \
+            "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/manifest.json" \
+            --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
+          aws s3 cp manifest.json.bundle \
+            "s3://${{ secrets.DEPENDENCY_BUCKET_NAME }}/manifest.json.bundle" \
+            --region "${{ secrets.DEPENDENCY_BUCKET_REGION }}"
