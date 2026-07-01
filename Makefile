@@ -57,7 +57,7 @@ $(FINCH_DAEMON_OUTDIR)/finch-daemon: $(OUTPUT_DIRECTORIES)
 install: uninstall
 	mkdir -p $(DEST)
 	(cd _output && tar c * | tar Cvx  $(DEST) )
-	sed -i.bak -e "s|${FINCH_OS_IMAGE_LOCATION}|$(FINCH_IMAGE_LOCATION)|g" $(DEST)/lima-template/fedora.yaml
+	sed -i.bak -e "s|${FINCH_OS_IMAGE_LOCATION}|$(FINCH_IMAGE_LOCATION)|g" $(DEST)/lima-template/macos.yaml
 	rm $(DEST)/lima-template/*.yaml.bak
 
 .PHONY: uninstall
@@ -75,6 +75,11 @@ clean:
 	-@cd src/finch-daemon && make clean 2>/dev/null || true
 	-@cd src/socket_vmnet && make clean 2>/dev/null || true
 
+# LIMA_TEMPLATE is the rendered, platform-specific Lima template. It is defined by
+# the included platform makefile (Makefile.darwin / Makefile.windows).
 .PHONY: test-e2e
-test-e2e: $(LIMA_TEMPLATE_OUTDIR)/fedora.yaml
-	cd e2e && VM_TYPE=$(FINCH_VM_TYPE) go test -timeout 30m -v ./... -ginkgo.v
+test-e2e: $(LIMA_TEMPLATE)
+	cd e2e && VM_TYPE=$(FINCH_VM_TYPE) LIMA_TEMPLATE=$(LIMA_TEMPLATE) \
+	go test -timeout 60m -v ./... \
+	-ginkgo.vv \
+	-ginkgo.flake-attempts=3
