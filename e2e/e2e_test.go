@@ -38,7 +38,13 @@ func TestE2e(t *testing.T) {
 		t.Fatalf("failed to get the current working directory: %v", err)
 	}
 
-	vmConfigFile := filepath.Join(wd, "./../_output/lima-template/fedora.yaml")
+	// LIMA_TEMPLATE is set by the `test-e2e` make target to the platform-specific
+	// template rendered under _output/lima-template (macos.yaml on macOS,
+	// windows.yaml on Windows). Fall back to the macOS template for direct `go test`.
+	vmConfigFile := os.Getenv("LIMA_TEMPLATE")
+	if vmConfigFile == "" {
+		vmConfigFile = filepath.Join(wd, "./../_output/lima-template/macos.yaml")
+	}
 
 	subject := "limactl"
 	limaOpt, err := option.New([]string{subject})
@@ -46,7 +52,7 @@ func TestE2e(t *testing.T) {
 		t.Fatalf("failed to initialize a testing option: %v", err)
 	}
 
-	vmName := "fedora"
+	vmName := "finch"
 
 	nerdctlOpt, err := option.New(
 		[]string{subject, "shell", vmName, "sudo", "-E", "nerdctl"},

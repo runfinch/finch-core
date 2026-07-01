@@ -14,6 +14,7 @@ on:
       - .gitmodules
       - deps/container-runtime-full-archive.conf
       - deps/rootfs.conf
+      - e2e/**
       - lima-template/**
       - Makefile
       - Makefile.windows
@@ -24,7 +25,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  install-dependencies:
+  e2e-tests:
     # This is a spot check for make install.dependencies on Windows platform.
     # Finch-core provides the core dependencies needed to run Finch such as the base OS
     # image, rootfs, and Lima bundle. Validate the mechanism used to install the core
@@ -32,9 +33,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022]
+        os: [windows-2025] # [self-hosted, windows, amd64, test]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Configure git CRLF settings
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
@@ -46,7 +51,12 @@ jobs:
         with:
           go-version-file: e2e/go.mod
           cache-dependency-path: e2e/go.sum
+      - name: Enable WSL2
+        uses: Vampire/setup-wsl@v7
       - name: Install platform dependencies
         run: make install.dependencies
+      - name: Run e2e tests
+        run: make test-e2e
       - name: Clean up dependencies
+        if: always()
         run: make clean
