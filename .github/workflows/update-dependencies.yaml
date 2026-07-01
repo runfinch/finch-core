@@ -26,8 +26,16 @@ permissions:
   contents: read
 
 jobs:
-  update-lima-bundle:
+  build-lima-and-qemu:
+    permissions:
+      id-token: write
+      contents: read
+    
+    uses: ./.github/workflows/build-lima-and-qemu.yaml
+
+  update-lima-and-qemu-bundle:
     if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+    needs: build-lima-and-qemu
     runs-on: ubuntu-latest
 
     permissions:
