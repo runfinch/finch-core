@@ -22,3 +22,6 @@ require (
 	golang.org/x/text v0.38.0 // indirect
 	golang.org/x/tools v0.45.0 // indirect
 )
+
+// TODO: revert
+replace github.com/runfinch/common-tests => github.com/Swapnanil-Gupta/common-tests v0.0.0-20260702211621-98bf7424f2b1

@@ -1,6 +1,7 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+# This template file is based on macos.yaml but with Windows specific options.
 vmType: wsl2
 mountType: wsl2
 

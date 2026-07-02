@@ -15,10 +15,13 @@ on:
       - deps/container-runtime-full-archive.conf
       - deps/rootfs.conf
       - e2e/**
-      - lima-template/**
+      - lima-template/windows.yaml
       - Makefile
       - Makefile.windows
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,10 +29,6 @@ concurrency:
 
 jobs:
   e2e-tests:
-    # This is a spot check for make install.dependencies on Windows platform.
-    # Finch-core provides the core dependencies needed to run Finch such as the base OS
-    # image, rootfs, and Lima bundle. Validate the mechanism used to install the core
-    # dependencies works on Windows.
     strategy:
       fail-fast: false
       matrix:
@@ -53,6 +52,11 @@ jobs:
           cache-dependency-path: e2e/go.sum
       - name: Enable WSL2
         uses: Vampire/setup-wsl@v7
+      - name: Configure WSL2 networking
+        shell: pwsh
+        run: |
+          "networkingMode=mirrored`nhostAddressLoopback=true" | Out-File -FilePath "$env:USERPROFILE\.wslconfig" -Encoding ascii
+          wsl --shutdown
       - name: Install platform dependencies
         run: make install.dependencies
       - name: Run e2e tests

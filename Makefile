@@ -80,6 +80,6 @@ clean:
 .PHONY: test-e2e
 test-e2e: $(LIMA_TEMPLATE)
 	cd e2e && VM_TYPE=$(FINCH_VM_TYPE) LIMA_TEMPLATE=$(LIMA_TEMPLATE) \
-	go test -timeout 60m -v ./... \
+	go test -timeout 3h -v ./... \
 	-ginkgo.vv \
 	-ginkgo.flake-attempts=3

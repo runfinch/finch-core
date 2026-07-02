@@ -16,7 +16,7 @@ on:
       - deps/full-os.conf
       - deps/lima-bundles.conf
       - e2e/**
-      - lima-template/**
+      - lima-template/macos.yaml
       - Makefile
       - Makefile.darwin
   workflow_dispatch:
