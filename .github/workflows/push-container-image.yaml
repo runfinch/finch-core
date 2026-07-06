@@ -1,4 +1,7 @@
-name: Push Container Image to ECR
+# This workflow containerizes and pushes the macos vm images to ECR.
+# This image exists only for Inspector scanning purposes.
+# We also delete older images to suppress non-latest findings.
+name: Push VM OS Container Image to ECR
 
 on:
   push:
