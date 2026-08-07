@@ -4,8 +4,12 @@
 package e2e
 
 import (
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
+	"runtime"
 	"testing"
 
 	"github.com/onsi/ginkgo/v2"
@@ -38,7 +42,11 @@ func TestE2e(t *testing.T) {
 		t.Fatalf("failed to get the current working directory: %v", err)
 	}
 
-	vmConfigFile := filepath.Join(wd, "./../_output/lima-template/fedora.yaml")
+	configFileName := "macos.yaml"
+	if runtime.GOOS == "windows" {
+		configFileName = "windows.yaml"
+	}
+	vmConfigFile := filepath.Join(wd, "./../_output/lima-template/", configFileName)
 
 	subject := "limactl"
 	limaOpt, err := option.New([]string{subject})
@@ -46,11 +54,17 @@ func TestE2e(t *testing.T) {
 		t.Fatalf("failed to initialize a testing option: %v", err)
 	}
 
-	vmName := "fedora"
+	vmName := "finch"
+
+	nerdctlMods := []option.Modifier{option.WithNoEnvironmentVariablePassthrough()}
+	if runtime.GOOS == "windows" {
+		// On Windows, file paths must be translated to WSL compatible paths.
+		nerdctlMods = append(nerdctlMods, option.WithWindowsHostPathTranslation())
+	}
 
 	nerdctlOpt, err := option.New(
 		[]string{subject, "shell", vmName, "sudo", "-E", "nerdctl"},
-		option.WithNoEnvironmentVariablePassthrough(),
+		nerdctlMods...,
 	)
 	if err != nil {
 		t.Fatalf("failed to initialize a testing option: %v", err)
@@ -62,6 +76,22 @@ func TestE2e(t *testing.T) {
 		vmType = "vz"
 	}
 
+	var runOpt *tests.RunOption
+	switch runtime.GOOS {
+	case "windows":
+		runOpt = &tests.RunOption{
+			BaseOpt: nerdctlOpt,
+			CGMode:  tests.Hybrid,
+		}
+	case "darwin":
+		runOpt = &tests.RunOption{
+			BaseOpt: nerdctlOpt,
+			CGMode:  tests.Unified,
+			// See https://lima-vm.io/docs/config/network/user/.
+			DefaultHostGatewayIP: "192.168.5.2",
+		}
+	}
+
 	ginkgo.SynchronizedBeforeSuite(func() []byte {
 		limactlStartOpts := []string{"start", vmConfigFile, "--name", vmName, "--vm-type", vmType}
 		if vmType == "vz" {
@@ -69,6 +99,26 @@ func TestE2e(t *testing.T) {
 		}
 		command.New(limaOpt, limactlStartOpts...).WithTimeoutInSeconds(600).Run()
 		tests.SetupLocalRegistry(nerdctlOpt)
+
+		// Get the WSL host gateway ip using netsh. This is only available when a
+		// WSL VM instance is running.
+		if runtime.GOOS == "windows" {
+			n, err := exec.Command("netsh", "interface", "ipv4", "show", "addresses", "vEthernet (WSL (Hyper-V firewall))").CombinedOutput()
+			gomega.Expect(err).Should(gomega.BeNil(), "netsh output: %s", string(n))
+			runOpt.DefaultHostGatewayIP = extractIPAddress(string(n))
+		}
+
+		// Finch CLI rewrites `--add-host <host>:host-gateway` to the host
+		// IP before invoking nerdctl. Our subject runs nerdctl theough lima directly, so nerdctl
+		// will fall back to its own default (the guest's own IP).
+		// Configure the guest's nerdctl.toml so nerdctl resolves host-gateway to the host IP.
+		if runOpt != nil && runOpt.DefaultHostGatewayIP != "" {
+			script := fmt.Sprintf(
+				"mkdir -p /etc/nerdctl && printf 'host_gateway_ip = \"%s\"\\n' > /etc/nerdctl/nerdctl.toml",
+				runOpt.DefaultHostGatewayIP,
+			)
+			command.New(limaOpt, "shell", vmName, "sudo", "sh", "-c", script).Run()
+		}
 		return nil
 	}, func(bytes []byte) {})
 
@@ -79,7 +129,11 @@ func TestE2e(t *testing.T) {
 	}, func() {})
 
 	ginkgo.Describe(description, func() {
-		// TODO: add more e2e tests and make them work.
+		if runOpt != nil {
+			tests.Run(runOpt)
+		}
+		tests.Ps(nerdctlOpt)
+		tests.Restart(nerdctlOpt)
 		tests.Save(nerdctlOpt)
 		tests.Load(nerdctlOpt)
 		tests.Pull(nerdctlOpt)
@@ -127,6 +181,16 @@ func TestE2e(t *testing.T) {
 
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, description)
+}
+
+func extractIPAddress(data string) string {
+	re := regexp.MustCompile(`IP Address:\s+(\d+\.\d+\.\d+\.\d+)`)
+	match := re.FindStringSubmatch(data)
+
+	if match != nil {
+		return match[1]
+	}
+	return ""
 }
 
 func printLimaLogs(vmName string) {
