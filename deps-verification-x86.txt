@@ -48,8 +48,8 @@
 /usr/local/Cellar/nettle/4.0/lib/libnettle.9.0.dylib [293K]
 /usr/local/Cellar/nettle/4.0/lib/libnettle.9.dylib → libnettle.9.0.dylib
 /usr/local/Cellar/nettle/4.0/lib/libnettle.dylib → libnettle.9.0.dylib
-/usr/local/Cellar/openssl@3/3.6.2/lib/libcrypto.3.dylib [5.0M]
-/usr/local/Cellar/openssl@3/3.6.2/lib/libcrypto.dylib → libcrypto.3.dylib
+/usr/local/Cellar/openssl@3/3.6.3/lib/libcrypto.3.dylib [5.0M]
+/usr/local/Cellar/openssl@3/3.6.3/lib/libcrypto.dylib → libcrypto.3.dylib
 /usr/local/Cellar/p11-kit/0.26.2/lib/libp11-kit.0.dylib [1.4M]
 /usr/local/Cellar/p11-kit/0.26.2/lib/libp11-kit.dylib → libp11-kit.0.dylib
 /usr/local/Cellar/p11-kit/0.26.2/lib/p11-kit-proxy.dylib → libp11-kit.0.dylib
@@ -97,9 +97,9 @@
 /usr/local/opt/ncurses → ../Cellar/ncurses/6.6
 /usr/local/opt/nettle → ../Cellar/nettle/4.0
 /usr/local/opt/nettle@4 → ../Cellar/nettle/4.0
-/usr/local/opt/openssl → ../Cellar/openssl@3/3.6.2
-/usr/local/opt/openssl@3 → ../Cellar/openssl@3/3.6.2
-/usr/local/opt/openssl@3.6 → ../Cellar/openssl@3/3.6.2
+/usr/local/opt/openssl → ../Cellar/openssl@3/3.6.3
+/usr/local/opt/openssl@3 → ../Cellar/openssl@3/3.6.3
+/usr/local/opt/openssl@3.6 → ../Cellar/openssl@3/3.6.3
 /usr/local/opt/p11-kit → ../Cellar/p11-kit/0.26.2
 /usr/local/opt/pcre2 → ../Cellar/pcre2/10.47_1
 /usr/local/opt/pixman → ../Cellar/pixman/0.46.4

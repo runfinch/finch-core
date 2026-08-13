@@ -48,8 +48,8 @@
 /opt/homebrew/Cellar/nettle/4.0/lib/libnettle.9.0.dylib [327K]
 /opt/homebrew/Cellar/nettle/4.0/lib/libnettle.9.dylib → libnettle.9.0.dylib
 /opt/homebrew/Cellar/nettle/4.0/lib/libnettle.dylib → libnettle.9.0.dylib
-/opt/homebrew/Cellar/openssl@3/3.6.2/lib/libcrypto.3.dylib [4.6M]
-/opt/homebrew/Cellar/openssl@3/3.6.2/lib/libcrypto.dylib → libcrypto.3.dylib
+/opt/homebrew/Cellar/openssl@3/3.6.3/lib/libcrypto.3.dylib [4.7M]
+/opt/homebrew/Cellar/openssl@3/3.6.3/lib/libcrypto.dylib → libcrypto.3.dylib
 /opt/homebrew/Cellar/p11-kit/0.26.2/lib/libp11-kit.0.dylib [1.5M]
 /opt/homebrew/Cellar/p11-kit/0.26.2/lib/libp11-kit.dylib → libp11-kit.0.dylib
 /opt/homebrew/Cellar/p11-kit/0.26.2/lib/p11-kit-proxy.dylib → libp11-kit.0.dylib
@@ -96,9 +96,9 @@
 /opt/homebrew/opt/ncurses → ../Cellar/ncurses/6.6
 /opt/homebrew/opt/nettle → ../Cellar/nettle/4.0
 /opt/homebrew/opt/nettle@4 → ../Cellar/nettle/4.0
-/opt/homebrew/opt/openssl → ../Cellar/openssl@3/3.6.2
-/opt/homebrew/opt/openssl@3 → ../Cellar/openssl@3/3.6.2
-/opt/homebrew/opt/openssl@3.6 → ../Cellar/openssl@3/3.6.2
+/opt/homebrew/opt/openssl → ../Cellar/openssl@3/3.6.3
+/opt/homebrew/opt/openssl@3 → ../Cellar/openssl@3/3.6.3
+/opt/homebrew/opt/openssl@3.6 → ../Cellar/openssl@3/3.6.3
 /opt/homebrew/opt/p11-kit → ../Cellar/p11-kit/0.26.2
 /opt/homebrew/opt/pcre2 → ../Cellar/pcre2/10.47_1
 /opt/homebrew/opt/pixman → ../Cellar/pixman/0.46.4
