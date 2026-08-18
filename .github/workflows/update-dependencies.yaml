@@ -32,6 +32,7 @@ jobs:
       contents: write
       pull-requests: write
     uses: ./.github/workflows/build-lima-and-qemu.yaml
+    secrets: inherit
 
   update-lima-and-qemu-bundle:
     if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
