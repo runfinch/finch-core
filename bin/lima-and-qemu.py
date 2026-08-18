@@ -82,7 +82,7 @@ def main():
     print("Done")
 
 def get_templates_from_args():
-    default_templates = ["fedora-42", "default"]
+    default_templates = ["fedora-44", "default"]
     return sys.argv[1:] if len(sys.argv) > 1 else default_templates
 
 def get_system_arch():
