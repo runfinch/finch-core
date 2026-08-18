@@ -26,9 +26,9 @@
 /usr/local/Cellar/libpng/1.6.58/lib/libpng16.dylib → libpng16.16.dylib
 /usr/local/Cellar/libslirp/4.9.3/lib/libslirp.0.dylib [122K]
 /usr/local/Cellar/libslirp/4.9.3/lib/libslirp.dylib → libslirp.0.dylib
-/usr/local/Cellar/libssh/0.12.0_1/lib/libssh.4.11.0.dylib [483K]
-/usr/local/Cellar/libssh/0.12.0_1/lib/libssh.4.dylib → libssh.4.11.0.dylib
-/usr/local/Cellar/libssh/0.12.0_1/lib/libssh.dylib → libssh.4.dylib
+/usr/local/Cellar/libssh/0.12.2/lib/libssh.4.12.0.dylib [483K]
+/usr/local/Cellar/libssh/0.12.2/lib/libssh.4.dylib → libssh.4.12.0.dylib
+/usr/local/Cellar/libssh/0.12.2/lib/libssh.dylib → libssh.4.dylib
 /usr/local/Cellar/libtasn1/4.21.0/lib/libtasn1.6.dylib [67K]
 /usr/local/Cellar/libtasn1/4.21.0/lib/libtasn1.dylib → libtasn1.6.dylib
 /usr/local/Cellar/libunistring/1.4.2/lib/libunistring.5.dylib [1.9M]
@@ -110,6 +110,6 @@
 /usr/local/opt/zstd → ../Cellar/zstd/1.5.7_1
 /usr/local/share/lima/lima-guestagent.Linux-x86_64.gz [7.7M]
 /usr/local/share/lima/templates/_default/mounts.yaml [171B]
-/usr/local/share/lima/templates/_images/fedora-42.yaml [889B]
+/usr/local/share/lima/templates/_images/fedora-44.yaml [889B]
 /usr/local/share/lima/templates/_images/ubuntu.yaml [2.6K]
 /usr/local/share/qemu → ../Cellar/qemu/11.0.1/share/qemu
