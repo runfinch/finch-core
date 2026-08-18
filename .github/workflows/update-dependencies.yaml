@@ -29,8 +29,8 @@ jobs:
   build-lima-and-qemu:
     permissions:
       id-token: write
-      contents: read
-    
+      contents: write
+      pull-requests: write
     uses: ./.github/workflows/build-lima-and-qemu.yaml
 
   update-lima-and-qemu-bundle:
