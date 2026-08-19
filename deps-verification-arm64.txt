@@ -62,9 +62,9 @@
 /opt/homebrew/Cellar/qemu/11.0.2/bin/qemu-system-aarch64 [30M]
 /opt/homebrew/Cellar/qemu/11.0.2/share/qemu/edk2-aarch64-code.fd [64M]
 /opt/homebrew/Cellar/qemu/11.0.2/share/qemu/efi-virtio.rom [157K]
-/opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.1.2.2.dylib [60K]
-/opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.1.dylib → libsnappy.1.2.2.dylib
-/opt/homebrew/Cellar/snappy/1.2.2/lib/libsnappy.dylib → libsnappy.1.dylib
+/opt/homebrew/Cellar/snappy/1.3.1/lib/libsnappy.1.3.1.dylib [60K]
+/opt/homebrew/Cellar/snappy/1.3.1/lib/libsnappy.1.dylib → libsnappy.1.3.1.dylib
+/opt/homebrew/Cellar/snappy/1.3.1/lib/libsnappy.dylib → libsnappy.1.dylib
 /opt/homebrew/Cellar/vde/2.3.3/lib/libvdeplug.3.dylib [53K]
 /opt/homebrew/Cellar/vde/2.3.3/lib/libvdeplug.dylib → libvdeplug.3.dylib
 /opt/homebrew/Cellar/zstd/1.5.7_1/lib/libzstd.1.5.7.dylib [638K]
@@ -104,7 +104,7 @@
 /opt/homebrew/opt/pixman → ../Cellar/pixman/0.46.4
 /opt/homebrew/opt/pzstd → ../Cellar/zstd/1.5.7_1
 /opt/homebrew/opt/qemu → ../Cellar/qemu/11.0.2
-/opt/homebrew/opt/snappy → ../Cellar/snappy/1.2.2
+/opt/homebrew/opt/snappy → ../Cellar/snappy/1.3.1
 /opt/homebrew/opt/vde → ../Cellar/vde/2.3.3
 /opt/homebrew/opt/zstd → ../Cellar/zstd/1.5.7_1
 /opt/homebrew/share/lima/lima-guestagent.Linux-aarch64.gz [6.9M]
