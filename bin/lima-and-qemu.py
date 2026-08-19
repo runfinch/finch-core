@@ -8,6 +8,7 @@ import re
 import tarfile
 import gzip
 import json
+from pathlib import Path
 from enum import Enum
 from collections import defaultdict
 from typing import List, Dict, Set, Literal
@@ -38,6 +39,9 @@ def main():
     lima_version = get_installed_lima_version()
     print("using lima version: ", lima_version)
     
+    cosign_release = get_cosign_release_from_conf()
+    print("using cosign version: ", cosign_release)
+
     print("recording initial deps...")
     deps = record_initial_deps(arch, install_dir, qemu_version)
     
@@ -65,7 +69,7 @@ def main():
     resign(resign_files)
 
     print("Extracting and exporting package versions...")
-    extract_and_export_package_versions(deps, arch, install_dir)
+    extract_and_export_package_versions(deps, arch, install_dir, cosign_release)
 
     print("Packaging files and socket_vmnet...")
     archive_path = package_files_and_socket_vmnet(deps, install_dir, dist_path)
@@ -280,6 +284,24 @@ def add_lima_version_to_archive(archive_path: str, lima_version: str):
             print(f"Added LIMA_VERSION file to archive {archive_path}")
     except Exception as ex:
         raise RuntimeError("failed to add LIMA_VERSION to archive") from ex
+
+def get_cosign_release_from_conf():
+    try:
+        cur_file = Path(__file__).resolve()
+        project_dir = cur_file.parent.parent
+        cosign_conf_path = project_dir / 'deps' / 'cosign.conf'
+
+        with open(cosign_conf_path, 'r') as conf:
+            lines = [line.strip() for line in conf.read().splitlines()]
+            for line in lines:
+                if line[0] == '#': # Skip comments
+                    continue
+                k, v = line.split("=", maxsplit=1)
+                if k == "COSIGN_RELEASE":
+                    return v
+            raise RuntimeError("could not find COSIGN_RELEASE in conf")
+    except Exception as ex:
+        raise RuntimeError("could not get cosign version") from ex
 
 def package_files_and_socket_vmnet(deps: Dict[str, str], install_dir: str, dist_path: str):
     tar_files = [path.removeprefix(f"{install_dir}/") for path in deps.keys()]
@@ -571,7 +593,7 @@ def normalize_path_for_version_comparison(path: str, install_dir: str):
     
     return path
 
-def extract_and_export_package_versions(deps: Dict[str, str], arch: Literal[Arch.X86_64, Arch.AARCH64], install_dir: str):
+def extract_and_export_package_versions(deps: Dict[str, str], arch: Literal[Arch.X86_64, Arch.AARCH64], install_dir: str, cosign_version: str):
     """
     Extract package versions from dependencies and export to JSON.
     
@@ -614,6 +636,12 @@ def extract_and_export_package_versions(deps: Dict[str, str], arch: Literal[Arch
                 # Skip if version extraction fails
                 pass
     
+    # Special-case cosign here, since we only want to track it for CVE purposes.
+    package_versions["cosign"] = {
+        "package": "cosign",
+        "version": cosign_version
+    }
+
     # Export to JSON
     lima_repo_root = os.path.join(os.getcwd(), 'src', 'lima')
     json_file = f"{lima_repo_root}/dep-version-mapping-{arch}.json"
