@@ -110,6 +110,6 @@
 /usr/local/opt/zstd → ../Cellar/zstd/1.5.7_1
 /usr/local/share/lima/lima-guestagent.Linux-x86_64.gz [7.7M]
 /usr/local/share/lima/templates/_default/mounts.yaml [171B]
-/usr/local/share/lima/templates/_images/fedora-44.yaml [892B]
-/usr/local/share/lima/templates/_images/ubuntu.yaml [3.8K]
+/usr/local/share/lima/templates/_images/fedora-44.yaml [740B]
+/usr/local/share/lima/templates/_images/ubuntu.yaml [2.4K]
 /usr/local/share/qemu → ../Cellar/qemu/11.0.2/share/qemu
