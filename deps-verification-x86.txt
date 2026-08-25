@@ -4,13 +4,13 @@
 /usr/local/Cellar/dtc/1.8.1/lib/libfdt.dylib → libfdt.1.dylib
 /usr/local/Cellar/gettext/1.0/lib/libintl.8.dylib [185K]
 /usr/local/Cellar/gettext/1.0/lib/libintl.dylib → libintl.8.dylib
-/usr/local/Cellar/glib/2.88.3/lib/libgio-2.0.0.dylib [1.7M]
+/usr/local/Cellar/glib/2.88.3/lib/libgio-2.0.0.dylib [1.6M]
 /usr/local/Cellar/glib/2.88.3/lib/libgio-2.0.dylib → libgio-2.0.0.dylib
 /usr/local/Cellar/glib/2.88.3/lib/libglib-2.0.0.dylib [1.1M]
 /usr/local/Cellar/glib/2.88.3/lib/libglib-2.0.dylib → libglib-2.0.0.dylib
-/usr/local/Cellar/glib/2.88.3/lib/libgmodule-2.0.0.dylib [41K]
+/usr/local/Cellar/glib/2.88.3/lib/libgmodule-2.0.0.dylib [23K]
 /usr/local/Cellar/glib/2.88.3/lib/libgmodule-2.0.dylib → libgmodule-2.0.0.dylib
-/usr/local/Cellar/glib/2.88.3/lib/libgobject-2.0.0.dylib [340K]
+/usr/local/Cellar/glib/2.88.3/lib/libgobject-2.0.0.dylib [320K]
 /usr/local/Cellar/glib/2.88.3/lib/libgobject-2.0.dylib → libgobject-2.0.0.dylib
 /usr/local/Cellar/gmp/6.3.0/lib/libgmp.10.dylib [410K]
 /usr/local/Cellar/gmp/6.3.0/lib/libgmp.dylib → libgmp.10.dylib
