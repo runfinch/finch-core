@@ -8,6 +8,7 @@ import re
 import tarfile
 import gzip
 import json
+from pathlib import Path
 from enum import Enum
 from collections import defaultdict
 from typing import List, Dict, Set, Literal
@@ -37,9 +38,13 @@ def main():
 
     lima_version = get_installed_lima_version()
     print("using lima version: ", lima_version)
-    
+
+    cosign_release = get_cosign_release_from_conf()
+    print("using cosign version: ", cosign_release)
+
     print("recording initial deps...")
     deps = record_initial_deps(arch, install_dir, qemu_version)
+    deps['cosign'] = cosign_release
     
     print("Starting fs_usage monitoring for runtime file access...")
     fs_usage_log = start_fs_usage(arch)
@@ -281,6 +286,24 @@ def add_lima_version_to_archive(archive_path: str, lima_version: str):
     except Exception as ex:
         raise RuntimeError("failed to add LIMA_VERSION to archive") from ex
 
+def get_cosign_release_from_conf():
+    try:
+        cur_file = Path(__file__).resolve()
+        project_dir = cur_file.parent.parent
+        cosign_conf_path = project_dir / 'deps' / 'cosign.conf'
+
+        with open(cosign_conf_path, 'r') as conf:
+            lines = [line.strip() for line in conf.read().splitlines()]
+            for line in lines:
+                if line[0] == '#': # Skip comments
+                    continue
+                k, v = line.split("=", maxsplit=1)
+                if k == "COSIGN_RELEASE":
+                    return v
+            raise RuntimeError("could not find COSIGN_VERSION in conf")
+    except Exception as ex:
+        raise RuntimeError("could not get cosign version") from ex
+
 def package_files_and_socket_vmnet(deps: Dict[str, str], install_dir: str, dist_path: str):
     tar_files = [path.removeprefix(f"{install_dir}/") for path in deps.keys()]
     
@@ -503,7 +526,9 @@ def verify_dependencies(current_deps: Dict[str, str], arch: Literal[Arch.X86_64,
     
     # Check for missing dependencies (ignoring versions)
     for normalized_expected in expected_normalized:
-        if normalized_expected not in current_normalized:
+        # Ignore cosign as it isn't used in the initial flow,
+        # however we still want to track its CVEs.
+        if normalized_expected not in current_normalized and normalized_expected != "cosign":
             # No matching dependency found at all
             missing_deps.extend(expected_normalized[normalized_expected])
         else:
