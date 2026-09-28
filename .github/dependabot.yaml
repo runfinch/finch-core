@@ -18,12 +18,3 @@ updates:
     github-actions:
       patterns:
         - "*"
-- package-ecosystem: "gomod"
-  directory: "/rootfs/cosign"
-  allow:
-    - dependency-type: direct
-  schedule:
-    interval: "daily"
-  commit-message:
-    prefix: "build"
-    include: "scope"
