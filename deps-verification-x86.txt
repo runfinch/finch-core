@@ -21,9 +21,9 @@
 /usr/local/Cellar/jpeg-turbo/3.2.0/lib/libjpeg.dylib → libjpeg.8.dylib
 /usr/local/Cellar/libidn2/2.3.8/lib/libidn2.0.dylib [206K]
 /usr/local/Cellar/libidn2/2.3.8/lib/libidn2.dylib → libidn2.0.dylib
-/usr/local/Cellar/libpng/1.6.58/lib/libpng.dylib → libpng16.dylib
-/usr/local/Cellar/libpng/1.6.58/lib/libpng16.16.dylib [169K]
-/usr/local/Cellar/libpng/1.6.58/lib/libpng16.dylib → libpng16.16.dylib
+/usr/local/Cellar/libpng/1.6.59/lib/libpng.dylib → libpng16.dylib
+/usr/local/Cellar/libpng/1.6.59/lib/libpng16.16.dylib [169K]
+/usr/local/Cellar/libpng/1.6.59/lib/libpng16.dylib → libpng16.16.dylib
 /usr/local/Cellar/libslirp/4.9.5/lib/libslirp.0.dylib [129K]
 /usr/local/Cellar/libslirp/4.9.5/lib/libslirp.dylib → libslirp.0.dylib
 /usr/local/Cellar/libssh/0.12.2/lib/libssh.4.12.0.dylib [509K]
@@ -48,13 +48,13 @@
 /usr/local/Cellar/nettle/4.0/lib/libnettle.9.0.dylib [293K]
 /usr/local/Cellar/nettle/4.0/lib/libnettle.9.dylib → libnettle.9.0.dylib
 /usr/local/Cellar/nettle/4.0/lib/libnettle.dylib → libnettle.9.0.dylib
-/usr/local/Cellar/openssl@3/3.6.4_1/lib/libcrypto.3.dylib [5.0M]
-/usr/local/Cellar/openssl@3/3.6.4_1/lib/libcrypto.dylib → libcrypto.3.dylib
+/usr/local/Cellar/openssl@3/3.6.5/lib/libcrypto.3.dylib [5.0M]
+/usr/local/Cellar/openssl@3/3.6.5/lib/libcrypto.dylib → libcrypto.3.dylib
 /usr/local/Cellar/p11-kit/0.26.5/lib/libp11-kit.0.dylib [1.4M]
 /usr/local/Cellar/p11-kit/0.26.5/lib/libp11-kit.dylib → libp11-kit.0.dylib
 /usr/local/Cellar/p11-kit/0.26.5/lib/p11-kit-proxy.dylib → libp11-kit.0.dylib
-/usr/local/Cellar/pcre2/10.48/lib/libpcre2-8.0.dylib [592K]
-/usr/local/Cellar/pcre2/10.48/lib/libpcre2-8.dylib → libpcre2-8.0.dylib
+/usr/local/Cellar/pcre2/10.49/lib/libpcre2-8.0.dylib [592K]
+/usr/local/Cellar/pcre2/10.49/lib/libpcre2-8.dylib → libpcre2-8.0.dylib
 /usr/local/Cellar/pixman/0.46.4/lib/libpixman-1.0.dylib [606K]
 /usr/local/Cellar/pixman/0.46.4/lib/libpixman-1.dylib → libpixman-1.0.dylib
 /usr/local/Cellar/qemu/11.0.2/bin [ec2-user]
@@ -86,7 +86,7 @@
 /usr/local/opt/libidn2 → ../Cellar/libidn2/2.3.8
 /usr/local/opt/libjpeg-turbo → ../Cellar/jpeg-turbo/3.2.0
 /usr/local/opt/libnettle → ../Cellar/nettle/4.0
-/usr/local/opt/libpng → ../Cellar/libpng/1.6.58
+/usr/local/opt/libpng → ../Cellar/libpng/1.6.59
 /usr/local/opt/libslirp → ../Cellar/libslirp/4.9.5
 /usr/local/opt/libssh → ../Cellar/libssh/0.12.2
 /usr/local/opt/libtasn → ../Cellar/libtasn1/4.21.0
@@ -97,10 +97,10 @@
 /usr/local/opt/ncurses → ../Cellar/ncurses/6.6
 /usr/local/opt/nettle → ../Cellar/nettle/4.0
 /usr/local/opt/nettle@4 → ../Cellar/nettle/4.0
-/usr/local/opt/openssl@3 → ../Cellar/openssl@3/3.6.4_1
-/usr/local/opt/openssl@3.6 → ../Cellar/openssl@3/3.6.4_1
+/usr/local/opt/openssl@3 → ../Cellar/openssl@3/3.6.5
+/usr/local/opt/openssl@3.6 → ../Cellar/openssl@3/3.6.5
 /usr/local/opt/p11-kit → ../Cellar/p11-kit/0.26.5
-/usr/local/opt/pcre2 → ../Cellar/pcre2/10.48
+/usr/local/opt/pcre2 → ../Cellar/pcre2/10.49
 /usr/local/opt/pixman → ../Cellar/pixman/0.46.4
 /usr/local/opt/pzstd → ../Cellar/zstd/1.5.7_1
 /usr/local/opt/qemu → ../Cellar/qemu/11.0.2
