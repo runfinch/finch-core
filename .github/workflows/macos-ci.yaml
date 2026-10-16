@@ -16,7 +16,7 @@ on:
       - deps/full-os.conf
       - deps/lima-bundles.conf
       - e2e/**
-      - lima-template/**
+      - lima-template/macos.yaml
       - Makefile
       - Makefile.darwin
   workflow_dispatch:
@@ -26,33 +26,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  install-dependencies:
-    # This is a spot check for make install.dependencies on macOS x86/ARM platforms.
-    # Finch-core provides the core dependencies needed to run Finch such as the base OS
-    # image, rootfs, and Lima bundle. Validate the mechanism used to install the core
-    # dependencies works on macOS.
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-26, macos-15, macos-15-intel]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-          submodules: true
-      - name: Setup go
-        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
-        with:
-          go-version-file: e2e/go.mod
-          cache-dependency-path: e2e/go.sum
-      - name: Install platform dependencies
-        run: make install.dependencies
-      - name: Clean up dependencies
-        run: make clean
-
   e2e-tests:
     strategy:
       fail-fast: false
@@ -91,7 +64,7 @@ jobs:
       - name: Install dependencies
         shell: zsh {0}
         run: brew install lz4 automake autoconf libtool
-      - name: Build project
+      - name: Install platform dependencies
         shell: zsh {0}
         run: |
           export PATH="/opt/homebrew/opt/libtool/libexec/gnubin:$PATH"
@@ -102,3 +75,6 @@ jobs:
       - name: Run e2e tests
         shell: zsh {0}
         run: FINCH_VM_TYPE=${{ matrix.vm_type }} make test-e2e
+      - name: Clean up dependencies
+        if: always()
+        run: make clean

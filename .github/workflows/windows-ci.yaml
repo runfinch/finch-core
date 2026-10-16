@@ -14,27 +14,31 @@ on:
       - .gitmodules
       - deps/container-runtime-full-archive.conf
       - deps/rootfs.conf
-      - lima-template/**
+      - e2e/**
+      - lima-template/windows.yaml
       - Makefile
       - Makefile.windows
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  install-dependencies:
-    # This is a spot check for make install.dependencies on Windows platform.
-    # Finch-core provides the core dependencies needed to run Finch such as the base OS
-    # image, rootfs, and Lima bundle. Validate the mechanism used to install the core
-    # dependencies works on Windows.
+  e2e-tests:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022]
+        os: [windows-2025]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Configure git CRLF settings
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
@@ -46,7 +50,17 @@ jobs:
         with:
           go-version-file: e2e/go.mod
           cache-dependency-path: e2e/go.sum
+      - name: Setup WSL2
+        uses: Vampire/setup-wsl@v7
+      - name: Allow inbound traffic from WSL2
+        shell: pwsh
+        run: |
+          New-NetFirewallRule -DisplayName "Allow WSL2 inbound" -Direction Inbound `
+            -RemoteAddress 172.16.0.0/12 -Action Allow | Out-Null
       - name: Install platform dependencies
         run: make install.dependencies
+      - name: Run e2e tests
+        run: make test-e2e
       - name: Clean up dependencies
+        if: always()
         run: make clean
